@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Falhane Test</title>
+  <style>
+    body { font-family: -apple-system, system-ui, Arial; padding: 16px; }
+    input, select, textarea, button { width: 100%; margin: 8px 0; padding: 12px; font-size: 16px; }
+    pre { white-space: pre-wrap; background:#111; color:#eee; padding:12px; border-radius:8px; }
+  </style>
+</head>
+<body>
+  <h2>Falhane Test (Kahve / Rüya)</h2>
+
+  <label>Tür</label>
+  <select id="type">
+    <option value="kahve">Kahve</option>
+    <option value="ruya">Rüya</option>
+  </select>
+
+  <label>Soru / Metin</label>
+  <textarea id="q" rows="4" placeholder="Örn: Fincanda yol görüyorum... / Rüyamda deniz gördüm..."></textarea>
+
+  <button id="freeBtn">Ücretsiz Gönder (haftalık 1)</button>
+  <button id="paidBtn">Ücretli Gönder (test)</button>
+
+  <p id="status"></p>
+  <pre id="out"></pre>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
+      authDomain: "falhane-e3057.firebaseapp.com",
+      projectId: "falhane-e3057",
+      appId: "1:117754512778:web:52aee440472568bc6cb473",
+    };
+
+    const BACKEND = "https://falhane.onrender.com";
+
+    firebase.initializeApp(firebaseConfig);
+
+    const statusEl = document.getElementById("status");
+    const outEl = document.getElementById("out");
+
+    async function ensureAnonLogin() {
+      const auth = firebase.auth();
+      if (!auth.currentUser) {
+        statusEl.textContent = "Firebase anonim giriş yapılıyor...";
+        await auth.signInAnonymously();
+      }
+      return auth.currentUser.getIdToken();
+    }
+
+    async function send(isPaid) {
+      outEl.textContent = "";
+      statusEl.textContent = "Token alınıyor...";
+      const token = await ensureAnonLogin();
+
+      const type = document.getElementById("type").value;
+      const question = document.getElementById("q").value.trim();
+      if (question.length < 3) {
+        statusEl.textContent = "En az 3 karakter yaz.";
+        return;
+      }
+
+      statusEl.textContent = "İstek gönderiliyor...";
+      const resp = await fetch(BACKEND + "/api/fortune", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ type, question, isPaid })
+      });
+
+      const text = await resp.text();
+
+      if (resp.status === 402) {
+        statusEl.textContent = "Ücretsiz hak bitti (haftalık 1).";
+        outEl.textContent = text;
+        return;
+      }
+
+      if (!resp.ok) {
+        statusEl.textContent = "Hata: " + resp.status;
+        outEl.textContent = text;
+        return;
+      }
+
+      statusEl.textContent = "Başarılı.";
+      try {
+        const data = JSON.parse(text);
+        outEl.textContent = data.text || "";
+      } catch {
+        outEl.textContent = text;
+      }
+    }
+
+    document.getElementById("freeBtn").addEventListener("click", () => send(false));
+    document.getElementById("paidBtn").addEventListener("click", () => send(true));
+  </script>
+</body>
+</html>
