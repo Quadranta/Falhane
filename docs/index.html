@@ -2,161 +2,114 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Falhane Kullanıcı Paneli</title>
   <style>
-    :root{
-      --bg:#f4f7fb; --card:#ffffff; --text:#0f172a; --muted:#64748b;
-      --primary:#2563eb; --danger:#ef4444; --ok:#16a34a; --border:#e2e8f0;
-      --shadow:0 8px 24px rgba(2,6,23,.08);
-      --radius:18px;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-    }
-    body{margin:0;background:var(--bg);color:var(--text);}
-    .wrap{max-width:720px;margin:24px auto;padding:0 14px 28px;}
-    h1{font-size:44px;line-height:1.05;margin:10px 0 18px;}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:14px 0;}
-    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:10px 12px;border-radius:999px;border:1px solid var(--border);background:#f8fafc;color:var(--muted);font-weight:600;}
-    .alert{padding:12px 14px;border-radius:14px;border:1px solid #fed7aa;background:#fff7ed;color:#9a3412;font-weight:700;}
-    .ok{border-color:#bbf7d0;background:#f0fdf4;color:#166534;}
-    button{
-      border:0;border-radius:14px;padding:12px 14px;font-weight:800;
-      cursor:pointer;transition:.15s transform,.15s opacity;
-    }
-    button:active{transform:scale(.98)}
-    .btn-primary{background:var(--primary);color:#fff;}
-    .btn-ghost{background:#0b1220;color:#fff;}
-    .btn-danger{background:var(--danger);color:#fff;}
-    .btn-ok{background:var(--ok);color:#fff;}
-    .btn-light{background:#e5e7eb;color:#111827;}
-    .btn-disabled{opacity:.5;cursor:not-allowed;}
-    .muted{color:var(--muted);}
-    .grid{display:grid;grid-template-columns:1fr;gap:12px;}
-    label{font-weight:800;margin-bottom:6px;display:block}
-    input[type="text"], input[type="number"], select, textarea{
-      width:100%;box-sizing:border-box;
-      padding:13px 12px;border-radius:14px;border:1px solid var(--border);
-      outline:none;font-size:16px;background:#fff;
-    }
-    textarea{min-height:90px;resize:vertical}
-    .disabled{opacity:.55;pointer-events:none;}
-    .fileBox{border:1px dashed #cbd5e1;border-radius:16px;padding:12px;background:#f8fafc;}
-    .fileBtns{display:flex;gap:10px;flex-wrap:wrap}
-    .thumbs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .thumb{
-      width:92px;height:120px;border-radius:14px;border:1px solid var(--border);
-      object-fit:cover;background:#fff;
-    }
-    .small{font-size:13px}
-    .debug{
-      white-space:pre-wrap;background:#0b1220;color:#dbeafe;border-radius:16px;padding:14px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      font-size:12px;line-height:1.4;
-    }
-    .sep{height:1px;background:var(--border);margin:12px 0;}
-    .title{font-size:22px;margin:0 0 10px;font-weight:900}
+    :root { --bg:#f6f7fb; --card:#fff; --text:#0f172a; --muted:#64748b; --b:#e5e7eb; --ok:#16a34a; --bad:#f59e0b; --pri:#2563eb; }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--text); }
+    .wrap{ max-width:820px; margin:0 auto; padding:18px; }
+    h1{ font-size:44px; margin:8px 0 16px; }
+    .card{ background:var(--card); border:1px solid var(--b); border-radius:16px; padding:14px; margin:12px 0; box-shadow:0 8px 24px rgba(15,23,42,.06); }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .alert{ background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; padding:10px 12px; border-radius:12px; font-weight:800; }
+    .btn{ border:0; border-radius:12px; padding:10px 14px; font-weight:900; cursor:pointer; }
+    .btn.blue{ background:var(--pri); color:#fff; }
+    .btn.gray{ background:#111827; color:#fff; }
+    .btn.ok{ background:var(--ok); color:#fff; }
+    .muted{ color:var(--muted); }
+    input, select{ width:100%; padding:12px; border-radius:12px; border:1px solid var(--b); font-size:16px; }
+    label{ display:block; font-weight:900; margin:10px 0 8px; }
+    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .box{ border:1px dashed #cbd5e1; border-radius:14px; padding:12px; background:#f8fafc; }
+    .smallbtn{ border:1px solid var(--b); border-radius:12px; padding:10px 12px; font-weight:900; cursor:pointer; background:#fff; }
+    .thumbs{ display:flex; gap:10px; margin-top:10px; }
+    .thumb{ width:110px; height:150px; border-radius:14px; border:1px dashed #cbd5e1; background:#fff; object-fit:cover; }
+    .debug{ background:#0b1220; color:#d1d5db; border-radius:16px; padding:12px; white-space:pre-wrap; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .disabled{ opacity:.45; pointer-events:none; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Falhane Kullanıcı<br/>Paneli</h1>
+    <h1>Falhane Kullanıcı Paneli</h1>
 
-    <div id="banner" class="alert">Oturum kapalı. Google ile giriş yap.</div>
+    <div id="alert" class="alert">Oturum kapalı. Google ile giriş yap.</div>
 
     <div class="card">
-      <div class="title">Giriş (Google)</div>
+      <h2 style="margin:0 0 10px">Giriş (Google)</h2>
       <div class="row">
-        <button id="btnGoogle" class="btn-primary">Google ile giriş</button>
-        <button id="btnLogout" class="btn-ghost">Çıkış</button>
+        <button id="btnGoogle" class="btn blue" type="button">Google ile giriş</button>
+        <button id="btnLogout" class="btn gray" type="button" style="display:none">Çıkış</button>
       </div>
-      <div class="sep"></div>
-      <div class="muted">
-        <div><b>Giriş yapan:</b> <span id="who">-</span></div>
-        <div><b>UID:</b> <span id="uid">-</span></div>
-        <div class="small" style="margin-top:8px;">
-          Not: Bu sayfa <b>upload</b> oluşturur. Admin paneli “uploads” içinden onaylayınca “readings”e taşır.
-        </div>
+
+      <div class="muted" style="margin-top:10px">
+        Giriş yapan: <b id="who">-</b><br/>
+        UID: <b id="uid">-</b><br/>
+        Not: Bu sayfa upload oluşturur. Admin paneli “uploads” içinden onaylayınca “readings”e taşır.
       </div>
     </div>
 
-    <div id="formCard" class="card disabled">
-      <div class="title">Fal Başvurusu (2 Foto)</div>
-      <div class="muted small" style="margin-bottom:10px;">Bu formu göndermek için giriş yapman gerekiyor.</div>
+    <div class="card" id="formCard">
+      <h2 style="margin:0 0 6px">Fal Başvurusu (2 Foto)</h2>
+      <div class="muted" style="margin:0 0 12px">Bu formu göndermek için giriş yapman gerekiyor.</div>
 
-      <div class="grid">
-        <div>
-          <label>Ad</label>
-          <input id="name" type="text" placeholder="Adın" autocomplete="name" />
-        </div>
-        <div>
-          <label>Yaş</label>
-          <input id="age" type="number" placeholder="Örn: 26" min="10" max="120" />
-        </div>
-        <div>
-          <label>Burç</label>
-          <select id="sign">
-            <option value="">Seç</option>
-            <option>Koç</option><option>Boğa</option><option>İkizler</option><option>Yengeç</option>
-            <option>Aslan</option><option>Başak</option><option>Terazi</option><option>Akrep</option>
-            <option>Yay</option><option>Oğlak</option><option>Kova</option><option>Balık</option>
-          </select>
-        </div>
+      <label>Ad</label>
+      <input id="name" placeholder="Adın" />
 
-        <div class="fileBox">
-          <label>Foto 1</label>
-          <!-- gerçek inputlar gizli -->
+      <label>Yaş</label>
+      <input id="age" type="number" inputmode="numeric" placeholder="Örn: 26" />
+
+      <label>Burç</label>
+      <select id="sign">
+        <option value="">Seç</option>
+        <option>Koç</option><option>Boğa</option><option>İkizler</option><option>Yengeç</option>
+        <option>Aslan</option><option>Başak</option><option>Terazi</option><option>Akrep</option>
+        <option>Yay</option><option>Oğlak</option><option>Kova</option><option>Balık</option>
+      </select>
+
+      <div class="grid2" style="margin-top:12px">
+        <div class="box">
+          <div style="font-weight:900;margin-bottom:8px">Foto 1</div>
           <input id="file1" type="file" accept="image/*" style="display:none" />
           <input id="cam1" type="file" accept="image/*" capture="environment" style="display:none" />
-          <div class="fileBtns">
-            <button id="btnPick1" class="btn-light" type="button">Galeriden seç</button>
-            <button id="btnCam1" class="btn-light" type="button">Kamera ile çek</button>
+          <div class="row">
+            <button class="smallbtn" id="pick1" type="button">Galeriden seç</button>
+            <button class="smallbtn" id="take1" type="button">Kamera ile çek</button>
           </div>
-          <div class="thumbs"><img id="prev1" class="thumb" alt="" style="display:none" /></div>
         </div>
 
-        <div class="fileBox">
-          <label>Foto 2</label>
+        <div class="box">
+          <div style="font-weight:900;margin-bottom:8px">Foto 2</div>
           <input id="file2" type="file" accept="image/*" style="display:none" />
           <input id="cam2" type="file" accept="image/*" capture="environment" style="display:none" />
-          <div class="fileBtns">
-            <button id="btnPick2" class="btn-light" type="button">Galeriden seç</button>
-            <button id="btnCam2" class="btn-light" type="button">Kamera ile çek</button>
+          <div class="row">
+            <button class="smallbtn" id="pick2" type="button">Galeriden seç</button>
+            <button class="smallbtn" id="take2" type="button">Kamera ile çek</button>
           </div>
-          <div class="thumbs"><img id="prev2" class="thumb" alt="" style="display:none" /></div>
         </div>
+      </div>
 
-        <div>
-          <button id="btnSubmit" class="btn-ok" style="width:100%">Başvuruyu Gönder</button>
-          <div class="small muted" style="margin-top:10px;">
-            İpucu: “Kamera ile çek” telefonda kamerayı açar. “Galeriden seç” galeriden seçmek içindir.
-          </div>
-        </div>
+      <div class="thumbs">
+        <img id="prev1" class="thumb" alt="prev1" />
+        <img id="prev2" class="thumb" alt="prev2" />
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <button id="btnSend" class="btn ok" type="button" style="flex:1">Başvuruyu Gönder</button>
+      </div>
+
+      <div class="muted" style="margin-top:10px">
+        İpucu: “Kamera ile çek” telefonda kamerayı açar. “Galeriden seç” galeriden seçmek içindir.
       </div>
     </div>
 
     <div class="card">
-      <div class="title">Debug</div>
-      <div id="debug" class="debug">Hazır.\n</div>
+      <h2 style="margin:0 0 10px">Debug</h2>
+      <div id="dbg" class="debug">Hazır.</div>
     </div>
   </div>
 
   <script type="module">
-    // Firebase v10 (modular)
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
-      getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
-      getRedirectResult, onAuthStateChanged, setPersistence, browserLocalPersistence,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import {
-      getFirestore, collection, addDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-    import {
-      getStorage, ref, uploadBytes, getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
-
-    // SENİN CONFIG (DEĞİŞTİRME)
+    // ===== Firebase Config =====
     const firebaseConfig = {
       apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
       authDomain: "falhane-e3057.firebaseapp.com",
@@ -167,195 +120,160 @@
       measurementId: "G-94TZ14VWPX"
     };
 
-    // ---------- helpers ----------
-    const $ = (id) => document.getElementById(id);
-    const log = (s) => { $("debug").textContent += String(s) + "\\n"; };
-    const setBanner = (text, ok=false) => {
-      const b = $("banner");
-      b.textContent = text;
-      b.classList.toggle("ok", ok);
-    };
-
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-    // ---------- init ----------
-    log("BOOT: auth ready");
-    log("UA: " + navigator.userAgent);
-    log("MODE: " + (isIOS && isSafari ? "iOS Safari (redirect)" : "Popup"));
+    // ===== Imports =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged,
+      signInWithRedirect, getRedirectResult, signOut,
+      GoogleAuthProvider,
+      setPersistence, browserLocalPersistence
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import {
+      getFirestore, collection, addDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import {
+      getStorage, ref, uploadBytes, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
+    const st = getStorage(app);
+
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
 
-    await setPersistence(auth, browserLocalPersistence);
+    const $ = (id) => document.getElementById(id);
+    const dbg = (s) => $("dbg").textContent = (typeof s === "string" ? s : JSON.stringify(s,null,2));
 
-    // Redirect sonucu (iOS Safari için kritik)
+    // ===== iOS Safari için en kritik satır: persistence =====
     try {
-      log("REDIRECT: getRedirectResult() çağrılıyor...");
-      const rr = await getRedirectResult(auth);
-      if (rr?.user) {
-        log("REDIRECT: OK user=" + (rr.user.email || rr.user.uid));
-      } else {
-        log("REDIRECT: boş (normal olabilir)");
-      }
+      await setPersistence(auth, browserLocalPersistence);
+      dbg("BOOT: persistence=browserLocalPersistence\n");
     } catch (e) {
-      log("REDIRECT ERROR: " + e.code + " / " + e.message);
+      dbg("BOOT: persistence set ERROR\n" + (e.code || "") + " " + (e.message || e));
     }
 
-    // ---------- UI refs ----------
+    // ===== Redirect result =====
+    try {
+      const r = await getRedirectResult(auth);
+      dbg($("dbg").textContent + "\nREDIRECT RESULT: " + (r?.user?.email || "boş (normal olabilir)"));
+    } catch (e) {
+      dbg($("dbg").textContent + "\nREDIRECT ERROR: " + (e.code || "") + " " + (e.message || e));
+    }
+
+    // ===== UI =====
+    const alert = $("alert");
+    const who = $("who");
+    const uid = $("uid");
     const btnGoogle = $("btnGoogle");
     const btnLogout = $("btnLogout");
     const formCard = $("formCard");
-    const who = $("who");
-    const uidEl = $("uid");
+    const btnSend = $("btnSend");
 
-    // file inputs
-    const file1 = $("file1"), file2 = $("file2");
-    const cam1 = $("cam1"), cam2 = $("cam2");
+    const file1 = $("file1"), file2 = $("file2"), cam1 = $("cam1"), cam2 = $("cam2");
     const prev1 = $("prev1"), prev2 = $("prev2");
+    let f1 = null, f2 = null;
 
-    const pick1 = $("btnPick1"), pick2 = $("btnPick2");
-    const take1 = $("btnCam1"),  take2 = $("btnCam2");
+    $("pick1").onclick = () => file1.click();
+    $("pick2").onclick = () => file2.click();
+    $("take1").onclick = () => cam1.click();
+    $("take2").onclick = () => cam2.click();
 
-    let photo1 = null;
-    let photo2 = null;
-
-    const showPreview = (file, imgEl) => {
-      if (!file) { imgEl.style.display = "none"; imgEl.src = ""; return; }
+    function setPreview(imgEl, file){
+      if (!file) { imgEl.removeAttribute("src"); return; }
       const url = URL.createObjectURL(file);
       imgEl.src = url;
-      imgEl.style.display = "block";
+    }
+
+    file1.onchange = (e)=>{ f1 = e.target.files?.[0] || null; setPreview(prev1, f1); };
+    file2.onchange = (e)=>{ f2 = e.target.files?.[0] || null; setPreview(prev2, f2); };
+    cam1.onchange  = (e)=>{ f1 = e.target.files?.[0] || null; setPreview(prev1, f1); };
+    cam2.onchange  = (e)=>{ f2 = e.target.files?.[0] || null; setPreview(prev2, f2); };
+
+    btnGoogle.onclick = async () => {
+      try {
+        dbg($("dbg").textContent + "\nLOGIN: redirect başlıyor...");
+        await signInWithRedirect(auth, provider);
+      } catch (e) {
+        dbg($("dbg").textContent + "\nLOGIN ERROR: " + (e.code || "") + " " + (e.message || e));
+      }
     };
 
-    pick1.addEventListener("click", () => file1.click());
-    pick2.addEventListener("click", () => file2.click());
-    take1.addEventListener("click", () => cam1.click());
-    take2.addEventListener("click", () => cam2.click());
+    btnLogout.onclick = async () => {
+      await signOut(auth);
+    };
 
-    file1.addEventListener("change", () => { photo1 = file1.files?.[0] || null; showPreview(photo1, prev1); });
-    file2.addEventListener("change", () => { photo2 = file2.files?.[0] || null; showPreview(photo2, prev2); });
-    cam1.addEventListener("change",  () => { photo1 = cam1.files?.[0]  || null; showPreview(photo1, prev1); });
-    cam2.addEventListener("change",  () => { photo2 = cam2.files?.[0]  || null; showPreview(photo2, prev2); });
+    function setSignedIn(user){
+      alert.textContent = "Giriş yapıldı.";
+      who.textContent = user.email || "-";
+      uid.textContent = user.uid || "-";
+      btnGoogle.style.display = "none";
+      btnLogout.style.display = "inline-block";
+      formCard.classList.remove("disabled");
+      btnSend.classList.remove("disabled");
+    }
 
-    // ---------- auth ----------
-    btnGoogle.addEventListener("click", async () => {
-      btnGoogle.classList.add("btn-disabled");
-      btnGoogle.disabled = true;
-
-      try {
-        if (isIOS && isSafari) {
-          log("LOGIN: signInWithRedirect()");
-          await signInWithRedirect(auth, provider);
-          // redirect ile sayfa gidecek, buradan sonrası çalışmayabilir
-        } else {
-          log("LOGIN: signInWithPopup()");
-          const res = await signInWithPopup(auth, provider);
-          log("LOGIN OK: " + (res.user.email || res.user.uid));
-        }
-      } catch (e) {
-        log("LOGIN ERROR: " + e.code + " / " + e.message);
-        setBanner("Giriş hatası: " + e.code, false);
-      } finally {
-        btnGoogle.disabled = false;
-        btnGoogle.classList.remove("btn-disabled");
-      }
-    });
-
-    btnLogout.addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-        log("LOGOUT: OK");
-      } catch (e) {
-        log("LOGOUT ERROR: " + e.code + " / " + e.message);
-      }
-    });
+    function setSignedOut(){
+      alert.textContent = "Oturum kapalı. Google ile giriş yap.";
+      who.textContent = "-";
+      uid.textContent = "-";
+      btnGoogle.style.display = "inline-block";
+      btnLogout.style.display = "none";
+      formCard.classList.add("disabled");
+      btnSend.classList.add("disabled");
+    }
 
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        who.textContent = user.email || "-";
-        uidEl.textContent = user.uid || "-";
-        setBanner("Oturum açık. Formu gönderebilirsin.", true);
-        formCard.classList.remove("disabled");
-      } else {
-        who.textContent = "-";
-        uidEl.textContent = "-";
-        setBanner("Oturum kapalı. Google ile giriş yap.", false);
-        formCard.classList.add("disabled");
-      }
-      log("AUTH STATE: " + (user ? "signed in" : "signed out"));
+      dbg($("dbg").textContent + "\nAUTH STATE: " + (user ? "signed in" : "signed out"));
+      if (user) setSignedIn(user); else setSignedOut();
     });
 
-    // ---------- submit ----------
-    $("btnSubmit").addEventListener("click", async (ev) => {
-      ev.preventDefault();
+    async function uploadOne(userId, which, file){
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const id = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+      const path = `uploads/${userId}/${id}/${which}.${ext}`;
+      const r = ref(st, path);
+      await uploadBytes(r, file);
+      return await getDownloadURL(r);
+    }
 
-      const user = auth.currentUser;
-      if (!user) { setBanner("Önce Google ile giriş yap.", false); return; }
-
-      const name = $("name").value.trim();
-      const age = Number($("age").value);
-      const sign = $("sign").value.trim();
-
-      if (!name) { setBanner("Ad boş olamaz.", false); return; }
-      if (!age || age < 10 || age > 120) { setBanner("Yaş yanlış.", false); return; }
-      if (!sign) { setBanner("Burç seçmelisin.", false); return; }
-      if (!photo1 || !photo2) { setBanner("2 foto da zorunlu.", false); return; }
-
-      const btn = $("btnSubmit");
-      btn.disabled = true; btn.classList.add("btn-disabled");
-      setBanner("Yükleniyor...", true);
-
+    btnSend.onclick = async () => {
       try {
-        // 1) önce uploads dokümanı oluştur
-        const docRef = await addDoc(collection(db, "uploads"), {
+        const user = auth.currentUser;
+        if (!user) { alert.textContent = "Önce Google ile giriş yap."; return; }
+
+        const name = $("name").value.trim();
+        const age  = Number($("age").value);
+        const sign = $("sign").value;
+
+        if (!name) { alert.textContent = "Ad zorunlu."; return; }
+        if (!age || age < 1) { alert.textContent = "Yaş geçersiz."; return; }
+        if (!sign) { alert.textContent = "Burç seç."; return; }
+        if (!f1 || !f2) { alert.textContent = "2 foto zorunlu."; return; }
+
+        alert.textContent = "Yükleniyor...";
+
+        const photo1Url = await uploadOne(user.uid, "photo1", f1);
+        const photo2Url = await uploadOne(user.uid, "photo2", f2);
+
+        await addDoc(collection(db, "uploads"), {
           status: "pending",
-          createdAt: serverTimestamp(),
           userId: user.uid,
-          userEmail: user.email || null,
-          name,
-          age,
-          sign
+          email: user.email || null,
+          name, age, sign,
+          photo1Url, photo2Url,
+          createdAt: serverTimestamp()
         });
 
-        const docId = docRef.id;
-        log("UPLOAD DOC: " + docId);
-
-        // 2) storage'a foto yükle
-        const basePath = `uploads/${user.uid}/${docId}`;
-        const r1 = ref(storage, `${basePath}/photo1.jpg`);
-        const r2 = ref(storage, `${basePath}/photo2.jpg`);
-
-        await uploadBytes(r1, photo1, { contentType: photo1.type || "image/jpeg" });
-        await uploadBytes(r2, photo2, { contentType: photo2.type || "image/jpeg" });
-
-        const url1 = await getDownloadURL(r1);
-        const url2 = await getDownloadURL(r2);
-
-        // 3) foto url'lerini aynı doc'a yazmak yerine (şimdilik) admin tarafı storage path'ten çekebilir.
-        //    Ama istersen burada ayrıca Firestore update ekleriz.
-        log("PHOTO1 URL: " + url1);
-        log("PHOTO2 URL: " + url2);
-
-        setBanner("Başvuru gönderildi (pending). Admin onaylayınca reading oluşacak.", true);
-
-        // form reset
-        $("name").value = "";
-        $("age").value = "";
-        $("sign").value = "";
-        photo1 = null; photo2 = null;
-        file1.value = ""; file2.value = ""; cam1.value = ""; cam2.value = "";
-        showPreview(null, prev1); showPreview(null, prev2);
+        alert.textContent = "Başvuru gönderildi (pending). Admin onaylayınca reading oluşacak.";
+        dbg($("dbg").textContent + "\nUPLOAD: OK");
 
       } catch (e) {
-        log("SUBMIT ERROR: " + e.code + " / " + e.message);
-        setBanner("Hata: " + (e.code || e.message), false);
-      } finally {
-        btn.disabled = false; btn.classList.remove("btn-disabled");
+        alert.textContent = "Hata: " + (e.code || e.message || e);
+        dbg($("dbg").textContent + "\nSEND ERROR: " + (e.code || "") + " " + (e.message || e));
       }
-    });
+    };
   </script>
 </body>
 </html>
