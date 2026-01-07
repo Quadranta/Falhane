@@ -2,106 +2,283 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Falhane Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Falhane Kullanıcı Paneli</title>
   <style>
-    body { font-family: -apple-system, system-ui, Arial; padding: 16px; }
-    input, select, textarea, button { width: 100%; margin: 8px 0; padding: 12px; font-size: 16px; }
-    pre { white-space: pre-wrap; background:#111; color:#eee; padding:12px; border-radius:8px; }
+    :root { --bg:#f6f7fb; --card:#fff; --text:#0b1220; --muted:#556; --ok:#dff6e5; --err:#ffe3e3; --btn:#2563eb; --btn2:#111827; }
+    body{ margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
+    .wrap{ max-width:820px; margin:28px auto; padding:0 16px; }
+    h1{ font-size:44px; line-height:1.05; margin:0 0 18px; }
+    .card{ background:var(--card); border-radius:16px; box-shadow:0 10px 24px rgba(0,0,0,.06); padding:18px; margin:14px 0; }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .btn{ border:0; border-radius:12px; padding:14px 16px; font-weight:700; cursor:pointer; }
+    .btn.primary{ background:var(--btn); color:#fff; flex:1; min-width:180px; }
+    .btn.dark{ background:var(--btn2); color:#fff; flex:1; min-width:180px; }
+    .btn.gray{ background:#334155; color:#fff; }
+    .badge{ display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; }
+    .ok{ background:var(--ok); border:1px solid #9ae6b4; color:#14532d; padding:12px 14px; border-radius:14px; }
+    .err{ background:var(--err); border:1px solid #fecaca; color:#7f1d1d; padding:12px 14px; border-radius:14px; white-space:pre-wrap; word-break:break-word; }
+    .muted{ color:var(--muted); }
+    .list{ display:flex; flex-direction:column; gap:12px; margin-top:12px; }
+    .item{ border:1px solid #e5e7eb; border-radius:14px; padding:14px; background:#fff; }
+    .item .top{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    pre{ margin:0; padding:12px; border-radius:12px; background:#0b1220; color:#e5e7eb; overflow:auto; }
+    .small{ font-size:13px; }
   </style>
 </head>
 <body>
-  <h2>Falhane Test (Kahve / Rüya)</h2>
+  <div class="wrap">
+    <h1>Falhane Kullanıcı<br/>Paneli</h1>
 
-  <label>Tür</label>
-  <select id="type">
-    <option value="kahve">Kahve</option>
-    <option value="ruya">Rüya</option>
-  </select>
+    <div id="statusBox" class="ok" style="display:none;"></div>
+    <div id="errorBox" class="err" style="display:none;"></div>
 
-  <label>Soru / Metin</label>
-  <textarea id="q" rows="4" placeholder="Örn: Fincanda yol görüyorum... / Rüyamda deniz gördüm..."></textarea>
+    <div class="card">
+      <h2>Giriş (Google)</h2>
+      <div class="row">
+        <button id="btnLogin" class="btn primary">Google ile giriş</button>
+        <button id="btnLogout" class="btn dark">Çıkış</button>
+      </div>
+      <p class="muted small" style="margin-top:12px">
+        Giriş yapan: <b id="whoEmail">-</b><br/>
+        UID: <span id="whoUid" class="mono">-</span><br/>
+        Not: Bu sayfa sadece <b>readings</b> koleksiyonundan <b>kendi kayıtlarını</b> gösterir.
+      </p>
+    </div>
 
-  <button id="freeBtn">Ücretsiz Gönder (haftalık 1)</button>
-  <button id="paidBtn">Ücretli Gönder (test)</button>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <h2 style="margin:0">Benim Fal Sonuçlarım (readings)</h2>
+        <button id="btnRefresh" class="btn gray">Yenile</button>
+      </div>
+      <p class="muted small" style="margin:10px 0 0">
+        Toplam: <b id="count">0</b> (max 50)
+      </p>
+      <div id="list" class="list"></div>
+    </div>
 
-  <p id="status"></p>
-  <pre id="out"></pre>
+    <div class="card">
+      <h2>Debug</h2>
+      <pre id="debug">{}</pre>
+    </div>
+  </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
-
-  <script>
+  <script type="module">
+    // ===== Firebase (Senin config) =====
     const firebaseConfig = {
       apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
       authDomain: "falhane-e3057.firebaseapp.com",
       projectId: "falhane-e3057",
+      storageBucket: "falhane-e3057.appspot.com",
+      messagingSenderId: "117754512778",
       appId: "1:117754512778:web:52aee440472568bc6cb473",
+      measurementId: "G-94TZ14VWPX"
     };
 
-    const BACKEND = "https://falhane.onrender.com";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      GoogleAuthProvider,
+      signInWithRedirect,
+      signInWithPopup,
+      getRedirectResult,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-    firebase.initializeApp(firebaseConfig);
+    import {
+      getFirestore,
+      collection,
+      query,
+      where,
+      orderBy,
+      limit,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    const statusEl = document.getElementById("status");
-    const outEl = document.getElementById("out");
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    async function ensureAnonLogin() {
-      const auth = firebase.auth();
-      if (!auth.currentUser) {
-        statusEl.textContent = "Firebase anonim giriş yapılıyor...";
-        await auth.signInAnonymously();
-      }
-      return auth.currentUser.getIdToken();
+    // UI
+    const statusBox = document.getElementById("statusBox");
+    const errorBox  = document.getElementById("errorBox");
+    const debugEl   = document.getElementById("debug");
+    const listEl    = document.getElementById("list");
+    const countEl   = document.getElementById("count");
+    const whoEmail  = document.getElementById("whoEmail");
+    const whoUid    = document.getElementById("whoUid");
+
+    const btnLogin  = document.getElementById("btnLogin");
+    const btnLogout = document.getElementById("btnLogout");
+    const btnRefresh= document.getElementById("btnRefresh");
+
+    function setStatus(msg) {
+      statusBox.style.display = msg ? "block" : "none";
+      statusBox.textContent = msg || "";
+    }
+    function setError(msg) {
+      errorBox.style.display = msg ? "block" : "none";
+      errorBox.textContent = msg || "";
+    }
+    function setDebug(obj) {
+      debugEl.textContent = JSON.stringify(obj, null, 2);
     }
 
-    async function send(isPaid) {
-      outEl.textContent = "";
-      statusEl.textContent = "Token alınıyor...";
-      const token = await ensureAnonLogin();
+    function clearList() {
+      listEl.innerHTML = "";
+      countEl.textContent = "0";
+    }
 
-      const type = document.getElementById("type").value;
-      const question = document.getElementById("q").value.trim();
-      if (question.length < 3) {
-        statusEl.textContent = "En az 3 karakter yaz.";
+    function renderList(rows) {
+      listEl.innerHTML = "";
+      countEl.textContent = String(rows.length);
+
+      if (!rows.length) {
+        listEl.innerHTML = `<div class="item muted">Kayıt yok.</div>`;
         return;
       }
 
-      statusEl.textContent = "İstek gönderiliyor...";
-      const resp = await fetch(BACKEND + "/api/fortune", {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer " + token,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ type, question, isPaid })
-      });
+      for (const r of rows) {
+        const createdAt = r.createdAt?.toDate ? r.createdAt.toDate().toISOString() : (r.createdAt || "-");
+        const approvedAt = r.approvedAt?.toDate ? r.approvedAt.toDate().toISOString() : (r.approvedAt || "-");
+        const badge = `<span class="badge" style="background:#e5e7eb;color:#111827">${r.status || "?"}</span>`;
 
-      const text = await resp.text();
-
-      if (resp.status === 402) {
-        statusEl.textContent = "Ücretsiz hak bitti (haftalık 1).";
-        outEl.textContent = text;
-        return;
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="top">
+            <div>
+              <div class="mono small"><b>${r.id || r._docId}</b></div>
+              <div class="muted small">createdAt: ${createdAt}</div>
+              <div class="muted small">approvedAt: ${approvedAt}</div>
+              <div class="muted small">userId: <span class="mono">${r.userId || "-"}</span></div>
+            </div>
+            <div>${badge}</div>
+          </div>
+          <div style="margin-top:10px; font-size:16px">${(r.text || "").toString()}</div>
+          <div style="margin-top:10px">
+            <details>
+              <summary class="muted">JSON</summary>
+              <pre class="mono">${escapeHtml(JSON.stringify(r, null, 2))}</pre>
+            </details>
+          </div>
+        `;
+        listEl.appendChild(el);
       }
+    }
 
-      if (!resp.ok) {
-        statusEl.textContent = "Hata: " + resp.status;
-        outEl.textContent = text;
-        return;
-      }
+    function escapeHtml(s) {
+      return (s || "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+    }
 
-      statusEl.textContent = "Başarılı.";
+    // ===== Google Login =====
+    const provider = new GoogleAuthProvider();
+    // ÖNEMLİ: hesap seçtirsin. Aksi halde Safari aynı hesabı “takılı” tutar.
+    provider.setCustomParameters({ prompt: "select_account" });
+
+    btnLogin.addEventListener("click", async () => {
+      setError("");
+      setStatus("Giriş başlatıldı...");
       try {
-        const data = JSON.parse(text);
-        outEl.textContent = data.text || "";
-      } catch {
-        outEl.textContent = text;
+        // iOS Safari'de Redirect daha stabil.
+        await signInWithRedirect(auth, provider);
+      } catch (e) {
+        // Redirect fail olursa Popup dene
+        try {
+          await signInWithPopup(auth, provider);
+        } catch (e2) {
+          setError(`Giriş HATA: ${e2?.message || e2}`);
+          setStatus("");
+        }
       }
+    });
+
+    btnLogout.addEventListener("click", async () => {
+      setError("");
+      setStatus("Çıkış yapılıyor...");
+      try {
+        await signOut(auth);
+        setStatus("Çıkış yapıldı.");
+        setDebug({ signedOut:true });
+        whoEmail.textContent = "-";
+        whoUid.textContent = "-";
+        clearList();
+      } catch (e) {
+        setError(`Çıkış HATA: ${e?.message || e}`);
+        setStatus("");
+      }
+    });
+
+    btnRefresh.addEventListener("click", async () => {
+      await loadReadings();
+    });
+
+    // Redirect sonucu
+    try {
+      const res = await getRedirectResult(auth);
+      if (res?.user) {
+        setStatus("Giriş başarılı.");
+      }
+    } catch (e) {
+      // Redirect hata
+      if (e?.message) setError(`Redirect HATA: ${e.message}`);
     }
 
-    document.getElementById("freeBtn").addEventListener("click", () => send(false));
-    document.getElementById("paidBtn").addEventListener("click", () => send(true));
+    onAuthStateChanged(auth, async (user) => {
+      setError("");
+      if (!user) {
+        whoEmail.textContent = "-";
+        whoUid.textContent = "-";
+        setStatus("Giriş yok.");
+        clearList();
+        setDebug({ auth: "signed_out" });
+        return;
+      }
+
+      whoEmail.textContent = user.email || "-";
+      whoUid.textContent = user.uid || "-";
+      setStatus("Okuma hazır.");
+      setDebug({ auth: "signed_in", email: user.email, uid: user.uid });
+
+      await loadReadings();
+    });
+
+    async function loadReadings() {
+      setError("");
+      const user = auth.currentUser;
+      if (!user) {
+        clearList();
+        return;
+      }
+
+      setStatus("Readings yükleniyor...");
+      try {
+        // Sadece kendi kayıtları: readings where userId == uid, createdAt desc
+        const q = query(
+          collection(db, "readings"),
+          where("userId", "==", user.uid),
+          orderBy("createdAt", "desc"),
+          limit(50)
+        );
+
+        const snap = await getDocs(q);
+        const rows = [];
+        snap.forEach(doc => {
+          rows.push({ _docId: doc.id, ...doc.data() });
+        });
+
+        renderList(rows);
+        setStatus("Okuma başarılı.");
+        setDebug({ count: rows.length, ids: rows.map(r => r._docId) });
+      } catch (e) {
+        clearList();
+        setStatus("");
+        setError(`Okuma HATA: ${e?.message || e}`);
+        setDebug({ error: e?.message || String(e) });
+      }
+    }
   </script>
 </body>
 </html>
