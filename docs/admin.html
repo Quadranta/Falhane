@@ -3,37 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Falhane Admin</title>
+  <title>Admin İşlemleri</title>
   <style>
-    :root { --bg:#f6f7fb; --card:#fff; --text:#0f172a; --muted:#64748b; --b:#e5e7eb; --ok:#16a34a; --bad:#ef4444; --pri:#2563eb; }
-    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--text); }
-    .wrap{ max-width:980px; margin:0 auto; padding:18px; }
-    h1{ font-size:40px; margin:8px 0 16px; }
-    .card{ background:var(--card); border:1px solid var(--b); border-radius:16px; padding:14px; margin:12px 0; box-shadow:0 8px 24px rgba(15,23,42,.06); }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .pill{ display:inline-flex; gap:8px; align-items:center; padding:8px 12px; border-radius:999px; border:1px solid var(--b); background:#fff; font-weight:700; }
-    .pill.ok{ border-color:#bbf7d0; background:#ecfdf5; color:#166534; }
-    .pill.bad{ border-color:#fecaca; background:#fff1f2; color:#9f1239; }
-    .btn{ border:0; border-radius:12px; padding:10px 14px; font-weight:800; cursor:pointer; }
-    .btn.blue{ background:var(--pri); color:#fff; }
-    .btn.gray{ background:#111827; color:#fff; }
-    .btn.ok{ background:var(--ok); color:#fff; }
-    .btn.bad{ background:var(--bad); color:#fff; }
-    .btn.ghost{ background:#fff; border:1px solid var(--b); }
-    .muted{ color:var(--muted); }
-    .grid{ display:grid; gap:12px; }
-    .item{ border:1px solid var(--b); border-radius:16px; padding:12px; background:#fff; }
-    .itemHead{ display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; }
-    .name{ font-size:26px; font-weight:900; }
-    .chips{ display:flex; gap:8px; flex-wrap:wrap; }
-    .chip{ background:#eef2ff; color:#1e3a8a; border:1px solid #dbeafe; padding:6px 10px; border-radius:999px; font-weight:800; }
-    .meta{ display:grid; gap:6px; margin:10px 0; }
-    .meta b{ font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-    .thumbs{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .thumb{ width:72px; height:72px; border-radius:12px; border:1px solid var(--b); object-fit:cover; background:#f1f5f9; cursor:pointer; }
-    textarea{ width:100%; min-height:110px; border-radius:12px; border:1px solid var(--b); padding:10px; font-size:15px; }
-    .debug{ background:#0b1220; color:#d1d5db; border-radius:16px; padding:12px; white-space:pre-wrap; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-    .hide{ display:none!important; }
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#f3f6fb;color:#111}
+    .wrap{max-width:900px;margin:24px auto;padding:0 16px}
+    h1{font-size:44px;letter-spacing:-1px;margin:8px 0 18px}
+    .card{background:#fff;border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.06);padding:16px;margin:12px 0}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;background:#eef2ff;font-weight:600}
+    .pill.bad{background:#ffecec;color:#b10000}
+    .pill.good{background:#eafff0;color:#0b7a2a}
+    button{border:0;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer}
+    .btn{background:#1f6feb;color:#fff}
+    .btn2{background:#111827;color:#fff}
+    .btn3{background:#e11d48;color:#fff}
+    .muted{color:#6b7280}
+    pre{white-space:pre-wrap;background:#0b1220;color:#e5e7eb;border-radius:14px;padding:12px;overflow:auto}
+    .hide{display:none!important}
   </style>
 </head>
 <body>
@@ -42,43 +28,56 @@
 
     <div class="card">
       <div class="row">
-        <div id="adminBadge" class="pill bad">Admin: HAYIR</div>
-        <div class="pill">Giriş yapan: <span id="who">-</span></div>
-        <div class="pill">UID: <span id="uid">-</span></div>
+        <span id="pillAdmin" class="pill bad">Admin: HAYIR</span>
+        <span class="pill">Giriş yapan: <span id="whoEmail">-</span></span>
+        <span class="pill">UID: <span id="whoUid">-</span></span>
       </div>
 
-      <div class="row" style="margin-top:10px">
-        <button id="btnGoogle" class="btn blue">Google ile giriş</button>
-        <button id="btnLogout" class="btn gray hide">Çıkış</button>
+      <div style="margin-top:12px" class="row">
+        <button id="btnGoogle" class="btn">Google ile giriş</button>
+        <button id="btnLogout" class="btn2 hide">Çıkış</button>
       </div>
 
       <div class="muted" style="margin-top:10px">
-        Not: Admin yetkisi için Firestore’da <b>admins/{UID}</b> dokümanı olmalı ve <b>role="admin"</b> yazmalı.
-        <div id="statusLine">Durum: Oturum kapalı.</div>
+        Not: Admin yetkisi için Firestore'da <b>admins/{UID}</b> dokümanı olmalı.
+        <br />
+        Durum: <span id="statusText">Hazır.</span>
       </div>
     </div>
 
     <div class="card">
-      <div class="row">
-        <button id="tabPending" class="btn gray">Bekleyen Fallar</button>
-        <button id="tabAll" class="btn ghost">Son 50 (tümü)</button>
-        <button id="btnRefresh" class="btn blue">Yenile</button>
-      </div>
-      <div class="muted" style="margin-top:8px" id="countLine">Durum: -</div>
-    </div>
-
-    <div class="card">
-      <div class="grid" id="list"></div>
-    </div>
-
-    <div class="card">
-      <h2 style="margin:0 0 10px">Debug</h2>
-      <div id="dbg" class="debug">Hazır.</div>
+      <h2 style="margin:0 0 8px">Debug</h2>
+      <pre id="debug">BOOT: loading...</pre>
     </div>
   </div>
 
   <script type="module">
-    // ===== Firebase (SENİN CONFIG) =====
+    // =========================
+    // Firebase imports
+    // =========================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult,
+      onAuthStateChanged,
+      setPersistence,
+      browserLocalPersistence,
+      browserSessionPersistence,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    import {
+      getFirestore,
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    // =========================
+    // CONFIG (senin config)
+    // =========================
     const firebaseConfig = {
       apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
       authDomain: "falhane-e3057.firebaseapp.com",
@@ -89,292 +88,134 @@
       measurementId: "G-94TZ14VWPX"
     };
 
-    // ===== Imports =====
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
-      getAuth, onAuthStateChanged, signInWithRedirect, getRedirectResult,
-      GoogleAuthProvider, signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, collection, query, where, orderBy, limit, getDocs,
-      updateDoc, serverTimestamp, addDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    // =========================
+    // UI helpers
+    // =========================
+    const $ = (id) => document.getElementById(id);
+    const debug = (msg) => {
+      const t = $("debug");
+      t.textContent = (t.textContent ? t.textContent + "\n" : "") + msg;
+    };
+    const setStatus = (msg) => $("statusText").textContent = msg;
 
-    // ===== Boot =====
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // ===== UI refs =====
-    const $ = (id) => document.getElementById(id);
-    const dbg = (s) => { $("dbg").textContent = (typeof s === "string" ? s : JSON.stringify(s,null,2)); };
-
-    const btnGoogle = $("btnGoogle");
-    const btnLogout = $("btnLogout");
-    const who = $("who");
-    const uid = $("uid");
-    const adminBadge = $("adminBadge");
-    const statusLine = $("statusLine");
-    const list = $("list");
-    const countLine = $("countLine");
-
-    let IS_ADMIN = false;
-    let MODE = "pending"; // pending | all
-
-    function fmtDate(d) {
-      const pad = (n)=>String(n).padStart(2,"0");
-      return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-    }
-
-    function openImg(url){
-      window.open(url, "_blank");
-    }
-
-    async function checkAdmin(user) {
-      IS_ADMIN = false;
-      adminBadge.className = "pill bad";
-      adminBadge.textContent = "Admin: HAYIR";
-
-      if (!user) return;
-
-      const ref = doc(db, "admins", user.uid);
-      const snap = await getDoc(ref);
-      if (snap.exists() && snap.data()?.role === "admin") {
-        IS_ADMIN = true;
-        adminBadge.className = "pill ok";
-        adminBadge.textContent = "Admin: EVET";
-      }
-    }
-
-    // ===== Google login (redirect - iPhone Safari uyumlu) =====
-    btnGoogle.addEventListener("click", async () => {
+    // iOS/Safari için: local persistence dene, olmazsa session'a düş
+    async function ensurePersistence() {
       try {
-        dbg("LOGIN: Google redirect başlatılıyor...");
-        await signInWithRedirect(auth, provider);
+        await setPersistence(auth, browserLocalPersistence);
+        debug("BOOT: persistence=browserLocalPersistence");
       } catch (e) {
-        dbg(`LOGIN ERROR: ${e.code || ""} ${e.message || e}`);
+        debug("BOOT: local persistence FAIL -> session. " + (e?.code || e));
+        await setPersistence(auth, browserSessionPersistence);
+        debug("BOOT: persistence=browserSessionPersistence");
       }
-    });
+    }
 
-    btnLogout.addEventListener("click", async () => {
+    async function checkAdmin(uid) {
+      try {
+        const ref = doc(db, "admins", uid);
+        const snap = await getDoc(ref);
+        return snap.exists();
+      } catch (e) {
+        debug("ADMIN CHECK ERROR: " + (e?.code || e));
+        return false;
+      }
+    }
+
+    function renderSignedOut() {
+      $("whoEmail").textContent = "-";
+      $("whoUid").textContent = "-";
+      $("pillAdmin").textContent = "Admin: HAYIR";
+      $("pillAdmin").className = "pill bad";
+      $("btnGoogle").classList.remove("hide");
+      $("btnLogout").classList.add("hide");
+      setStatus("Oturum kapalı.");
+    }
+
+    async function renderSignedIn(user) {
+      $("whoEmail").textContent = user.email || "-";
+      $("whoUid").textContent = user.uid;
+
+      $("btnGoogle").classList.add("hide");
+      $("btnLogout").classList.remove("hide");
+
+      setStatus("Giriş yapıldı. Admin kontrol ediliyor...");
+
+      const isAdmin = await checkAdmin(user.uid);
+      if (isAdmin) {
+        $("pillAdmin").textContent = "Admin: EVET";
+        $("pillAdmin").className = "pill good";
+        setStatus("Giriş OK. Admin.");
+      } else {
+        $("pillAdmin").textContent = "Admin: HAYIR";
+        $("pillAdmin").className = "pill bad";
+        setStatus("Giriş OK ama admin değil.");
+      }
+    }
+
+    async function doLogin() {
+      setStatus("Google giriş deneniyor...");
+      debug("LOGIN: starting...");
+      try {
+        // iOS Safari'de popup çoğu zaman daha stabil
+        await signInWithPopup(auth, provider);
+        debug("LOGIN: popup OK");
+      } catch (e) {
+        debug("LOGIN: popup FAIL -> redirect. " + (e?.code || e));
+        // Popup engellenirse redirect'e düş
+        await signInWithRedirect(auth, provider);
+      }
+    }
+
+    async function doLogout() {
       try {
         await signOut(auth);
+        debug("LOGOUT: OK");
+        renderSignedOut();
       } catch (e) {
-        dbg(`LOGOUT ERROR: ${e.code || ""} ${e.message || e}`);
+        debug("LOGOUT ERROR: " + (e?.code || e));
       }
-    });
-
-    // Redirect dönüşünü yakala (boş olabilir, normal)
-    try {
-      const r = await getRedirectResult(auth);
-      dbg("BOOT: getRedirectResult() ok.\nREDIRECT RESULT: " + (r?.user?.email || "boş (normal olabilir)"));
-    } catch (e) {
-      dbg(`REDIRECT ERROR: ${e.code || ""} ${e.message || e}`);
     }
 
-    // ===== Auth state =====
+    // =========================
+    // BOOT
+    // =========================
+    $("debug").textContent = "";
+    debug("BOOT: auth ready");
+
+    await ensurePersistence();
+
+    // redirect sonucu varsa yakala
+    try {
+      debug("REDIRECT: getRedirectResult() called...");
+      const res = await getRedirectResult(auth);
+      if (res?.user) debug("REDIRECT: user OK");
+      else debug("REDIRECT: empty (normal olabilir)");
+    } catch (e) {
+      debug("REDIRECT ERROR: " + (e?.code || e));
+    }
+
+    // auth state listener
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        who.textContent = "-";
-        uid.textContent = "-";
-        statusLine.textContent = "Durum: Oturum kapalı.";
-        btnLogout.classList.add("hide");
-        btnGoogle.classList.remove("hide");
-        list.innerHTML = "";
-        countLine.textContent = "Durum: Oturum kapalı.";
+        debug("AUTH STATE: signed out");
+        renderSignedOut();
         return;
       }
-
-      who.textContent = user.email || "(email yok)";
-      uid.textContent = user.uid;
-      statusLine.textContent = "Durum: Giriş OK. Admin isen listeleyebilirsin.";
-      btnLogout.classList.remove("hide");
-      btnGoogle.classList.add("hide");
-
-      await checkAdmin(user);
-
-      if (!IS_ADMIN) {
-        countLine.textContent = "Admin değilsin. Firestore’da admins/{UID} role=admin olmalı.";
-        list.innerHTML = "";
-        return;
-      }
-
-      await loadList();
+      debug("AUTH STATE: signed in");
+      await renderSignedIn(user);
     });
 
-    // ===== Tabs / Refresh =====
-    $("tabPending").addEventListener("click", async () => { MODE="pending"; $("tabPending").className="btn gray"; $("tabAll").className="btn ghost"; await loadList(); });
-    $("tabAll").addEventListener("click", async () => { MODE="all"; $("tabAll").className="btn gray"; $("tabPending").className="btn ghost"; await loadList(); });
-    $("btnRefresh").addEventListener("click", loadList);
+    // buttons
+    $("btnGoogle").addEventListener("click", doLogin);
+    $("btnLogout").addEventListener("click", doLogout);
 
-    // ===== Data load =====
-    async function loadList() {
-      try {
-        const user = auth.currentUser;
-        if (!user) return;
-        await checkAdmin(user);
-        if (!IS_ADMIN) return;
-
-        list.innerHTML = "";
-        countLine.textContent = "Yükleniyor...";
-
-        // uploads koleksiyonu: pending veya hepsi
-        let q;
-        if (MODE === "pending") {
-          q = query(
-            collection(db, "uploads"),
-            where("status", "==", "pending"),
-            orderBy("createdAt", "desc"),
-            limit(50)
-          );
-        } else {
-          q = query(
-            collection(db, "uploads"),
-            orderBy("createdAt", "desc"),
-            limit(50)
-          );
-        }
-
-        const snap = await getDocs(q);
-        countLine.textContent = `Durum: ${snap.size} kayıt.`;
-
-        if (snap.empty) {
-          list.innerHTML = `<div class="item muted">Kayıt yok.</div>`;
-          return;
-        }
-
-        snap.forEach((docSnap) => {
-          const d = docSnap.data() || {};
-          const created = d.createdAt?.toDate ? d.createdAt.toDate() : null;
-          const createdStr = created ? fmtDate(created) : "-";
-
-          const name = d.name || "-";
-          const age = (d.age ?? "-");
-          const sign = d.sign || d.burc || "-";
-          const userId = d.userId || "-";
-
-          const photo1 = d.photo1Url || d.photo1 || "";
-          const photo2 = d.photo2Url || d.photo2 || "";
-
-          const el = document.createElement("div");
-          el.className = "item";
-
-          el.innerHTML = `
-            <div class="itemHead">
-              <div>
-                <div class="name">${escapeHtml(name)}</div>
-                <div class="chips">
-                  <span class="chip">Yaş: ${escapeHtml(String(age))}</span>
-                  <span class="chip">Burç: ${escapeHtml(String(sign))}</span>
-                  <span class="chip">Gönderim: ${escapeHtml(createdStr)}</span>
-                </div>
-              </div>
-              <div class="chips">
-                <button class="btn ghost" data-copy>Resimleri Kopyala</button>
-                <button class="btn ok" data-approve>Onayla</button>
-                <button class="btn bad" data-reject>Reddet</button>
-              </div>
-            </div>
-
-            <div class="meta">
-              <div class="muted">UserId: <b>${escapeHtml(userId)}</b></div>
-              <div class="muted">Doc: <b>${escapeHtml(docSnap.id)}</b></div>
-            </div>
-
-            <div class="muted" style="font-weight:800;margin:8px 0 6px">Fotoğraflar</div>
-            <div class="thumbs">
-              ${photo1 ? `<img class="thumb" data-img src="${photo1}" alt="foto1">` : `<div class="muted">Foto1 yok</div>`}
-              ${photo2 ? `<img class="thumb" data-img src="${photo2}" alt="foto2">` : ``}
-            </div>
-
-            <div style="margin-top:10px">
-              <div class="muted" style="font-weight:900;margin:0 0 6px">Fal Yorumu (müşteri görecek)</div>
-              <textarea placeholder="Fal yorumunu buraya yaz...">${escapeHtmlTextarea(d.adminNote || d.readingText || "")}</textarea>
-              <div class="row" style="margin-top:8px">
-                <button class="btn blue" data-save>Yorumu Kaydet</button>
-              </div>
-              <div class="muted" style="margin-top:6px">Not: Onayladığında bu yorum “readings” içine taşınır ve müşteri panelinde görünür.</div>
-            </div>
-          `;
-
-          // actions
-          el.querySelector("[data-copy]").addEventListener("click", async () => {
-            const txt = `Foto1: ${photo1 || "-"}\nFoto2: ${photo2 || "-"}`;
-            await navigator.clipboard.writeText(txt);
-            dbg("Kopyalandı:\n" + txt);
-          });
-
-          el.querySelectorAll("[data-img]").forEach(img=>{
-            img.addEventListener("click", ()=>openImg(img.src));
-          });
-
-          el.querySelector("[data-save]").addEventListener("click", async () => {
-            const note = el.querySelector("textarea").value.trim();
-            await updateDoc(doc(db, "uploads", docSnap.id), {
-              adminNote: note,
-              updatedAt: serverTimestamp()
-            });
-            dbg("Yorum kaydedildi: " + docSnap.id);
-          });
-
-          el.querySelector("[data-reject]").addEventListener("click", async () => {
-            const note = el.querySelector("textarea").value.trim();
-            await updateDoc(doc(db, "uploads", docSnap.id), {
-              status: "rejected",
-              rejectedAt: serverTimestamp(),
-              adminNote: note
-            });
-            dbg("Reddedildi: " + docSnap.id);
-            await loadList();
-          });
-
-          el.querySelector("[data-approve]").addEventListener("click", async () => {
-            const note = el.querySelector("textarea").value.trim();
-
-            // readings kaydı oluştur (müşteri buradan görecek)
-            await addDoc(collection(db, "readings"), {
-              name, age, sign,
-              userId,
-              photo1Url: photo1 || null,
-              photo2Url: photo2 || null,
-              adminNote: note,
-              createdAt: serverTimestamp(),
-              uploadDocId: docSnap.id,
-              approvedBy: auth.currentUser.uid
-            });
-
-            // upload status güncelle
-            await updateDoc(doc(db, "uploads", docSnap.id), {
-              status: "approved",
-              approvedAt: serverTimestamp(),
-              approvedBy: auth.currentUser.uid,
-              adminNote: note
-            });
-
-            dbg("Onaylandı + readings oluşturuldu: " + docSnap.id);
-            await loadList();
-          });
-
-          list.appendChild(el);
-        });
-
-      } catch (e) {
-        dbg(`LOAD ERROR: ${e.code || ""} ${e.message || e}`);
-        countLine.textContent = "Hata: " + (e.code || e.message || e);
-      }
-    }
-
-    // ===== Helpers =====
-    function escapeHtml(s){
-      return String(s).replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
-    function escapeHtmlTextarea(s){
-      // textarea içinde HTML kaçışı gerekmez ama güvenli tutalım
-      return String(s).replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    }
+    // İlk yüklemede default
+    renderSignedOut();
   </script>
 </body>
 </html>
