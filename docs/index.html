@@ -6,31 +6,56 @@
   <title>Falhane Kullanıcı Paneli</title>
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#f3f6fb;color:#111}
-    .wrap{max-width:920px;margin:0 auto;padding:22px}
+    .wrap{max-width:980px;margin:0 auto;padding:22px}
     h1{font-size:44px;line-height:1.05;margin:12px 0 16px}
     .card{background:#fff;border:1px solid #e6e8ef;border-radius:18px;padding:16px 16px 18px;margin:14px 0;box-shadow:0 6px 24px rgba(12,19,33,.06)}
     .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-    .btn{border:0;border-radius:14px;padding:10px 14px;font-weight:700;cursor:pointer}
+    .btn{border:0;border-radius:14px;padding:10px 14px;font-weight:800;cursor:pointer}
     .btnPrimary{background:#2563eb;color:#fff}
     .btnGhost{background:#e9eefb;color:#0f172a}
     .btnDanger{background:#111827;color:#fff}
     .btnOk{background:#16a34a;color:#fff}
     .muted{color:#64748b}
-    .pill{display:inline-block;background:#eef2ff;color:#1e3a8a;padding:8px 10px;border-radius:999px;font-weight:800}
-    .warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:14px;font-weight:700}
-    label{display:block;font-weight:800;margin:12px 0 6px}
+    .pill{display:inline-block;background:#eef2ff;color:#1e3a8a;padding:8px 10px;border-radius:999px;font-weight:900}
+    .warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:14px;font-weight:800}
+    label{display:block;font-weight:900;margin:12px 0 6px}
     input,select,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #e5e7eb;font-size:16px}
+    .hr{height:1px;background:#eef2f7;margin:14px 0}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     @media (max-width:720px){.grid2{grid-template-columns:1fr}}
-    .photoBox{border:2px dashed #d7dce8;border-radius:16px;padding:12px;background:#f8fafc}
-    .previewGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
-    .preview{aspect-ratio:3/4;border-radius:16px;border:2px dashed #d7dce8;display:flex;align-items:center;justify-content:center;color:#64748b;font-weight:800;background:#fff;overflow:hidden}
-    .preview img{width:100%;height:100%;object-fit:cover}
-    .hr{height:1px;background:#eef2f7;margin:14px 0}
+    .imgPick{border:2px dashed #d7dce8;border-radius:16px;background:#f8fafc;padding:12px}
+    .imgBtn{
+      width:100%;
+      border:0;border-radius:16px;
+      padding:16px;
+      background:#e9eefb;
+      font-weight:900;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:120px;
+      position:relative;
+      overflow:hidden;
+    }
+    .imgBtn .txt{z-index:2}
+    .imgBtn.hasImg .txt{display:none}
+    .imgBtn.hasImg::before{
+      content:"";
+      position:absolute; inset:0;
+      background-size:cover;
+      background-position:center;
+      filter:none;
+      z-index:1;
+    }
     .listItem{border:1px solid #e6e8ef;border-radius:18px;padding:14px;margin:10px 0;background:#fff}
-    .small{font-size:13px}
     .debug{white-space:pre-wrap;background:#0b1220;color:#e5e7eb;border-radius:16px;padding:12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
     .right{margin-left:auto}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .tabBtn{border:0;border-radius:999px;padding:10px 12px;font-weight:900;cursor:pointer;background:#eef2ff;color:#1e3a8a}
+    .tabBtn.active{background:#111827;color:#fff}
+    .badge{display:inline-block;background:#dcfce7;color:#14532d;border-radius:999px;padding:6px 10px;font-weight:900}
+    .badge2{display:inline-block;background:#fee2e2;color:#7f1d1d;border-radius:999px;padding:6px 10px;font-weight:900}
   </style>
 </head>
 <body>
@@ -41,24 +66,29 @@
 
     <div class="card">
       <div class="row">
-        <div style="min-width:220px">
+        <div style="min-width:260px">
           <div class="pill" id="authPill">Oturum kapalı</div>
-          <div class="small muted" style="margin-top:8px">
+          <div class="muted" style="margin-top:8px">
             Giriş yapan: <b id="userEmail">-</b><br/>
             UID: <b id="userUid">-</b>
           </div>
         </div>
+
         <div class="right row">
+          <div class="pill" id="telvePill">Telve: 0</div>
+          <button class="btn btnGhost" id="btnBuyWeekly">Haftalık abonelik al (21 telve)</button>
           <button class="btn btnPrimary" id="btnGoogle">Google ile giriş</button>
-          <button class="btn btnGhost" id="btnApple" title="Apple sonra aktif edilecek">Apple ile giriş (sonra)</button>
+          <button class="btn btnGhost" id="btnApple">Apple ile giriş (sonra)</button>
           <button class="btn btnDanger" id="btnLogout">Çıkış</button>
         </div>
       </div>
-      <div class="muted small" style="margin-top:10px">
-        Not: Apple henüz aktif değil; buton sadece uyarı verir. Google çalışır.
+      <div class="muted" style="margin-top:10px">
+        Not: Apple henüz aktif değil. Google ile giriş kullanılacak.
+        <span id="subInfo" style="margin-left:8px"></span>
       </div>
     </div>
 
+    <!-- FORM -->
     <div class="card" id="formCard" style="display:none">
       <h2 style="margin:0 0 10px">Fal Başvurusu (2 Foto)</h2>
 
@@ -79,47 +109,57 @@
       <div class="hr"></div>
 
       <div class="grid2">
-        <div class="photoBox">
+        <div class="imgPick">
           <b>Foto 1</b>
           <div class="row" style="margin-top:10px">
-            <input id="file1" type="file" accept="image/*" style="flex:1" />
+            <input id="file1" type="file" accept="image/*" style="display:none" />
             <input id="cam1" type="file" accept="image/*" capture="environment" style="display:none" />
-            <button class="btn btnGhost" id="btnCam1">Kamera ile çek</button>
+            <button class="imgBtn" id="btnPick1">
+              <span class="txt">Galeriden seç / Kamera ile çek</span>
+            </button>
           </div>
         </div>
 
-        <div class="photoBox">
+        <div class="imgPick">
           <b>Foto 2</b>
           <div class="row" style="margin-top:10px">
-            <input id="file2" type="file" accept="image/*" style="flex:1" />
+            <input id="file2" type="file" accept="image/*" style="display:none" />
             <input id="cam2" type="file" accept="image/*" capture="environment" style="display:none" />
-            <button class="btn btnGhost" id="btnCam2">Kamera ile çek</button>
+            <button class="imgBtn" id="btnPick2">
+              <span class="txt">Galeriden seç / Kamera ile çek</span>
+            </button>
           </div>
         </div>
-      </div>
-
-      <div class="previewGrid">
-        <div class="preview" id="prev1">Önizleme 1</div>
-        <div class="preview" id="prev2">Önizleme 2</div>
       </div>
 
       <div class="row" style="margin-top:14px">
-        <button class="btn btnOk" id="btnSend" style="flex:1">Falımı Gönder</button>
-        <button class="btn btnGhost" id="btnReloadMine">Geçmişi Yenile</button>
+        <button class="btn btnOk" id="btnSend" style="flex:1">Falımı Gönder (+3 telve)</button>
+        <button class="btn btnGhost" id="btnReloadAll">Yenile</button>
       </div>
 
-      <div class="muted small" style="margin-top:10px">
-        İpucu: “Kamera ile çek” telefonda kamerayı açar. “Dosya seç” galeriden seçmek içindir.
+      <div class="muted" style="margin-top:10px">
+        İpucu: Foto kutusuna basınca seçenek çıkar: Galeri veya Kamera.
       </div>
     </div>
 
-    <div class="card" id="historyCard" style="display:none">
+    <!-- LISTS -->
+    <div class="card" id="listsCard" style="display:none">
       <div class="row">
-        <h2 style="margin:0">Geçmiş Fallarım</h2>
-        <button class="btn btnGhost right" id="btnReloadMine2">Yenile</button>
+        <h2 style="margin:0">Fallarımdan Durum</h2>
+        <button class="btn btnGhost right" id="btnReloadAll2">Yenile</button>
       </div>
-      <div class="muted" id="mineCount" style="margin-top:6px"></div>
-      <div id="mineList"></div>
+
+      <div class="tabs">
+        <button class="tabBtn active" id="tabPending">Bekleyen Fallarım</button>
+        <button class="tabBtn" id="tabDone">Sonuçlanan Fallarım</button>
+        <button class="tabBtn" id="tabRead">Geçmiş Fallarım (max 10)</button>
+      </div>
+
+      <div class="muted" id="countLine" style="margin-top:10px"></div>
+
+      <div id="listPending"></div>
+      <div id="listDone" style="display:none"></div>
+      <div id="listRead" style="display:none"></div>
     </div>
 
     <div class="card">
@@ -136,13 +176,16 @@
     setPersistence, browserLocalPersistence
   } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
   import {
-    getFirestore, collection, addDoc, query, where, orderBy, limit, getDocs, serverTimestamp
+    getFirestore,
+    doc, getDoc, setDoc, updateDoc,
+    collection, addDoc, query, where, orderBy, limit, getDocs,
+    serverTimestamp, increment, deleteDoc
   } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
   import {
     getStorage, ref as sRef, uploadBytes, getDownloadURL
   } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 
-  // === FIREBASE CONFIG (SENİN VERDİĞİN) ===
+  // === FIREBASE CONFIG ===
   const firebaseConfig = {
     apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
     authDomain: "falhane-e3057.firebaseapp.com",
@@ -153,38 +196,44 @@
     measurementId: "G-94TZ14VWPX"
   };
 
-  // === UI HELPERS ===
+  // === UI ===
   const $ = (id) => document.getElementById(id);
   const log = (s) => $("debugBox").textContent = String(s);
-  const banner = (s) => { $("banner").style.display = s ? "block" : "none"; $("banner").textContent = s || ""; };
+  const banner = (s) => { $("banner").style.display = s ? "block":"none"; $("banner").textContent = s||""; };
 
-  function pickRandomPendingText() {
-    const arr = [
-      "Falcı fincanı inceliyor. 5 dakika içinde hazır.",
-      "Enerjini alıyorum… Falın birazdan çıkacak.",
-      "Fincanda hareket var. Falın hazırlanıyor.",
-      "Kahve telvesi konuşuyor… Çok az kaldı.",
-      "Falın sıraya alındı. Birkaç dakika içinde sende."
-    ];
-    return arr[Math.floor(Math.random() * arr.length)];
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
-
-  function fmtDate(ts) {
-    try {
-      if (!ts) return "-";
+  function fmtDate(ts){
+    try{
+      if(!ts) return "-";
       const d = ts.toDate ? ts.toDate() : new Date(ts);
-      const pad = (n)=>String(n).padStart(2,"0");
+      const pad=(n)=>String(n).padStart(2,"0");
       return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    } catch { return "-"; }
+    }catch{return "-";}
+  }
+  function pickPendingText(){
+    const arr=[
+      "Fincan inceleniyor. 5 dakika içinde hazır.",
+      "Telve konuşuyor… Az kaldı.",
+      "Falcı incelemeye başladı. Birkaç dakika içinde sende.",
+      "Enerjini aldık. Falın hazırlanıyor.",
+      "Falın sıraya alındı. Çok az kaldı."
+    ];
+    return arr[Math.floor(Math.random()*arr.length)];
   }
 
-  function setPreview(box, file) {
-    if (!file) { box.textContent = box.id === "prev1" ? "Önizleme 1" : "Önizleme 2"; return; }
-    const url = URL.createObjectURL(file);
-    box.innerHTML = `<img src="${url}" alt="preview"/>`;
+  function setTab(active){
+    const t1=$("tabPending"), t2=$("tabDone"), t3=$("tabRead");
+    const p=$("listPending"), d=$("listDone"), r=$("listRead");
+    [t1,t2,t3].forEach(x=>x.classList.remove("active"));
+    p.style.display="none"; d.style.display="none"; r.style.display="none";
+    if(active==="pending"){t1.classList.add("active");p.style.display="block";}
+    if(active==="done"){t2.classList.add("active");d.style.display="block";}
+    if(active==="read"){t3.classList.add("active");r.style.display="block";}
   }
 
-  // === INIT ===
+  // === FIREBASE INIT ===
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -193,76 +242,184 @@
   log("BOOT: start\nBOOT: persistence=browserLocalPersistence");
   await setPersistence(auth, browserLocalPersistence);
 
-  // === AUTH UI ===
-  $("btnApple").onclick = () => alert("Apple girişi daha aktif değil. Sonra yapacağız.");
-  $("btnLogout").onclick = async () => { await signOut(auth); };
+  // --- Auth buttons ---
+  $("btnApple").onclick = ()=> alert("Apple girişi daha aktif değil. Sonra yapacağız.");
+  $("btnLogout").onclick = async ()=>{ await signOut(auth); };
 
-  $("btnGoogle").onclick = async () => {
-    try {
+  $("btnGoogle").onclick = async ()=>{
+    try{
       banner("");
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
-      log($("debugBox").textContent + "\nLOGIN: popup deneniyor (iOS için daha stabil)...");
+      log($("debugBox").textContent + "\nLOGIN: popup...");
       await signInWithPopup(auth, provider);
-      log($("debugBox").textContent + "\nLOGIN: popup OK");
-    } catch (e) {
-      log($("debugBox").textContent + "\nLOGIN ERROR: " + (e?.code || e?.message || e));
-      banner("Google giriş başarısız: " + (e?.code || e?.message || e));
+      log($("debugBox").textContent + "\nLOGIN: OK");
+    }catch(e){
+      const msg = e?.code || e?.message || String(e);
+      banner("Google giriş başarısız: " + msg);
+      log($("debugBox").textContent + "\nLOGIN ERROR: " + msg);
     }
   };
 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      $("authPill").textContent = "Oturum açık";
-      $("authPill").style.background = "#dcfce7";
-      $("authPill").style.color = "#14532d";
-      $("userEmail").textContent = user.email || "-";
-      $("userUid").textContent = user.uid || "-";
-      $("formCard").style.display = "block";
-      $("historyCard").style.display = "block";
-      banner("");
-      await loadMyHistory();
+  // --- Telve / subscription ---
+  const WEEKLY_COST = 21; // 7 gün * 3 telve (varsayım)
+  const userRef = (uid)=>doc(db,"users",uid);
+
+  async function ensureUserDoc(user){
+    const ref = userRef(user.uid);
+    const snap = await getDoc(ref);
+    if(!snap.exists()){
+      await setDoc(ref,{
+        email: user.email || null,
+        telve: 0,
+        subscriptionUntil: null,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    }
+  }
+
+  async function refreshUserStats(user){
+    const snap = await getDoc(userRef(user.uid));
+    const data = snap.exists() ? snap.data() : {};
+    const telve = Number(data.telve || 0);
+    $("telvePill").textContent = `Telve: ${telve}`;
+
+    let txt = "";
+    if(data.subscriptionUntil){
+      const until = data.subscriptionUntil.toDate ? data.subscriptionUntil.toDate() : new Date(data.subscriptionUntil);
+      const now = new Date();
+      if(until > now){
+        txt = `<span class="badge">Abonelik aktif: ${until.toLocaleDateString()}</span>`;
+      } else {
+        txt = `<span class="badge2">Abonelik bitmiş</span>`;
+      }
     } else {
+      txt = `<span class="badge2">Abonelik yok</span>`;
+    }
+    $("subInfo").innerHTML = txt;
+  }
+
+  $("btnBuyWeekly").onclick = async ()=>{
+    try{
+      banner("");
+      const user = auth.currentUser;
+      if(!user) throw new Error("Oturum yok.");
+      const snap = await getDoc(userRef(user.uid));
+      const telve = Number(snap.data()?.telve || 0);
+      if(telve < WEEKLY_COST) throw new Error(`Yetersiz telve. Gerekli: ${WEEKLY_COST}`);
+
+      // 7 gün ekle: mevcut aktifse üstüne ekle, değilse bugünden başlat
+      const curUntil = snap.data()?.subscriptionUntil?.toDate ? snap.data().subscriptionUntil.toDate() : null;
+      const now = new Date();
+      const base = (curUntil && curUntil > now) ? curUntil : now;
+      const newUntil = new Date(base.getTime() + 7*24*60*60*1000);
+
+      await updateDoc(userRef(user.uid),{
+        telve: increment(-WEEKLY_COST),
+        subscriptionUntil: newUntil,
+        updatedAt: serverTimestamp()
+      });
+
+      banner("Haftalık abonelik alındı.");
+      await refreshUserStats(user);
+    }catch(e){
+      banner("Satın alma hatası: " + (e?.message || e?.code || String(e)));
+    }
+  };
+
+  // --- Auth state ---
+  onAuthStateChanged(auth, async (user)=>{
+    if(!user){
       $("authPill").textContent = "Oturum kapalı";
       $("authPill").style.background = "#fee2e2";
       $("authPill").style.color = "#7f1d1d";
-      $("userEmail").textContent = "-";
-      $("userUid").textContent = "-";
-      $("formCard").style.display = "none";
-      $("historyCard").style.display = "none";
+      $("userEmail").textContent="-";
+      $("userUid").textContent="-";
+      $("formCard").style.display="none";
+      $("listsCard").style.display="none";
       banner("Oturum kapalı. Google ile giriş yap.");
+      return;
     }
+
+    $("authPill").textContent = "Oturum açık";
+    $("authPill").style.background = "#dcfce7";
+    $("authPill").style.color = "#14532d";
+    $("userEmail").textContent = user.email || "-";
+    $("userUid").textContent = user.uid || "-";
+    $("formCard").style.display="block";
+    $("listsCard").style.display="block";
+    banner("");
+
+    await ensureUserDoc(user);
+    await refreshUserStats(user);
+    await loadAllLists();
   });
 
-  // === CAMERA BUTTONS ===
-  $("btnCam1").onclick = () => $("cam1").click();
-  $("btnCam2").onclick = () => $("cam2").click();
+  // --- Photo pick (button overlay) ---
+  let f1=null, f2=null;
 
-  let f1 = null, f2 = null;
+  function applyBtnImage(btn, file){
+    if(!file) return;
+    const url = URL.createObjectURL(file);
+    btn.classList.add("hasImg");
+    btn.style.setProperty("--bg", `url("${url}")`);
+    btn.style.setProperty("background", "#e9eefb");
+    btn.style.setProperty("position","relative");
+    btn.style.setProperty("color","#0f172a");
+    btn.style.setProperty("overflow","hidden");
+    btn.style.setProperty("borderRadius","16px");
+    btn.style.setProperty("minHeight","140px");
+    btn.style.setProperty("padding","0");
+    btn.style.setProperty("display","block");
+    btn.style.setProperty("backgroundImage","none");
+    btn.style.setProperty("outline","none");
+    btn.style.setProperty("border","0");
+    btn.style.setProperty("cursor","pointer");
 
-  $("file1").onchange = (e)=>{ f1 = e.target.files?.[0] || null; setPreview($("prev1"), f1); };
-  $("file2").onchange = (e)=>{ f2 = e.target.files?.[0] || null; setPreview($("prev2"), f2); };
-  $("cam1").onchange  = (e)=>{ f1 = e.target.files?.[0] || null; setPreview($("prev1"), f1); };
-  $("cam2").onchange  = (e)=>{ f2 = e.target.files?.[0] || null; setPreview($("prev2"), f2); };
+    // background via ::before
+    const css = `#${btn.id}.hasImg::before{background-image:${btn.style.getPropertyValue("--bg")};}`;
+    let st = document.getElementById("dynPreviewStyle");
+    if(!st){ st=document.createElement("style"); st.id="dynPreviewStyle"; document.head.appendChild(st); }
+    st.textContent += "\n" + css;
+  }
 
-  // === SEND ===
-  $("btnSend").onclick = async () => {
-    try {
+  async function pickSourceFor(which){
+    // which: 1 or 2
+    const choice = confirm("Kamera ile çekmek için 'Tamam', galeriden seçmek için 'İptal'.");
+    if(which===1){
+      if(choice) $("cam1").click(); else $("file1").click();
+    } else {
+      if(choice) $("cam2").click(); else $("file2").click();
+    }
+  }
+
+  $("btnPick1").onclick = ()=>pickSourceFor(1);
+  $("btnPick2").onclick = ()=>pickSourceFor(2);
+
+  $("file1").onchange=(e)=>{ f1=e.target.files?.[0]||null; if(f1) applyBtnImage($("btnPick1"), f1); };
+  $("cam1").onchange =(e)=>{ f1=e.target.files?.[0]||null; if(f1) applyBtnImage($("btnPick1"), f1); };
+  $("file2").onchange=(e)=>{ f2=e.target.files?.[0]||null; if(f2) applyBtnImage($("btnPick2"), f2); };
+  $("cam2").onchange =(e)=>{ f2=e.target.files?.[0]||null; if(f2) applyBtnImage($("btnPick2"), f2); };
+
+  // --- Send ---
+  $("btnSend").onclick = async ()=>{
+    try{
       banner("");
       const user = auth.currentUser;
-      if (!user) throw new Error("Oturum yok.");
+      if(!user) throw new Error("Oturum yok.");
+
       const name = $("inpName").value.trim();
       const age = Number($("inpAge").value);
       const sign = $("selSign").value.trim();
 
-      if (!name) throw new Error("Ad boş.");
-      if (!age || Number.isNaN(age)) throw new Error("Yaş sayı olmalı.");
-      if (!sign) throw new Error("Burç seç.");
+      if(!name) throw new Error("Ad boş.");
+      if(!age || Number.isNaN(age)) throw new Error("Yaş sayı olmalı.");
+      if(!sign) throw new Error("Burç seç.");
+      if(!f1 || !f2) throw new Error("2 foto zorunlu.");
 
-      if (!f1 || !f2) throw new Error("2 foto zorunlu.");
-
-      $("btnSend").disabled = true;
-      $("btnSend").textContent = "Yükleniyor...";
+      $("btnSend").disabled=true;
+      $("btnSend").textContent="Yükleniyor...";
 
       const base = `uploads/${user.uid}/${Date.now()}`;
       const r1 = sRef(storage, `${base}/photo1.jpg`);
@@ -274,103 +431,210 @@
       const url1 = await getDownloadURL(r1);
       const url2 = await getDownloadURL(r2);
 
-      // uploads doc
-      await addDoc(collection(db, "uploads"), {
+      await addDoc(collection(db,"uploads"),{
         userId: user.uid,
         email: user.email || null,
-        name,
-        age,
-        sign,
+        name, age, sign,
         photo1: url1,
         photo2: url2,
-        status: "pending",
-        statusText: pickRandomPendingText(),
+        status: "pending",        // bekleyen
+        statusText: pickPendingText(),
         comment: "",
         createdAt: serverTimestamp(),
-        approvedAt: null,
-        approvedBy: null
+        answeredAt: null,
+        readAt: null
       });
 
-      banner("Falın sıraya alındı. İnceleme başladı.");
-      $("btnSend").textContent = "Falımı Gönder";
-      $("btnSend").disabled = false;
-      await loadMyHistory();
-    } catch (e) {
-      $("btnSend").textContent = "Falımı Gönder";
-      $("btnSend").disabled = false;
+      // +3 telve
+      await updateDoc(userRef(user.uid),{
+        telve: increment(3),
+        updatedAt: serverTimestamp()
+      });
 
-      const msg = (e?.message || e?.code || String(e));
+      banner("Falın sıraya alındı. Falcı incelemeye başladı.");
+      $("btnSend").disabled=false;
+      $("btnSend").textContent="Falımı Gönder (+3 telve)";
+      await refreshUserStats(user);
+      await loadAllLists();
+    }catch(e){
+      $("btnSend").disabled=false;
+      $("btnSend").textContent="Falımı Gönder (+3 telve)";
+      const msg = e?.message || e?.code || String(e);
       banner("Gönderim hatası: " + msg);
       log($("debugBox").textContent + "\nSEND ERROR: " + msg);
-
-      // Index hatasını kullanıcıya net göster
-      if (String(msg).includes("requires an index") || String(msg).includes("FAILED_PRECONDITION")) {
-        banner("Firestore index lazım. Admin tarafında verilen linkten Create Index yapmalısın.");
+      if(String(msg).includes("requires an index") || String(msg).includes("FAILED_PRECONDITION")){
+        banner("Firestore index lazım. Admin panelinde hata linki çıkar; oradan Create Index yap.");
       }
     }
   };
 
-  $("btnReloadMine").onclick = loadMyHistory;
-  $("btnReloadMine2").onclick = loadMyHistory;
+  $("btnReloadAll").onclick = loadAllLists;
+  $("btnReloadAll2").onclick = loadAllLists;
 
-  async function loadMyHistory() {
+  // --- Tabs ---
+  $("tabPending").onclick = ()=>setTab("pending");
+  $("tabDone").onclick = ()=>setTab("done");
+  $("tabRead").onclick = ()=>setTab("read");
+
+  async function loadAllLists(){
     const user = auth.currentUser;
-    if (!user) return;
+    if(!user) return;
 
-    try {
-      const q = query(
-        collection(db, "uploads"),
-        where("userId", "==", user.uid),
-        orderBy("createdAt", "desc"),
+    try{
+      // pending
+      const qP = query(
+        collection(db,"uploads"),
+        where("userId","==",user.uid),
+        where("status","==","pending"),
+        orderBy("createdAt","desc"),
         limit(50)
       );
-      const snap = await getDocs(q);
-      const items = [];
-      snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+      const sP = await getDocs(qP);
+      const pending=[];
+      sP.forEach(d=>pending.push({id:d.id, ...d.data()}));
 
-      $("mineCount").textContent = `${items.length} kayıt bulundu.`;
-      $("mineList").innerHTML = items.map(renderMine).join("");
-    } catch (e) {
-      const msg = (e?.message || e?.code || String(e));
-      log($("debugBox").textContent + "\nHISTORY ERROR: " + msg);
-      banner("Geçmiş yükleme hatası: " + msg);
+      // done (answered)
+      const qD = query(
+        collection(db,"uploads"),
+        where("userId","==",user.uid),
+        where("status","==","answered"),
+        orderBy("answeredAt","desc"),
+        limit(50)
+      );
+      const sD = await getDocs(qD);
+      const done=[];
+      sD.forEach(d=>done.push({id:d.id, ...d.data()}));
+
+      // read history (max 10)
+      const qR = query(
+        collection(db,"uploads"),
+        where("userId","==",user.uid),
+        where("status","==","read"),
+        orderBy("readAt","desc"),
+        limit(10)
+      );
+      const sR = await getDocs(qR);
+      const read=[];
+      sR.forEach(d=>read.push({id:d.id, ...d.data()}));
+
+      $("countLine").textContent = `Bekleyen: ${pending.length} | Sonuçlanan: ${done.length} | Geçmiş: ${read.length}/10`;
+
+      $("listPending").innerHTML = pending.map(renderPending).join("") || `<div class="muted">Bekleyen fal yok.</div>`;
+      $("listDone").innerHTML = done.map(renderDone).join("") || `<div class="muted">Sonuçlanan fal yok.</div>`;
+      $("listRead").innerHTML = read.map(renderRead).join("") || `<div class="muted">Geçmiş fal yok.</div>`;
+
+      bindDoneButtons(done);
+
+      log($("debugBox").textContent + `\nLOAD OK: P=${pending.length} D=${done.length} R=${read.length}`);
+    }catch(e){
+      const msg = e?.message || e?.code || String(e);
+      banner("Liste hatası: " + msg);
+      log($("debugBox").textContent + "\nLIST ERROR: " + msg);
+      if(String(msg).includes("requires an index") || String(msg).includes("FAILED_PRECONDITION")){
+        banner("Firestore index lazım. Hata linkinden Create Index yap.");
+      }
     }
   }
 
-  function renderMine(x) {
-    const status = x.status || "-";
-    const st = x.statusText || "";
-    const comment = x.comment || "";
-    const created = fmtDate(x.createdAt);
-
-    const hasComment = comment.trim().length > 0;
-    const commentHtml = hasComment
-      ? `<div class="hr"></div><b>Fal Yorumu</b><div style="margin-top:6px;white-space:pre-wrap">${escapeHtml(comment)}</div>`
-      : "";
-
+  function renderPending(x){
     return `
       <div class="listItem">
-        <div style="font-size:22px;font-weight:900">${escapeHtml(x.name || "-")}</div>
+        <div style="font-size:20px;font-weight:900">${escapeHtml(x.name||"-")}</div>
         <div class="row" style="margin-top:8px">
           <span class="pill">Yaş: ${escapeHtml(String(x.age ?? "-"))}</span>
-          <span class="pill">Burç: ${escapeHtml(String(x.sign ?? "-"))}</span>
-          <span class="pill">Tarih: ${escapeHtml(created)}</span>
-          <span class="pill">Durum: ${escapeHtml(status)}</span>
+          <span class="pill">Burç: ${escapeHtml(x.sign||"-")}</span>
+          <span class="pill">Tarih: ${escapeHtml(fmtDate(x.createdAt))}</span>
+          <span class="pill">Durum: beklemede</span>
         </div>
-        <div class="muted" style="margin-top:10px">${escapeHtml(st)}</div>
-        ${commentHtml}
-        <div class="row" style="margin-top:10px">
-          <a class="btn btnGhost" href="${x.photo1 || "#"}" target="_blank" rel="noreferrer">Foto1</a>
-          <a class="btn btnGhost" href="${x.photo2 || "#"}" target="_blank" rel="noreferrer">Foto2</a>
+        <div class="muted" style="margin-top:10px">${escapeHtml(x.statusText||"Falcı inceliyor...")}</div>
+      </div>
+    `;
+  }
+
+  function renderDone(x){
+    return `
+      <div class="listItem" id="done_${x.id}">
+        <div style="font-size:20px;font-weight:900">${escapeHtml(x.name||"-")}</div>
+        <div class="row" style="margin-top:8px">
+          <span class="pill">Yaş: ${escapeHtml(String(x.age ?? "-"))}</span>
+          <span class="pill">Burç: ${escapeHtml(x.sign||"-")}</span>
+          <span class="pill">Cevap: ${escapeHtml(fmtDate(x.answeredAt))}</span>
+          <span class="pill">Durum: sonuçlandı</span>
+        </div>
+
+        <div class="hr"></div>
+        <b>Fal Yorumu</b>
+        <div style="margin-top:8px;white-space:pre-wrap">${escapeHtml(x.comment||"")}</div>
+
+        <div class="row" style="margin-top:12px">
+          <a class="btn btnGhost" href="${x.photo1||"#"}" target="_blank" rel="noreferrer">Foto1</a>
+          <a class="btn btnGhost" href="${x.photo2||"#"}" target="_blank" rel="noreferrer">Foto2</a>
+          <button class="btn btnOk right" data-read="${x.id}">Okudum</button>
         </div>
       </div>
     `;
   }
 
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  function renderRead(x){
+    return `
+      <div class="listItem">
+        <div style="font-size:20px;font-weight:900">${escapeHtml(x.name||"-")}</div>
+        <div class="row" style="margin-top:8px">
+          <span class="pill">Yaş: ${escapeHtml(String(x.age ?? "-"))}</span>
+          <span class="pill">Burç: ${escapeHtml(x.sign||"-")}</span>
+          <span class="pill">Okundu: ${escapeHtml(fmtDate(x.readAt))}</span>
+        </div>
+        <div class="muted" style="margin-top:10px;white-space:pre-wrap">${escapeHtml(x.comment||"")}</div>
+      </div>
+    `;
   }
 
+  function bindDoneButtons(doneItems){
+    document.querySelectorAll("[data-read]").forEach(btn=>{
+      btn.onclick = async ()=>{
+        try{
+          const id = btn.getAttribute("data-read");
+          await updateDoc(doc(db,"uploads",id),{
+            status: "read",
+            readAt: serverTimestamp()
+          });
+          await enforceReadCap(10);
+          banner("Geçmişe taşındı.");
+          await loadAllLists();
+        }catch(e){
+          banner("Okudum hatası: " + (e?.message||e?.code||String(e)));
+        }
+      };
+    });
+  }
+
+  // 10'u aşan read kayıtlarını sil
+  async function enforceReadCap(max){
+    const user = auth.currentUser;
+    if(!user) return;
+
+    const qAllRead = query(
+      collection(db,"uploads"),
+      where("userId","==",user.uid),
+      where("status","==","read"),
+      orderBy("readAt","desc"),
+      limit(50)
+    );
+    const snap = await getDocs(qAllRead);
+    const all=[];
+    snap.forEach(d=>all.push({id:d.id, ...d.data()}));
+
+    if(all.length <= max) return;
+
+    const toDelete = all.slice(max); // 11+ (en eskiler)
+    for(const x of toDelete){
+      // Firestore rules izin vermiyorsa burada patlar.
+      await deleteDoc(doc(db,"uploads",x.id));
+    }
+  }
+
+  // default tab
+  setTab("pending");
 </script>
 </body>
 </html>
