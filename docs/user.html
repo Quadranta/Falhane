@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Falhane - Kullanıcı Paneli</title>
+  <style>
+    :root { --bg:#f6f7fb; --card:#fff; --txt:#0f172a; --muted:#64748b; --blue:#2563eb; --dark:#0b1220; --border:#e5e7eb; --ok:#16a34a; --bad:#dc2626; }
+    body { margin:0; font-family: Arial, Helvetica, sans-serif; background:var(--bg); color:var(--txt); }
+    .wrap { max-width: 820px; margin: 26px auto; padding: 0 14px; }
+    h1 { font-size: 44px; margin: 8px 0 14px; letter-spacing:-0.5px; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: 0 6px 20px rgba(2,6,23,.05); margin-bottom: 14px; }
+    .row { display:flex; gap:10px; }
+    .row > * { flex:1; }
+    input { width:100%; padding: 14px 12px; border:1px solid var(--border); border-radius: 10px; font-size: 16px; background:#fff; }
+    button { width:100%; padding: 14px 12px; border:0; border-radius: 10px; font-size: 16px; cursor:pointer; }
+    .btn { background:var(--blue); color:#fff; font-weight:700; }
+    .btn2 { background: var(--dark); color:#fff; font-weight:700; }
+    .btn3 { background:#475569; color:#fff; font-weight:700; }
+    .status { padding: 12px; border-radius: 12px; border:1px solid var(--border); background:#fff; }
+    .ok { color: var(--ok); font-weight: 700; }
+    .bad { color: var(--bad); font-weight: 700; }
+    .muted { color: var(--muted); }
+    .pill { display:inline-block; font-size:12px; padding: 6px 10px; border-radius:999px; background:#e2e8f0; color:#0f172a; font-weight:700; }
+    .pill.ok { background:#dcfce7; color:#166534; border:1px solid #bbf7d0; }
+    .item { border:1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 12px; }
+    .item h3 { margin:0 0 6px; font-size: 18px; }
+    .item .meta { font-size: 13px; color: var(--muted); }
+    .item pre { margin: 10px 0 0; background:#0b1220; color:#e5e7eb; padding: 12px; border-radius: 12px; overflow:auto; display:none; }
+    .split { display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap: wrap; }
+    .right { margin-left:auto; }
+    .hide { display:none !important; }
+    a { color: var(--blue); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Falhane Kullanıcı Paneli</h1>
+
+    <div class="card">
+      <div id="statusBox" class="status">
+        Durum: <span id="statusText" class="muted">Hazır</span>
+        <div class="muted" style="margin-top:6px;">
+          Not: Bu sayfa sadece <b>readings</b> koleksiyonundan kendi kayıtlarını gösterir.
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="authCard">
+      <h2 style="margin:0 0 10px;">Giriş (Email/Password)</h2>
+      <div class="row" style="margin-bottom:10px;">
+        <input id="email" type="email" placeholder="Email" autocomplete="email" />
+      </div>
+      <div class="row" style="margin-bottom:12px;">
+        <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
+      </div>
+      <div class="row" style="margin-bottom:10px;">
+        <button class="btn" id="btnLogin">Giriş</button>
+      </div>
+      <div class="row">
+        <button class="btn2" id="btnLogout">Çıkış</button>
+      </div>
+
+      <div class="muted" style="margin-top:10px;">
+        Giriş yapan: <span id="who" class="muted">-</span><br/>
+        UID: <span id="uid" class="muted">-</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="split">
+        <h2 style="margin:0;">Benim Fal Sonuçlarım (readings)</h2>
+        <div class="right" style="display:flex; gap:10px;">
+          <button class="btn3" id="btnReload" style="width:auto; padding:10px 12px;">Yenile</button>
+        </div>
+      </div>
+
+      <div class="muted" style="margin-top:8px;">
+        Toplam: <b id="count">0</b>
+      </div>
+
+      <div id="list"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px;">Debug</h3>
+      <pre id="debug" style="margin:0; background:#0b1220; color:#e5e7eb; padding:12px; border-radius:12px; overflow:auto;"></pre>
+    </div>
+  </div>
+
+  <script type="module">
+    // Firebase (Modular SDK)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, collection, query, where, orderBy, limit, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    // === SENİN CONFIG ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
+      authDomain: "falhane-e3057.firebaseapp.com",
+      projectId: "falhane-e3057",
+      storageBucket: "falhane-e3057.firebasestorage.app",
+      messagingSenderId: "117754512778",
+      appId: "1:117754512778:web:52aee440472568bc6cb473",
+      measurementId: "G-94TZ14VWPX"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const $ = (id) => document.getElementById(id);
+
+    function setStatus(msg, ok=true) {
+      $("statusText").textContent = msg;
+      $("statusText").className = ok ? "ok" : "bad";
+    }
+
+    function tsToText(v) {
+      try {
+        // Firestore Timestamp veya {seconds,nanoseconds} objesi olabilir
+        if (!v) return "-";
+        if (v instanceof Timestamp) return v.toDate().toLocaleString();
+        if (typeof v.seconds === "number") return new Date(v.seconds * 1000).toLocaleString();
+        return String(v);
+      } catch(e) {
+        return String(v);
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function renderReadings(docs) {
+      $("count").textContent = docs.length;
+      $("list").innerHTML = "";
+
+      if (docs.length === 0) {
+        $("list").innerHTML = `<div class="item"><div class="muted">Henüz sonuç yok.</div></div>`;
+        return;
+      }
+
+      for (const d of docs) {
+        const data = d.data || {};
+        const text = data.text ?? "(text yok)";
+        const status = data.status ?? "approved";
+        const createdAt = tsToText(data.createdAt);
+        const approvedAt = tsToText(data.approvedAt);
+        const approvedBy = data.approvedBy ?? "-";
+
+        const div = document.createElement("div");
+        div.className = "item";
+
+        div.innerHTML = `
+          <div class="split">
+            <h3 style="margin:0;">${escapeHtml(text).slice(0, 140)}</h3>
+            <span class="pill ok">${escapeHtml(status)}</span>
+          </div>
+          <div class="meta" style="margin-top:6px;">
+            docId: <b>${escapeHtml(d.id)}</b><br/>
+            createdAt: ${escapeHtml(createdAt)}<br/>
+            approvedAt: ${escapeHtml(approvedAt)}<br/>
+            approvedBy: ${escapeHtml(approvedBy)}
+          </div>
+          <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn3" data-json="1" style="width:auto; padding:10px 12px;">JSON</button>
+          </div>
+          <pre>${escapeHtml(JSON.stringify({ id: d.id, ...data }, null, 2))}</pre>
+        `;
+
+        const btnJson = div.querySelector('button[data-json="1"]');
+        const pre = div.querySelector("pre");
+        btnJson.addEventListener("click", () => {
+          pre.style.display = (pre.style.display === "block") ? "none" : "block";
+        });
+
+        $("list").appendChild(div);
+      }
+    }
+
+    async function loadMyReadings() {
+      const u = auth.currentUser;
+      if (!u) {
+        setStatus("Giriş yok. Önce login ol.", false);
+        $("debug").textContent = JSON.stringify({ loggedIn:false }, null, 2);
+        renderReadings([]);
+        return;
+      }
+
+      setStatus("Readings yükleniyor...", true);
+
+      // Bu sorgu genelde composite index ister:
+      // userId == uid + approvedAt desc
+      const q = query(
+        collection(db, "readings"),
+        where("userId", "==", u.uid),
+        orderBy("approvedAt", "desc"),
+        limit(50)
+      );
+
+      try {
+        const snap = await getDocs(q);
+        const docs = snap.docs.map(x => ({ id: x.id, data: x.data() }));
+        $("debug").textContent = JSON.stringify({ uid: u.uid, count: docs.length, ids: docs.map(x => x.id) }, null, 2);
+        renderReadings(docs.map(x => ({ id: x.id, data: x.data })));
+        setStatus("Okuma başarılı", true);
+      } catch (e) {
+        console.error(e);
+        $("debug").textContent = (e && e.stack) ? e.stack : String(e);
+        setStatus("Okuma HATA: " + (e?.message || e), false);
+
+        // Eğer index isterse Firebase hata mesajında link verir.
+        // O linke tıklayıp "Create index" / "Save" yapacaksın.
+      }
+    }
+
+    $("btnLogin").addEventListener("click", async () => {
+      const email = $("email").value.trim();
+      const password = $("password").value;
+      if (!email || !password) { setStatus("Email/Password boş.", false); return; }
+
+      setStatus("Giriş yapılıyor...", true);
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        setStatus("Giriş başarılı", true);
+      } catch (e) {
+        setStatus("Giriş HATA: " + (e?.message || e), false);
+        $("debug").textContent = (e && e.stack) ? e.stack : String(e);
+      }
+    });
+
+    $("btnLogout").addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        setStatus("Çıkış yapıldı", true);
+      } catch (e) {
+        setStatus("Çıkış HATA: " + (e?.message || e), false);
+      }
+    });
+
+    $("btnReload").addEventListener("click", loadMyReadings);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        $("who").textContent = user.email || "(email yok)";
+        $("uid").textContent = user.uid;
+        await loadMyReadings();
+      } else {
+        $("who").textContent = "-";
+        $("uid").textContent = "-";
+        renderReadings([]);
+        $("debug").textContent = JSON.stringify({ loggedIn:false }, null, 2);
+        setStatus("Hazır", true);
+      }
+    });
+  </script>
+</body>
+</html>
