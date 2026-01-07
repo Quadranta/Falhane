@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Falhane Admin Panel</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .box { border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+    input, button, textarea { width: 100%; padding: 10px; margin: 6px 0; box-sizing: border-box; }
+    textarea { min-height: 120px; }
+    .row { display: flex; gap: 10px; }
+    .row > * { flex: 1; }
+    .hidden { display:none; }
+    small { color:#666; }
+    .item { padding: 10px; border: 1px solid #eee; border-radius: 8px; margin: 8px 0; cursor:pointer; }
+    .item:hover { background:#fafafa; }
+    .ok { color: #0a7; }
+    .bad { color: #c00; }
+  </style>
+</head>
+<body>
+  <h2>Falhane Admin Panel</h2>
+
+  <div class="box" id="statusBox">
+    <div><b>Durum:</b> <span id="status">Başlatılıyor…</span></div>
+    <small>Admin UID kontrolü: <span id="adminUidLabel"></span></small>
+  </div>
+
+  <div class="box" id="loginBox">
+    <h3>Admin Giriş (Email/Password)</h3>
+    <input id="email" type="email" placeholder="Email" autocomplete="username" />
+    <input id="password" type="password" placeholder="Şifre" autocomplete="current-password" />
+    <button id="btnLogin">Giriş</button>
+  </div>
+
+  <div class="box hidden" id="panelBox">
+    <div class="row">
+      <div>
+        <h3>Yüklenenler (uploads)</h3>
+        <button id="btnRefresh">Listeyi Yenile</button>
+        <div id="uploads"></div>
+      </div>
+      <div>
+        <h3>Seçili Kayıt</h3>
+        <div id="selectedInfo">Henüz seçilmedi.</div>
+        <h3>Yorum Yaz</h3>
+        <textarea id="readingText" placeholder="Fal yorumu..."></textarea>
+        <button id="btnSave">Yorumu Kaydet</button>
+        <button id="btnLogout">Çıkış</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK (Compat değil, modüler) -->
+  <script type="module">
+    // 1) BURAYA KENDİ FIREBASE CONFIG'İNİ YAPIŞTIR
+    // Firebase Console -> Project settings -> Your apps -> Web app -> config
+    const firebaseConfig = {
+      apiKey: "PASTE_API_KEY",
+      authDomain: "PASTE_AUTH_DOMAIN",
+      projectId: "PASTE_PROJECT_ID",
+      storageBucket: "PASTE_STORAGE_BUCKET",
+      messagingSenderId: "PASTE_SENDER_ID",
+      appId: "PASTE_APP_ID"
+    };
+
+    // 2) ADMIN UID (senin verdiğin)
+    const ADMIN_UID = "5oxpcgGLHJgune66lpLNxrTB0Fm2";
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, collection, query, orderBy, limit, getDocs, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const adminUidLabel = document.getElementById("adminUidLabel");
+    adminUidLabel.textContent = ADMIN_UID;
+
+    const statusEl = document.getElementById("status");
+    const loginBox = document.getElementById("loginBox");
+    const panelBox = document.getElementById("panelBox");
+    const uploadsEl = document.getElementById("uploads");
+    const selectedInfo = document.getElementById("selectedInfo");
+    const readingText = document.getElementById("readingText");
+
+    const btnLogin = document.getElementById("btnLogin");
+    const btnLogout = document.getElementById("btnLogout");
+    const btnRefresh = document.getElementById("btnRefresh");
+    const btnSave = document.getElementById("btnSave");
+
+    let selectedUploadId = null;
+
+    function setStatus(msg, ok=true){
+      statusEl.textContent = msg;
+      statusEl.className = ok ? "ok" : "bad";
+    }
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    async function loadUploads(){
+      uploadsEl.innerHTML = "Yükleniyor…";
+      try{
+        const q = query(collection(db, "uploads"), orderBy("createdAt", "desc"), limit(50));
+        const snap = await getDocs(q);
+
+        if (snap.empty){
+          uploadsEl.innerHTML = "<small>Henüz upload yok.</small>";
+          return;
+        }
+
+        uploadsEl.innerHTML = "";
+        snap.forEach(d => {
+          const data = d.data();
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+            <div><b>ID:</b> ${d.id}</div>
+            <div><b>Tür:</b> ${data.type ?? "-"}</div>
+            <div><b>User:</b> ${data.userId ?? "-"}</div>
+            <div><small>${data.createdAt?.toDate ? data.createdAt.toDate() : ""}</small></div>
+          `;
+          div.onclick = () => {
+            selectedUploadId = d.id;
+            selectedInfo.innerHTML = `
+              <div class="box">
+                <div><b>Upload ID:</b> ${d.id}</div>
+                <div><b>Tür:</b> ${data.type ?? "-"}</div>
+                <div><b>Metin:</b> ${escapeHtml(data.text ?? "")}</div>
+                <div><b>Foto URL:</b> ${data.imageUrl ? `<a href="${data.imageUrl}" target="_blank">Aç</a>` : "-"}</div>
+              </div>
+            `;
+            readingText.value = "";
+            setStatus("Seçildi: " + d.id, true);
+          };
+          uploadsEl.appendChild(div);
+        });
+      }catch(e){
+        uploadsEl.innerHTML = "<small class='bad'>Liste okunamadı. Rules/Config hatası olabilir.</small>";
+        setStatus("Hata: uploads okunamadı (" + (e?.code || e?.message) + ")", false);
+      }
+    }
+
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, s => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[s]));
+    }
+
+    btnLogin.onclick = async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if(!email || !password){
+        setStatus("Email ve şifre boş olamaz.", false);
+        return;
+      }
+
+      try{
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const uid = cred.user.uid;
+
+        if(uid !== ADMIN_UID){
+          await signOut(auth);
+          setStatus("Bu hesap admin değil. UID eşleşmedi.", false);
+          return;
+        }
+
+        setStatus("Admin giriş başarılı.", true);
+      }catch(e){
+        setStatus("Giriş hatası: " + (e?.code || e?.message), false);
+      }
+    };
+
+    btnLogout.onclick = async () => {
+      await signOut(auth);
+      setStatus("Çıkış yapıldı.", true);
+    };
+
+    btnRefresh.onclick = loadUploads;
+
+    btnSave.onclick = async () => {
+      if(!selectedUploadId){
+        setStatus("Önce bir upload seç.", false);
+        return;
+      }
+      const text = readingText.value.trim();
+      if(!text){
+        setStatus("Yorum boş olamaz.", false);
+        return;
+      }
+
+      try{
+        // readings/{uploadId} -> admin yorumu
+        await setDoc(doc(db, "readings", selectedUploadId), {
+          uploadId: selectedUploadId,
+          text,
+          adminUid: auth.currentUser.uid,
+          createdAt: serverTimestamp()
+        }, { merge: true });
+
+        setStatus("Yorum kaydedildi: readings/" + selectedUploadId, true);
+      }catch(e){
+        setStatus("Kaydetme hatası: " + (e?.code || e?.message), false);
+      }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      if(!user){
+        loginBox.classList.remove("hidden");
+        panelBox.classList.add("hidden");
+        setStatus("Giriş bekleniyor…", true);
+        return;
+      }
+
+      if(user.uid !== ADMIN_UID){
+        loginBox.classList.remove("hidden");
+        panelBox.classList.add("hidden");
+        setStatus("Bu kullanıcı admin değil. Çıkış yapıldı.", false);
+        await signOut(auth);
+        return;
+      }
+
+      loginBox.classList.add("hidden");
+      panelBox.classList.remove("hidden");
+      setStatus("Admin oturum açık. Uploads listeleniyor…", true);
+      await loadUploads();
+    });
+  </script>
+</body>
+</html>
