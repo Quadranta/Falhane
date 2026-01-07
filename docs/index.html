@@ -2,84 +2,112 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Falhane Kullanıcı Paneli</title>
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:#f6f7fb; margin:0; padding:24px;}
-    h1{font-size:44px; margin:0 0 18px;}
-    .card{background:#fff; border-radius:16px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,.08); margin:16px 0;}
-    .row{display:flex; gap:12px; flex-wrap:wrap;}
-    button{border:0; border-radius:12px; padding:14px 16px; font-size:16px; cursor:pointer;}
-    .primary{background:#2563eb; color:#fff; flex:1;}
-    .dark{background:#0f172a; color:#fff; flex:1;}
-    .muted{color:#64748b; font-size:14px; margin-top:8px;}
-    .status{padding:12px 14px; border-radius:12px; margin:14px 0; font-weight:600;}
-    .ok{background:#e9f9ef; border:1px solid #b7f0c8; color:#14532d;}
-    .err{background:#ffecec; border:1px solid #ffb5b5; color:#7f1d1d; white-space:pre-wrap;}
-    .list{display:flex; flex-direction:column; gap:12px;}
-    .item{border:1px solid #e5e7eb; border-radius:14px; padding:14px;}
-    .badge{display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; background:#eef2ff; color:#3730a3;}
-    pre{background:#0b1220; color:#e5e7eb; padding:14px; border-radius:12px; overflow:auto; font-size:12px;}
-    a{color:#2563eb; word-break:break-all;}
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; background:#f5f6f8; color:#0b0f18; }
+    .wrap { max-width: 720px; margin: 24px auto 60px; padding: 0 16px; }
+    h1 { font-size: 56px; line-height: 1; margin: 12px 0 18px; letter-spacing: -1px; }
+    .card { background: #fff; border-radius: 18px; padding: 18px; box-shadow: 0 8px 24px rgba(0,0,0,.08); margin: 16px 0; }
+    .status { border-radius: 12px; padding: 12px 14px; font-weight: 600; }
+    .ok { background: #e8f7ee; color: #0a5a2b; border: 1px solid #bfe7cc; }
+    .err { background: #fdeceb; color: #8a1f16; border: 1px solid #f6c1bd; white-space: pre-wrap; word-break: break-word; }
+    .muted { color:#556070; font-size: 14px; }
+    .row { display:flex; gap:12px; flex-wrap: wrap; }
+    button {
+      appearance: none; border: 0; border-radius: 14px; padding: 14px 16px;
+      font-weight: 700; font-size: 16px; cursor:pointer; min-width: 160px;
+    }
+    .btn-primary { background:#2f6fed; color:#fff; }
+    .btn-dark { background:#101827; color:#fff; }
+    .btn-ghost { background:#eef2f7; color:#111; }
+    .kv { margin-top: 10px; font-size: 14px; }
+    .kv b { display:inline-block; min-width: 96px; }
+    pre {
+      margin: 0; padding: 14px; border-radius: 14px;
+      background:#0f172a; color:#e5e7eb; overflow:auto; white-space: pre-wrap; word-break: break-word;
+    }
+    .list { display:flex; flex-direction:column; gap:12px; margin-top: 12px; }
+    .item {
+      border: 1px solid #e8edf4; border-radius: 14px; padding: 12px; background:#fff;
+    }
+    .item .top { display:flex; justify-content:space-between; gap:8px; align-items:center; }
+    .pill { font-size: 12px; padding: 6px 10px; border-radius: 999px; font-weight: 700; }
+    .pill-ok { background:#e8f7ee; color:#0a5a2b; border: 1px solid #bfe7cc; }
+    .pill-warn { background:#fff7db; color:#7a5200; border: 1px solid #ffe08a; }
   </style>
 </head>
 <body>
-  <h1>Falhane Kullanıcı Paneli</h1>
+  <div class="wrap">
+    <h1>Falhane Kullanıcı<br/>Paneli</h1>
 
-  <div id="statusBox" class="status ok">Hazır.</div>
-
-  <div class="card">
-    <h2>Giriş (Google)</h2>
-    <div class="row">
-      <button id="btnLogin" class="primary">Google ile giriş</button>
-      <button id="btnLogout" class="dark">Çıkış</button>
+    <div id="statusBox" class="card">
+      <div id="status" class="status ok">Hazır.</div>
+      <div class="muted" style="margin-top:8px">
+        Not: Bu sayfa sadece <b>readings</b> koleksiyonundan kendi kayıtlarını gösterir.
+      </div>
     </div>
-    <div class="muted">
-      Giriş yapan: <b id="who">-</b><br/>
-      UID: <b id="uid">-</b><br/>
-      Not: Bu sayfa sadece <b>readings</b> koleksiyonundan kendi kayıtlarını gösterir.
+
+    <div class="card">
+      <h2>Giriş (Google)</h2>
+      <div class="row" style="margin: 10px 0 8px">
+        <button id="btnLogin" class="btn-primary">Google ile giriş</button>
+        <button id="btnLogout" class="btn-dark">Çıkış</button>
+      </div>
+
+      <div class="kv">
+        <div><b>Giriş yapan:</b> <span id="who">-</span></div>
+        <div><b>UID:</b> <span id="uid">-</span></div>
+      </div>
+
+      <div class="muted" style="margin-top:10px">
+        Eğer Google’a gidip hesap seçip geri dönüyor ama burada hâlâ “-” görüyorsan, Debug kısmına bak.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Benim Fal Sonuçlarım (readings)</h2>
+      <button id="btnRefresh" class="btn-primary" style="width:100%">Yenile</button>
+      <div class="muted" style="margin-top:10px">
+        Toplam: <span id="count">0</span>
+      </div>
+      <div id="list" class="list"></div>
+    </div>
+
+    <div class="card">
+      <h2>Debug</h2>
+      <pre id="debug">Hazır.</pre>
     </div>
   </div>
 
-  <div class="card">
-    <h2>Benim Fal Sonuçlarım (readings)</h2>
-    <div class="row">
-      <button id="btnRefresh" class="primary">Yenile</button>
-    </div>
-    <div class="muted">Toplam: <b id="count">0</b></div>
-    <div id="list" class="list"></div>
-  </div>
+  <!-- Firebase (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
-  <div class="card">
-    <h2>Debug</h2>
-    <pre id="debug">-</pre>
-  </div>
+  <script>
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+    const el = (id) => document.getElementById(id);
+    const log = (msg) => {
+      const cur = el("debug").textContent || "";
+      el("debug").textContent = (cur ? cur + "\n" : "") + msg;
+    };
+    const setStatusOk = (msg) => {
+      el("status").className = "status ok";
+      el("status").textContent = msg;
+    };
+    const setStatusErr = (msg) => {
+      el("status").className = "status err";
+      el("status").textContent = msg;
+    };
+    const safe = (v) => (v == null ? "" : String(v));
 
-  <script type="module">
-    // Firebase (modular v10)
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signOut,
-      GoogleAuthProvider,
-      signInWithRedirect,
-      getRedirectResult,
-      setPersistence,
-      browserLocalPersistence
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
-    import {
-      getFirestore,
-      collection,
-      query,
-      where,
-      orderBy,
-      limit,
-      getDocs
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-    // === SENİN CONFIG (aynen) ===
+    // -----------------------------
+    // Firebase config (SENİN)
+    // -----------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
       authDomain: "falhane-e3057.firebaseapp.com",
@@ -90,134 +118,181 @@
       measurementId: "G-94TZ14VWPX"
     };
 
-    // UI helpers
-    const el = (id)=>document.getElementById(id);
-    const log = (msg)=>{ el("debug").textContent = msg; };
-    const setStatusOk = (msg)=>{ el("statusBox").className="status ok"; el("statusBox").textContent = msg; };
-    const setStatusErr = (msg)=>{ el("statusBox").className="status err"; el("statusBox").textContent = msg; };
+    // -----------------------------
+    // Init
+    // -----------------------------
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const provider = new firebase.auth.GoogleAuthProvider();
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // iOS Safari için: her zaman kullanıcı seçtirsin (cache yüzünden aynı hesap takılmasın)
+    provider.setCustomParameters({ prompt: "select_account" });
 
-    // iOS/Safari için persistence net olsun
-    try {
-      await setPersistence(auth, browserLocalPersistence);
-    } catch (e) {
-      // Private mod bazı durumlarda kısıtlayabilir; yine de devam.
-      log("Persistence uyarı: " + (e?.message || e));
+    // -----------------------------
+    // Auth state UI
+    // -----------------------------
+    function renderUser(user) {
+      if (!user) {
+        el("who").textContent = "-";
+        el("uid").textContent = "-";
+        return;
+      }
+      el("who").textContent = user.email || user.displayName || "(no-email)";
+      el("uid").textContent = user.uid;
     }
 
-    auth.languageCode = "tr";
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: "select_account"  // hesap seçtir, aynı hesapta takılmayı azaltır
-    });
-
-    async function refreshReadings() {
+    // -----------------------------
+    // Readings load
+    // -----------------------------
+    async function loadMyReadings() {
       const user = auth.currentUser;
       if (!user) {
+        setStatusErr("Oturum kapalı. Google ile giriş yap.");
         el("count").textContent = "0";
         el("list").innerHTML = "";
-        setStatusOk("Oturum kapalı. Google ile giriş yap.");
         return;
       }
 
-      // readings: sadece kendi kayıtlarını çek
-      // Bu query index ister: userId ASC + createdAt DESC
-      const q = query(
-        collection(db, "readings"),
-        where("userId", "==", user.uid),
-        orderBy("createdAt", "desc"),
-        limit(50)
-      );
-
-      const snap = await getDocs(q);
-      el("count").textContent = String(snap.size);
-
-      const items = [];
-      snap.forEach(doc => {
-        const d = doc.data() || {};
-        const text = (d.text ?? "").toString();
-        const createdAt = d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt ?? "-");
-        const status = d.status ?? "approved";
-        items.push(`
-          <div class="item">
-            <div><b>${doc.id}</b> <span class="badge">${status}</span></div>
-            <div class="muted">createdAt: ${createdAt}</div>
-            <div style="margin-top:8px; white-space:pre-wrap;">${escapeHtml(text)}</div>
-          </div>
-        `);
-      });
-
-      el("list").innerHTML = items.join("") || `<div class="muted">Kayıt yok.</div>`;
-      setStatusOk("Okuma başarılı");
-    }
-
-    function escapeHtml(s){
-      return (s||"").replace(/[&<>"']/g, (c)=>({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[c]));
-    }
-
-    // Redirect dönüşünü yakala (sayfa açılınca çalışır)
-    try {
-      const res = await getRedirectResult(auth);
-      if (res?.user) {
-        setStatusOk("Giriş başarılı (redirect).");
-      } else {
-        log("getRedirectResult: sonuç yok (normal).");
-      }
-    } catch (e) {
-      setStatusErr("Redirect sonuç hatası:\n" + (e?.message || e));
-      log(JSON.stringify(e, null, 2));
-    }
-
-    // Oturum değişince UI güncelle
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        el("who").textContent = user.email || "(email yok)";
-        el("uid").textContent = user.uid;
-        setStatusOk("Oturum açık.");
-        await refreshReadings();
-      } else {
-        el("who").textContent = "-";
-        el("uid").textContent = "-";
-        setStatusOk("Oturum kapalı. Google ile giriş yap.");
-        el("count").textContent = "0";
+      try {
+        setStatusOk("Readings okunuyor...");
         el("list").innerHTML = "";
-      }
-    });
 
+        // Query: sadece kendi kayıtları
+        // Not: createdAt varsa newest-first, yoksa sadece userId filtre
+        const q = db.collection("readings")
+          .where("userId", "==", user.uid)
+          .orderBy("createdAt", "desc")
+          .limit(50);
+
+        const snap = await q.get();
+
+        el("count").textContent = String(snap.size);
+
+        if (snap.empty) {
+          setStatusOk("Okuma başarılı (kayıt yok).");
+          return;
+        }
+
+        const frag = document.createDocumentFragment();
+        snap.forEach(doc => {
+          const d = doc.data() || {};
+          const wrap = document.createElement("div");
+          wrap.className = "item";
+
+          const top = document.createElement("div");
+          top.className = "top";
+
+          const left = document.createElement("div");
+          left.innerHTML =
+            `<div style="font-weight:800">${doc.id}</div>
+             <div class="muted">createdAt: ${safe(d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().toISOString() : d.createdAt)}</div>`;
+
+          const pill = document.createElement("div");
+          const st = (d.status || "").toLowerCase();
+          pill.className = "pill " + (st === "approved" ? "pill-ok" : "pill-warn");
+          pill.textContent = d.status || "unknown";
+
+          top.appendChild(left);
+          top.appendChild(pill);
+
+          const txt = document.createElement("div");
+          txt.style.marginTop = "10px";
+          txt.textContent = d.text || "(no text)";
+
+          wrap.appendChild(top);
+          wrap.appendChild(txt);
+
+          frag.appendChild(wrap);
+        });
+
+        el("list").appendChild(frag);
+        setStatusOk("Okuma başarılı.");
+      } catch (e) {
+        setStatusErr("Okuma HATA: " + (e?.message || e));
+        log("READINGS ERROR:\n" + JSON.stringify(e, Object.getOwnPropertyNames(e), 2));
+      }
+    }
+
+    // -----------------------------
     // Buttons
+    // -----------------------------
     el("btnLogin").addEventListener("click", async () => {
       try {
+        sessionStorage.setItem("redirectStarted", "1");
         setStatusOk("Google yönlendirmesi başlatılıyor...");
-        await signInWithRedirect(auth, provider);
-        // buradan sonra sayfa Google'a gider
+        log("LOGIN: signInWithRedirect başlatıldı.");
+        await auth.signInWithRedirect(provider);
       } catch (e) {
         setStatusErr("Giriş başlatma hatası:\n" + (e?.message || e));
-        log(JSON.stringify(e, null, 2));
+        log("LOGIN START ERROR:\n" + JSON.stringify(e, Object.getOwnPropertyNames(e), 2));
       }
     });
 
     el("btnLogout").addEventListener("click", async () => {
       try {
-        await signOut(auth);
+        await auth.signOut();
         setStatusOk("Çıkış yapıldı.");
+        log("LOGOUT: ok");
       } catch (e) {
-        setStatusErr("Çıkış hatası:\n" + (e?.message || e));
+        setStatusErr("Çıkış hatası: " + (e?.message || e));
+        log("LOGOUT ERROR:\n" + JSON.stringify(e, Object.getOwnPropertyNames(e), 2));
       }
     });
 
-    el("btnRefresh").addEventListener("click", async () => {
+    el("btnRefresh").addEventListener("click", loadMyReadings);
+
+    // -----------------------------
+    // Redirect result (kritik)
+    // -----------------------------
+    (async function boot() {
+      log("BOOT: url=" + location.href);
+      log("BOOT: ua=" + navigator.userAgent);
+
+      // Redirect dönüşünden sonucu almaya çalış
       try {
-        await refreshReadings();
+        log("REDIRECT: getRedirectResult() çağrılıyor...");
+        const res = await auth.getRedirectResult();
+        const started = sessionStorage.getItem("redirectStarted");
+
+        if (res && res.user) {
+          log("REDIRECT: user geldi -> " + (res.user.email || res.user.uid));
+          setStatusOk("Giriş başarılı: " + (res.user.email || res.user.uid));
+        } else {
+          log("REDIRECT: sonuç yok.");
+          // Senin senaryon: Google'a gidip dönüyor ama sonuç yok
+          if (started) {
+            setStatusErr(
+              "Google'dan geri döndün ama giriş sonucu alınamadı.\n\n" +
+              "Bu genelde iOS Safari depolama/çerez engeli veya sayfanın redirect state'ini kaybedip geri gelmesi yüzünden olur.\n\n" +
+              "Şunları yap:\n" +
+              "1) Privé kapalı olmalı (normal sekme)\n" +
+              "2) Safari > Block All Cookies kapalı\n" +
+              "3) Sayfayı tamamen kapat/aç (sekme kapat)\n" +
+              "4) Tekrar dene\n\n" +
+              "Debug ekranındaki satırları ekran görüntüsü at."
+            );
+          } else {
+            // Normal ilk açılış
+            setStatusOk("Hazır.");
+          }
+        }
+
+        sessionStorage.removeItem("redirectStarted");
       } catch (e) {
-        setStatusErr("Okuma hatası:\n" + (e?.message || e));
-        log(JSON.stringify(e, null, 2));
+        setStatusErr("Redirect okuma hatası: " + (e?.message || e));
+        log("REDIRECT ERROR:\n" + JSON.stringify(e, Object.getOwnPropertyNames(e), 2));
       }
-    });
+
+      // Auth state listener
+      auth.onAuthStateChanged(async (user) => {
+        renderUser(user);
+        log("AUTH STATE: " + (user ? (user.email || user.uid) : "null"));
+
+        // Giriş varsa otomatik readings çek
+        if (user) await loadMyReadings();
+      });
+    })();
   </script>
 </body>
 </html>
