@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <title>Firestore Rules Test</title>
+</head>
+<body>
+  <h2>Firestore Rules Test</h2>
+
+  <button onclick="loginAdmin()">Admin (Email/Password) Login</button>
+  <button onclick="loginGoogle()">User (Google) Login</button>
+  <button onclick="logout()">Logout</button>
+
+  <hr>
+
+  <button onclick="testUpload()">UPLOAD CREATE (user)</button>
+  <button onclick="testReadings()">READING WRITE (admin)</button>
+
+  <pre id="out"></pre>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
+      authDomain: "falhane-e3057.firebaseapp.com",
+      projectId: "falhane-e3057"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const out = document.getElementById("out");
+
+    function log(msg){ out.textContent += msg + "\n"; }
+
+    async function loginAdmin(){
+      const email = prompt("Admin email");
+      const pass = prompt("Admin password");
+      await auth.signInWithEmailAndPassword(email, pass);
+      log("Admin login OK");
+    }
+
+    async function loginGoogle(){
+      const provider = new firebase.auth.GoogleAuthProvider();
+      await auth.signInWithPopup(provider);
+      log("Google user login OK");
+    }
+
+    async function logout(){
+      await auth.signOut();
+      log("Logout");
+    }
+
+    async function testUpload(){
+      try {
+        await db.collection("uploads").add({
+          uid: auth.currentUser.uid,
+          text: "test upload",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        log("UPLOAD CREATE: OK");
+      } catch(e){
+        log("UPLOAD CREATE: FAIL -> " + e.message);
+      }
+    }
+
+    async function testReadings(){
+      try {
+        await db.collection("readings").add({
+          uid: auth.currentUser.uid,
+          resultText: "admin test",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        log("READING WRITE: OK");
+      } catch(e){
+        log("READING WRITE: FAIL -> " + e.message);
+      }
+    }
+  </script>
+</body>
+</html>
