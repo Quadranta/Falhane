@@ -1,83 +1,232 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Falhane Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Firebase SDKs (COMPAT ŞART) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
   <style>
-    body { font-family: Arial, sans-serif; background:#f5f5f5; }
-    .box { max-width:400px; margin:40px auto; background:#fff; padding:20px; border-radius:8px; }
-    input, button { width:100%; padding:10px; margin-top:10px; }
-    .error { color:red; margin-bottom:10px; }
-    .ok { color:green; margin-bottom:10px; }
+    body { font-family: Arial, sans-serif; background:#f6f7fb; margin:0; padding:24px; }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    h1 { margin: 0 0 16px; }
+    .box { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:16px; margin: 12px 0; }
+    .hidden { display:none; }
+    input, button { width:100%; padding:12px; margin:8px 0; border-radius:10px; border:1px solid #d1d5db; box-sizing:border-box; }
+    button { cursor:pointer; border:0; background:#2563eb; color:#fff; font-weight:700; }
+    button.secondary { background:#111827; }
+    button:disabled { opacity:.55; cursor:not-allowed; }
+    .status { padding:12px; border-radius:10px; border:1px solid #e5e7eb; }
+    .ok { color:#065f46; background:#ecfdf5; border-color:#a7f3d0; }
+    .bad { color:#7f1d1d; background:#fef2f2; border-color:#fecaca; }
+    .row { display:flex; gap:10px; }
+    .row > * { flex:1; }
+    pre { white-space: pre-wrap; word-break: break-word; background:#0b1020; color:#e5e7eb; padding:12px; border-radius:10px; overflow:auto; }
+    small { color:#6b7280; }
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <h1>Falhane Admin Panel</h1>
 
-<div class="box">
-  <h2>Falhane Admin Panel</h2>
+    <div id="statusBox" class="status box">
+      Durum: <span id="statusText">Hazır</span><br/>
+      <small id="statusSub"></small>
+    </div>
 
-  <div id="status" class="error">Bekleniyor...</div>
+    <!-- LOGIN -->
+    <div id="loginBox" class="box">
+      <h2>Admin Giriş (Email/Password)</h2>
+      <input id="email" type="email" placeholder="Email" autocomplete="email" />
+      <input id="password" type="password" placeholder="Şifre" autocomplete="current-password" />
+      <button id="btnLogin">Giriş</button>
+      <small>Not: Girişten sonra admin yetkisi kontrol edilecek.</small>
+    </div>
 
-  <input id="email" type="email" placeholder="Email" />
-  <input id="password" type="password" placeholder="Şifre" />
-  <button onclick="login()">Giriş</button>
-</div>
+    <!-- ADMIN AREA -->
+    <div id="adminSection" class="box hidden">
+      <h2>Admin İşlemleri</h2>
+      <p id="adminInfo"></p>
 
-<script>
-  // 🔹 FIREBASE CONFIG (SENİN VERDİĞİN – DOĞRU)
-  const firebaseConfig = {
-    apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
-    authDomain: "falhane-e3057.firebaseapp.com",
-    projectId: "falhane-e3057",
-    storageBucket: "falhane-e3057.firebasestorage.app",
-    messagingSenderId: "117754512778",
-    appId: "1:117754512778:web:52aee440472568bc6cb473",
-    measurementId: "G-94TZ14VWPX"
-  };
+      <div class="row">
+        <button id="btnTestRead">Test OKU (readings)</button>
+        <button id="btnTestWrite">Test YAZ (readings)</button>
+      </div>
 
-  // 🔹 INIT
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+      <div class="row">
+        <button id="btnLogout" class="secondary">Çıkış</button>
+      </div>
 
-  // 🔹 ADMIN UID (SENİN)
-  const ADMIN_UID = "5oxpcgGLHJgune66lpLNxrTB0Fm2";
+      <pre id="debug"></pre>
+    </div>
+  </div>
 
-  // 🔹 LOGIN
-  function login() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+  <script type="module">
+    // Firebase SDK (CDN)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      collection,
+      getDocs,
+      query,
+      limit,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    auth.signInWithEmailAndPassword(email, password)
-      .then((cred) => {
-        if (cred.user.uid !== ADMIN_UID) {
-          document.getElementById("status").innerText = "Admin değilsin";
-          auth.signOut();
-        } else {
-          document.getElementById("status").className = "ok";
-          document.getElementById("status").innerText = "Admin giriş başarılı";
-        }
-      })
-      .catch((err) => {
-        document.getElementById("status").innerText = err.code;
-      });
-  }
+    // === SENİN CONFIG ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
+      authDomain: "falhane-e3057.firebaseapp.com",
+      projectId: "falhane-e3057",
+      storageBucket: "falhane-e3057.firebasestorage.app",
+      messagingSenderId: "117754512778",
+      appId: "1:117754512778:web:52aee440472568bc6cb473",
+      measurementId: "G-94TZ14VWPX"
+    };
 
-  // 🔹 AUTH STATE TEST
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      console.log("Giriş var:", user.uid);
-    } else {
-      console.log("Giriş yok");
+    // === TEK ADMIN UID (SEN) ===
+    const ADMIN_UID = "5oxpcgGLHJgune66lpLNxrTB0Fm2";
+
+    // Init
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // UI helpers
+    const statusBox = document.getElementById("statusBox");
+    const statusText = document.getElementById("statusText");
+    const statusSub = document.getElementById("statusSub");
+    const debugEl = document.getElementById("debug");
+
+    function setStatus(text, ok = true, sub = "") {
+      statusText.textContent = text;
+      statusSub.textContent = sub || "";
+      statusBox.classList.remove("ok", "bad");
+      statusBox.classList.add(ok ? "ok" : "bad");
     }
-  });
-</script>
 
+    function logDebug(msg) {
+      debugEl.textContent = String(msg ?? "");
+    }
+
+    function showAdminUI(user) {
+      document.getElementById("loginBox").classList.add("hidden");
+      document.getElementById("adminSection").classList.remove("hidden");
+      document.getElementById("adminInfo").textContent =
+        `Giriş yapan: ${user.email || "-"} | UID: ${user.uid}`;
+    }
+
+    function showLoginUI() {
+      document.getElementById("loginBox").classList.remove("hidden");
+      document.getElementById("adminSection").classList.add("hidden");
+      logDebug("");
+    }
+
+    // Admin check:
+    // 1) UID hardcoded (senin UID)
+    // 2) veya Firestore'da /admins/{uid} dokümanı varsa
+    async function isAdmin(user) {
+      if (!user) return false;
+      if (user.uid === ADMIN_UID) return true;
+
+      try {
+        const adminRef = doc(db, "admins", user.uid);
+        const snap = await getDoc(adminRef);
+        return snap.exists();
+      } catch (e) {
+        // Firestore erişimi yoksa burada patlayabilir; o zaman admin değil kabul et
+        return false;
+      }
+    }
+
+    // Auth state
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setStatus("Giriş yok", true);
+        showLoginUI();
+        return;
+      }
+
+      setStatus("Giriş yapıldı, admin kontrol ediliyor...", true);
+      const ok = await isAdmin(user);
+
+      if (!ok) {
+        setStatus("Bu hesap admin değil. Çıkış yapılıyor.", false, `UID: ${user.uid}`);
+        await signOut(auth);
+        showLoginUI();
+        return;
+      }
+
+      setStatus("Admin giriş başarılı", true, `UID: ${user.uid}`);
+      showAdminUI(user);
+    });
+
+    // Login button
+    document.getElementById("btnLogin").addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        setStatus("Email ve şifre boş olamaz", false);
+        return;
+      }
+
+      try {
+        setStatus("Giriş deneniyor...", true);
+        await signInWithEmailAndPassword(auth, email, password);
+        // onAuthStateChanged devamını halledecek
+      } catch (e) {
+        setStatus("Giriş hatası", false, e?.message || String(e));
+      }
+    });
+
+    // Logout
+    document.getElementById("btnLogout").addEventListener("click", async () => {
+      await signOut(auth);
+      setStatus("Çıkış yapıldı", true);
+      showLoginUI();
+    });
+
+    // Test READ
+    document.getElementById("btnTestRead").addEventListener("click", async () => {
+      try {
+        setStatus("Firestore okuma test...", true);
+        const q = query(collection(db, "readings"), limit(5));
+        const snap = await getDocs(q);
+        const arr = [];
+        snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+        logDebug(JSON.stringify(arr, null, 2));
+        setStatus("Okuma başarılı", true, `Kayıt: ${arr.length}`);
+      } catch (e) {
+        logDebug(e?.stack || e?.message || String(e));
+        setStatus("Okuma HATA", false, e?.message || String(e));
+      }
+    });
+
+    // Test WRITE
+    document.getElementById("btnTestWrite").addEventListener("click", async () => {
+      try {
+        setStatus("Firestore yazma test...", true);
+        const id = "test_" + Date.now();
+        await setDoc(doc(db, "readings", id), {
+          ok: true,
+          by: auth.currentUser?.uid || null,
+          createdAt: serverTimestamp()
+        });
+        logDebug(`Yazıldı: readings/${id}`);
+        setStatus("Yazma başarılı", true, `Doc: ${id}`);
+      } catch (e) {
+        logDebug(e?.stack || e?.message || String(e));
+        setStatus("Yazma HATA", false, e?.message || String(e));
+      }
+    });
+  </script>
 </body>
 </html>
