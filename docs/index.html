@@ -2,47 +2,65 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Falhane Kullanıcı Paneli</title>
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:#f5f7fb; margin:0; padding:24px;}
-    h1{font-size:44px; line-height:1.05; margin:0 0 18px;}
-    .card{background:#fff;border-radius:16px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,.08); margin:14px 0; border:1px solid #e9edf5;}
-    .row{display:flex; gap:10px; flex-wrap:wrap;}
-    button{border:0; border-radius:12px; padding:14px 16px; font-weight:700; cursor:pointer; min-width:160px}
-    .btn-primary{background:#2563eb; color:#fff;}
-    .btn-dark{background:#0f172a; color:#fff;}
-    .muted{color:#64748b; font-size:14px;}
-    .ok{background:#e7f8ef; border:1px solid #b7f0cf; color:#14532d; padding:12px 14px; border-radius:14px;}
-    .err{background:#ffe9e9; border:1px solid #ffb4b4; color:#7f1d1d; padding:12px 14px; border-radius:14px; white-space:pre-wrap;}
-    pre{background:#0b1220;color:#e2e8f0;padding:12px;border-radius:12px;overflow:auto; font-size:12px;}
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 0; background:#f6f7fb; color:#111; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+    h1 { font-size: 56px; line-height: 1; margin: 0 0 18px; letter-spacing:-1px; }
+    .card { background:#fff; border-radius:16px; padding:18px; box-shadow: 0 6px 20px rgba(0,0,0,.06); margin: 14px 0; }
+    .row { display:flex; gap:12px; flex-wrap:wrap; }
+    button { border:0; border-radius:12px; padding:14px 18px; font-weight:700; cursor:pointer; }
+    .btn-primary { background:#1f6feb; color:#fff; }
+    .btn-dark { background:#0b1220; color:#fff; }
+    .muted { color:#555; }
+    .pill { display:inline-block; padding:4px 10px; border-radius:999px; background:#eef2ff; color:#1f2a5a; font-weight:700; font-size:12px; }
+    .list { display:flex; flex-direction:column; gap:10px; }
+    .item { border:1px solid #eee; border-radius:14px; padding:14px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New"; }
+    .ok { background:#e9f8ef; border:1px solid #bfe6cb; color:#0f5132; }
+    .err { background:#fdecec; border:1px solid #f3b6b6; color:#842029; }
+    pre { white-space:pre-wrap; word-break:break-word; margin:0; }
   </style>
 </head>
 <body>
-  <h1>Falhane Kullanıcı Paneli</h1>
+  <div class="wrap">
+    <h1>Falhane Kullanıcı<br/>Paneli</h1>
 
-  <div class="card" id="statusBox">
-    <div id="statusMsg" class="muted">Hazır.</div>
-  </div>
+    <div id="statusBox" class="card ok" style="display:none;"></div>
 
-  <div class="card">
-    <h2>Giriş (Google)</h2>
-    <div class="row">
-      <button id="btnLogin" class="btn-primary">Google ile giriş</button>
-      <button id="btnLogout" class="btn-dark">Çıkış</button>
+    <div class="card">
+      <h2>Giriş (Google)</h2>
+      <div class="row">
+        <button id="btnLogin" class="btn-primary">Google ile giriş</button>
+        <button id="btnLogout" class="btn-dark">Çıkış</button>
+      </div>
+      <p class="muted" style="margin-top:12px;">
+        Giriş yapan: <b id="who">-</b><br/>
+        UID: <span class="mono" id="uid">-</span><br/>
+        <span class="muted">Not: Bu sayfa readings koleksiyonundan sadece kendi kayıtlarını gösterir.</span>
+      </p>
     </div>
-    <div class="muted" style="margin-top:10px">
-      Giriş yapan: <b id="whoEmail">-</b><br/>
-      UID: <b id="whoUid">-</b>
-    </div>
-  </div>
 
-  <div class="card">
-    <h2>Debug</h2>
-    <pre id="debug">Hazır.</pre>
+    <div class="card">
+      <h2>Benim Fal Sonuçlarım <span class="pill">(readings)</span></h2>
+      <div class="row">
+        <button id="btnRefresh" class="btn-primary">Yenile</button>
+      </div>
+      <p class="muted">Toplam: <b id="count">0</b></p>
+      <div id="list" class="list"></div>
+    </div>
+
+    <div class="card">
+      <h2>Debug</h2>
+      <div class="mono" style="background:#0b1220;color:#fff;border-radius:12px;padding:12px;">
+        <pre id="debug">Hazır.</pre>
+      </div>
+    </div>
   </div>
 
   <script type="module">
+    // Firebase v10 (module)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
       getAuth,
@@ -50,9 +68,22 @@
       signInWithRedirect,
       getRedirectResult,
       onAuthStateChanged,
-      signOut
+      signOut,
+      setPersistence,
+      browserLocalPersistence,
+      browserSessionPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
+    import {
+      getFirestore,
+      collection,
+      query,
+      where,
+      getDocs,
+      limit
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    // === SENİN CONFIG (aynen koydum) ===
     const firebaseConfig = {
       apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
       authDomain: "falhane-e3057.firebaseapp.com",
@@ -63,99 +94,140 @@
       measurementId: "G-94TZ14VWPX"
     };
 
+    // UI helpers
+    const $ = (id) => document.getElementById(id);
+    const debug = (msg) => { $("debug").textContent = String(msg); };
+    const showStatus = (text, ok=true) => {
+      const box = $("statusBox");
+      box.style.display = "block";
+      box.className = "card " + (ok ? "ok" : "err");
+      box.textContent = text;
+    };
+
+    // Init
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // İstersen hesap seçtirmek için bunu aç:
-    provider.setCustomParameters({ prompt: "select_account" });
-
-    const statusBox = document.getElementById("statusBox");
-    const statusMsg = document.getElementById("statusMsg");
-    const debugEl = document.getElementById("debug");
-    const whoEmail = document.getElementById("whoEmail");
-    const whoUid = document.getElementById("whoUid");
-    const btnLogin = document.getElementById("btnLogin");
-    const btnLogout = document.getElementById("btnLogout");
-
-    function setOk(msg){
-      statusBox.className = "card ok";
-      statusMsg.textContent = msg;
-    }
-    function setErr(msg){
-      statusBox.className = "card err";
-      statusMsg.textContent = msg;
-    }
-    function setInfo(msg){
-      statusBox.className = "card";
-      statusMsg.className = "muted";
-      statusMsg.textContent = msg;
-    }
-    function log(obj){
-      const text = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
-      debugEl.textContent = text;
+    // Persistence: iOS'ta bazen local persistence hata verir; session'a düş.
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+      debug("Persistence: local");
+    } catch (e) {
+      await setPersistence(auth, browserSessionPersistence);
+      debug("Persistence: session (local başarısız) -> " + (e?.message || e));
     }
 
-    btnLogin.addEventListener("click", async () => {
-      try {
-        setInfo("Google yönlendirmesi başlatılıyor...");
-        log("signInWithRedirect() çağrıldı.");
-        await signInWithRedirect(auth, provider);
-      } catch (e) {
-        setErr("Giriş HATA: " + (e?.message || e));
-        log({ where: "btnLogin", code: e?.code, message: e?.message });
+    // Redirect sonucu (NORMAL: ilk açılışta sonuç yok)
+    try {
+      const res = await getRedirectResult(auth);
+      if (res?.user) {
+        debug("getRedirectResult: OK -> " + res.user.email);
+      } else {
+        debug("getRedirectResult: sonuç yok (normal).");
       }
-    });
+    } catch (e) {
+      showStatus("Redirect HATA: " + (e?.message || e), false);
+      debug("Redirect ERR: " + (e?.message || e));
+    }
 
-    btnLogout.addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-        whoEmail.textContent = "-";
-        whoUid.textContent = "-";
-        setOk("Çıkış başarılı.");
-        log("signOut() başarılı.");
-      } catch (e) {
-        setErr("Çıkış HATA: " + (e?.message || e));
-        log({ where: "btnLogout", code: e?.code, message: e?.message });
-      }
-    });
-
-    // 1) Redirect dönüş sonucunu oku (iOS Safari’de kritik)
-    (async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result?.user) {
-          setOk("Giriş başarılı (redirect).");
-          log({
-            where: "getRedirectResult",
-            email: result.user.email,
-            uid: result.user.uid,
-            providerId: result.providerId
-          });
-        } else {
-          log("getRedirectResult: sonuç yok (normal).");
-        }
-      } catch (e) {
-        // Buraya düşüyorsa giriş denemesi var ama dönüşte hata olmuş
-        setErr("Redirect sonucu HATA: " + (e?.message || e));
-        log({ where: "getRedirectResult", code: e?.code, message: e?.message });
-      }
-    })();
-
-    // 2) Auth state’i sürekli dinle (UI’yi bu günceller)
+    // Auth state
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        whoEmail.textContent = user.email || "(email yok)";
-        whoUid.textContent = user.uid;
-        setOk("Oturum açık.");
-        // log’u ezmesin diye sadece kısa not:
-        // log({ where: "onAuthStateChanged", email: user.email, uid: user.uid });
+        $("who").textContent = user.email || "(email yok)";
+        $("uid").textContent = user.uid;
+        showStatus("Oturum açık: " + (user.email || user.uid), true);
       } else {
-        whoEmail.textContent = "-";
-        whoUid.textContent = "-";
-        setInfo("Oturum kapalı. Google ile giriş yap.");
+        $("who").textContent = "-";
+        $("uid").textContent = "-";
+        showStatus("Oturum kapalı. Google ile giriş yap.", false);
       }
     });
+
+    // Login / Logout
+    $("btnLogin").addEventListener("click", async () => {
+      try {
+        debug("Redirect login başlıyor...");
+        await signInWithRedirect(auth, provider);
+      } catch (e) {
+        showStatus("Giriş HATA: " + (e?.message || e), false);
+        debug("Login ERR: " + (e?.message || e));
+      }
+    });
+
+    $("btnLogout").addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        debug("Çıkış OK");
+      } catch (e) {
+        showStatus("Çıkış HATA: " + (e?.message || e), false);
+        debug("Logout ERR: " + (e?.message || e));
+      }
+    });
+
+    // Readings yükle (index istemesin diye orderBy yok)
+    async function loadReadings() {
+      const user = auth.currentUser;
+      if (!user) {
+        showStatus("Önce giriş yap.", false);
+        return;
+      }
+
+      $("list").innerHTML = "";
+      $("count").textContent = "0";
+      debug("Readings okunuyor...");
+
+      try {
+        // Sadece kendi kayıtları
+        const q = query(
+          collection(db, "readings"),
+          where("userId", "==", user.uid),
+          limit(50)
+        );
+
+        const snap = await getDocs(q);
+        let rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        // client-side sıralama (createdAt varsa)
+        rows.sort((a,b) => {
+          const ta = a.createdAt?.seconds ? a.createdAt.seconds : 0;
+          const tb = b.createdAt?.seconds ? b.createdAt.seconds : 0;
+          return tb - ta;
+        });
+
+        $("count").textContent = String(rows.length);
+
+        if (!rows.length) {
+          $("list").innerHTML = `<div class="item muted">Kayıt yok.</div>`;
+          debug("Readings: 0");
+          return;
+        }
+
+        for (const r of rows) {
+          const created = r.createdAt?.seconds
+            ? new Date(r.createdAt.seconds * 1000).toISOString()
+            : (r.createdAt || "-");
+
+          const html = `
+            <div class="item">
+              <div><b>${r.id}</b> <span class="pill">${r.status || "approved"}</span></div>
+              <div class="muted">createdAt: <span class="mono">${created}</span></div>
+              <div style="margin-top:10px;">${(r.text ?? "").toString()}</div>
+            </div>
+          `;
+          $("list").insertAdjacentHTML("beforeend", html);
+        }
+
+        debug("Readings OK: " + rows.length);
+      } catch (e) {
+        showStatus("Okuma HATA: " + (e?.message || e), false);
+        debug("Readings ERR: " + (e?.message || e));
+      }
+    }
+
+    $("btnRefresh").addEventListener("click", loadReadings);
+
   </script>
 </body>
 </html>
