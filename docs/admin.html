@@ -2,351 +2,479 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Falhane Admin Panel</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f6f7fb; margin:0; padding:24px; }
-    .wrap { max-width: 820px; margin: 0 auto; }
-    h1 { margin: 0 0 16px; font-size: 44px; letter-spacing: -1px; }
-    .card { background:#fff; border:1px solid #e6e7ee; border-radius:16px; padding:18px; margin: 14px 0; box-shadow: 0 4px 16px rgba(16,24,40,.06); }
-    .status { padding:14px 16px; border-radius:14px; border:1px solid; }
-    .ok { background:#e9fbf0; border-color:#b7f0c8; }
-    .bad { background:#ffecec; border-color:#ffc0c0; }
-    .row { display:flex; gap:12px; flex-wrap: wrap; }
-    input, button, textarea, select { width:100%; padding:14px 12px; font-size:16px; border:1px solid #d7d9e5; border-radius:12px; box-sizing:border-box; }
-    button { background:#1f66ff; color:#fff; border:none; cursor:pointer; font-weight:700; }
-    button.secondary { background:#0f172a; }
-    button.gray { background:#475569; }
+    body { font-family: Arial, sans-serif; margin: 0; background:#f6f7fb; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 24px 16px 80px; }
+    h1 { font-size: 44px; margin: 10px 0 18px; }
+    .box { background:#fff; border:1px solid #e6e8ef; border-radius: 14px; padding:16px; margin: 14px 0; box-shadow: 0 6px 18px rgba(0,0,0,.04); }
+    .row { display:flex; gap: 10px; flex-wrap: wrap; }
+    input, button, select, textarea { font-size: 16px; padding: 12px; border-radius: 10px; border:1px solid #d7dbe7; }
+    input, textarea { width: 100%; box-sizing: border-box; }
+    button { cursor:pointer; border:none; color:#fff; background:#2463eb; padding: 12px 16px; }
+    button.secondary { background:#111827; }
+    button.gray { background:#6b7280; }
     button.danger { background:#b91c1c; }
-    button:disabled { opacity:.55; cursor:not-allowed; }
-    .muted { color:#6b7280; font-size: 13px; line-height: 1.4; }
-    .pill { display:inline-block; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; }
-    .pill.pending { background:#fff7ed; color:#9a3412; border:1px solid #fed7aa; }
-    .pill.approved { background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; }
-    .pill.rejected { background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; }
-    .list { display:flex; flex-direction:column; gap:10px; margin-top: 10px; }
-    .item { border:1px solid #e6e7ee; border-radius:14px; padding:12px; background:#fff; }
-    .item-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
-    .item-meta { color:#6b7280; font-size:12px; margin-top: 6px; }
-    .item-text { margin-top:10px; white-space: pre-wrap; }
-    .actions { display:flex; gap:10px; margin-top:12px; flex-wrap: wrap; }
-    .actions button { width:auto; padding:10px 12px; border-radius:12px; }
-    pre { background:#0b1220; color:#e5e7eb; padding:12px; border-radius:12px; overflow:auto; font-size: 12px; }
+    button:disabled { opacity:.5; cursor:not-allowed; }
+    .status { border-radius: 12px; padding: 14px; border:1px solid; }
+    .ok { background:#e9f8ef; border-color:#b8ebc8; color:#0f5132; }
+    .bad { background:#fdecec; border-color:#f6b7b7; color:#7a1f1f; }
+    small { color:#6b7280; display:block; margin-top:8px; line-height:1.35; }
+    .hidden { display:none; }
+    .list { display:flex; flex-direction: column; gap: 12px; }
+    .card { border:1px solid #e6e8ef; border-radius: 12px; padding: 12px; background:#fff; }
+    .tag { display:inline-block; padding:4px 10px; border-radius:999px; font-size: 12px; border:1px solid #d7dbe7; color:#111827; background:#f3f4f6; }
+    .tag.pending { background:#fff7ed; border-color:#fed7aa; color:#9a3412; }
+    .tag.approved { background:#ecfdf5; border-color:#a7f3d0; color:#065f46; }
+    .tag.rejected { background:#fef2f2; border-color:#fecaca; color:#991b1b; }
+    pre { background:#0b1220; color:#e5e7eb; padding: 12px; border-radius: 12px; overflow:auto; }
+    .muted { color:#6b7280; }
   </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Falhane Admin Panel</h1>
+  <div class="wrap">
+    <h1>Falhane Admin Panel</h1>
 
-  <div id="statusBox" class="status ok card" style="display:none"></div>
+    <div id="statusBox" class="status ok">
+      Durum: Hazır
+    </div>
 
-  <div class="card">
-    <h2 style="margin:0 0 12px;">Admin Giriş (Email/Password)</h2>
-    <div class="row">
-      <div style="flex:1; min-width:220px;">
-        <input id="email" type="email" placeholder="Email" />
+    <div class="box">
+      <h2>Admin Giriş (Email/Password)</h2>
+      <div class="row">
+        <div style="flex:1; min-width:260px;">
+          <input id="email" placeholder="Email" autocomplete="username" />
+        </div>
+        <div style="flex:1; min-width:260px;">
+          <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
+        </div>
       </div>
-      <div style="flex:1; min-width:220px;">
-        <input id="password" type="password" placeholder="Password" />
+
+      <div class="row" style="margin-top:10px;">
+        <button id="btnLogin">Giriş</button>
+        <button id="btnLogout" class="secondary">Çıkış</button>
+      </div>
+
+      <small>
+        Admin UID kontrolü: Firestore'da <b>admins/{UID}</b> dokümanı olmalı (ör: Document ID = UID).
+      </small>
+      <div class="muted" style="margin-top:8px;">
+        UID: <span id="uidText">-</span> | Admin: <span id="isAdminText">-</span>
       </div>
     </div>
-    <div class="row" style="margin-top:10px;">
-      <button id="btnLogin">Giriş</button>
-      <button id="btnLogout" class="secondary">Çıkış</button>
+
+    <div id="adminArea" class="box hidden">
+      <h2>Admin İşlemleri</h2>
+
+      <div class="row" style="margin-top:8px;">
+        <button id="btnLoadPending">Pending Uploads Yükle</button>
+        <button id="btnLoadAll" class="gray">Son 50 Upload (tümü) yükle</button>
+      </div>
+
+      <div class="muted" style="margin-top:10px;">
+        Durum: <span id="uploadsInfo">-</span>
+      </div>
+
+      <div class="box" style="background:#f8fafc;">
+        <h3>Uploads Listesi</h3>
+        <div id="uploadsList" class="list"></div>
+      </div>
+
+      <div class="box">
+        <h3>Debug</h3>
+        <pre id="debugOut">{}</pre>
+      </div>
     </div>
 
-    <div class="muted" style="margin-top:10px;">
-      Admin UID kontrolü: <b id="adminUidLabel"></b><br/>
-      Not: Admin yetkisi için Firestore’da <b>admins/{UID}</b> dokümanı olmalı.
-    </div>
   </div>
 
-  <div class="card">
-    <h2 style="margin:0 0 12px;">Admin İşlemleri</h2>
-    <div class="muted">
-      Giriş yapan: <b id="who"></b>
-    </div>
+  <script type="module">
+    // Firebase (CDN, modular)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      collection,
+      query,
+      where,
+      orderBy,
+      limit,
+      getDocs,
+      writeBatch,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    <div class="row" style="margin-top:12px;">
-      <button id="btnLoadPending" class="gray">Pending Uploads Yükle</button>
-      <button id="btnLoadAll" class="gray">Son 50 Upload (tümü) yükle</button>
-    </div>
+    // === SENİN CONFIG (aynen koydum) ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
+      authDomain: "falhane-e3057.firebaseapp.com",
+      projectId: "falhane-e3057",
+      storageBucket: "falhane-e3057.firebasestorage.app",
+      messagingSenderId: "117754512778",
+      appId: "1:117754512778:web:52aee440472568bc6cb473",
+      measurementId: "G-94TZ14VWPX"
+    };
 
-    <div id="pendingInfo" class="muted" style="margin-top:10px;"></div>
-    <div id="list" class="list"></div>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    <hr style="border:none;border-top:1px solid #eceef6; margin:18px 0;">
+    // UI refs
+    const statusBox = document.getElementById("statusBox");
+    const emailEl = document.getElementById("email");
+    const passEl = document.getElementById("password");
+    const btnLogin = document.getElementById("btnLogin");
+    const btnLogout = document.getElementById("btnLogout");
+    const adminArea = document.getElementById("adminArea");
+    const uidText = document.getElementById("uidText");
+    const isAdminText = document.getElementById("isAdminText");
+    const uploadsList = document.getElementById("uploadsList");
+    const uploadsInfo = document.getElementById("uploadsInfo");
+    const debugOut = document.getElementById("debugOut");
+    const btnLoadPending = document.getElementById("btnLoadPending");
+    const btnLoadAll = document.getElementById("btnLoadAll");
 
-    <h3 style="margin:0 0 10px;">Debug</h3>
-    <pre id="debug">Hazır.</pre>
-  </div>
-</div>
+    let currentUser = null;
+    let currentIsAdmin = false;
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import {
-    getFirestore, doc, getDoc, setDoc, updateDoc,
-    collection, query, where, orderBy, limit, getDocs, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-  import {
-    getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
-  // === Firebase config (SENİN VERDİĞİN) ===
-  const firebaseConfig = {
-    apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
-    authDomain: "falhane-e3057.firebaseapp.com",
-    projectId: "falhane-e3057",
-    storageBucket: "falhane-e3057.firebasestorage.app",
-    messagingSenderId: "117754512778",
-    appId: "1:117754512778:web:52aee440472568bc6cb473",
-    measurementId: "G-94TZ14VWPX"
-  };
-
-  // Admin UID (SENİN VERDİĞİN)
-  const ADMIN_UID = "5oxpcgGLHJgune66lpLNxrTB0Fm2";
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
-
-  const $ = (id) => document.getElementById(id);
-
-  function setStatus(ok, html) {
-    const box = $("statusBox");
-    box.style.display = "block";
-    box.className = "status card " + (ok ? "ok" : "bad");
-    box.innerHTML = html;
-  }
-  function dbg(x) { $("debug").textContent = typeof x === "string" ? x : JSON.stringify(x, null, 2); }
-
-  $("adminUidLabel").textContent = ADMIN_UID;
-
-  async function isAdmin(uid) {
-    if (!uid) return false;
-    const snap = await getDoc(doc(db, "admins", uid));
-    return snap.exists();
-  }
-
-  async function ensureAdminDoc(uid) {
-    // Sen zaten oluşturmuşsun. Bu sadece kontrol eder, yoksa uyarı verir.
-    const ok = await isAdmin(uid);
-    if (!ok) {
-      setStatus(false, `Admin değil: Firestore'da <b>admins/${uid}</b> dokümanı yok.`);
+    function setStatusOk(msg) {
+      statusBox.classList.remove("bad");
+      statusBox.classList.add("ok");
+      statusBox.textContent = "Durum: " + msg;
     }
-    return ok;
-  }
-
-  async function login() {
-    const email = $("email").value.trim();
-    const pass = $("password").value;
-    if (!email || !pass) {
-      setStatus(false, "Email ve password boş olamaz.");
-      return;
+    function setStatusBad(msg) {
+      statusBox.classList.remove("ok");
+      statusBox.classList.add("bad");
+      statusBox.textContent = "Durum: " + msg;
     }
-    try {
-      const res = await signInWithEmailAndPassword(auth, email, pass);
-      const uid = res.user.uid;
-      $("who").textContent = `${res.user.email} | UID: ${uid}`;
+    function setDebug(obj) {
+      debugOut.textContent = JSON.stringify(obj, null, 2);
+    }
 
-      // 1) UID sabit admin UID ile aynı mı?
-      if (uid !== ADMIN_UID) {
-        setStatus(false, `Giriş oldu ama bu UID admin UID ile aynı değil.<br>Gelen UID: <b>${uid}</b><br>Beklenen: <b>${ADMIN_UID}</b>`);
+    async function checkAdmin(uid) {
+      // Admin sayıyoruz: admins/{uid} dokümanı varsa admin
+      const ref = doc(db, "admins", uid);
+      const snap = await getDoc(ref);
+      return snap.exists();
+    }
+
+    async function login() {
+      const email = (emailEl.value || "").trim();
+      const password = passEl.value || "";
+      if (!email || !password) {
+        setStatusBad("Email ve password boş olamaz");
+        return;
+      }
+      try {
+        setStatusOk("Giriş yapılıyor...");
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (e) {
+        setStatusBad("Giriş hatası: " + (e?.message || e));
+      }
+    }
+
+    async function logout() {
+      try {
+        await signOut(auth);
+        setStatusOk("Çıkış yapıldı");
+      } catch (e) {
+        setStatusBad("Çıkış hatası: " + (e?.message || e));
+      }
+    }
+
+    btnLogin.addEventListener("click", login);
+    btnLogout.addEventListener("click", logout);
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user || null;
+      uploadsList.innerHTML = "";
+      uploadsInfo.textContent = "-";
+      setDebug({});
+
+      if (!user) {
+        uidText.textContent = "-";
+        isAdminText.textContent = "-";
+        adminArea.classList.add("hidden");
+        setStatusOk("Hazır (giriş bekleniyor)");
         return;
       }
 
-      // 2) Firestore admins/{uid} var mı?
-      const ok = await ensureAdminDoc(uid);
-      if (ok) setStatus(true, `Admin giriş başarılı. UID: <b>${uid}</b>`);
-    } catch (e) {
-      setStatus(false, "Giriş HATA: " + (e?.code || e?.message));
-      dbg(e);
-    }
-  }
+      uidText.textContent = user.uid;
+      setStatusOk("Giriş başarılı, admin kontrol ediliyor...");
 
-  async function logout() {
-    try {
-      await signOut(auth);
-      setStatus(true, "Çıkış yapıldı.");
-      $("who").textContent = "-";
-      $("list").innerHTML = "";
-      $("pendingInfo").textContent = "";
-    } catch (e) {
-      setStatus(false, "Çıkış HATA: " + (e?.code || e?.message));
-      dbg(e);
-    }
-  }
+      try {
+        currentIsAdmin = await checkAdmin(user.uid);
+        isAdminText.textContent = currentIsAdmin ? "EVET" : "HAYIR";
 
-  function pill(status) {
-    const s = (status || "").toLowerCase();
-    const cls = s === "approved" ? "approved" : s === "rejected" ? "rejected" : "pending";
-    return `<span class="pill ${cls}">${s || "pending"}</span>`;
-  }
+        if (!currentIsAdmin) {
+          adminArea.classList.add("hidden");
+          setStatusBad("Bu kullanıcı admin değil. admins/{UID} dokümanı yok.");
+          return;
+        }
 
-  function renderList(docs) {
-    const list = $("list");
-    list.innerHTML = "";
-    if (!docs.length) {
-      list.innerHTML = `<div class="muted">Kayıt yok.</div>`;
-      return;
+        adminArea.classList.remove("hidden");
+        setStatusOk("Admin giriş başarılı");
+
+      } catch (e) {
+        adminArea.classList.add("hidden");
+        setStatusBad("Admin kontrol hatası: " + (e?.message || e));
+      }
+    });
+
+    function formatDate(ts) {
+      if (!ts) return "-";
+      // Firestore Timestamp gelebilir
+      try {
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toISOString();
+      } catch {
+        return String(ts);
+      }
     }
 
-    for (const d of docs) {
-      const data = d.data();
-      const id = d.id;
-      const status = data.status || "pending";
-      const text = data.text ?? data.test ?? "";
-      const userId = data.userId ?? "-";
-      const createdAt = data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : JSON.stringify(data.createdAt || null);
+    function renderUploadCard(docId, data) {
+      const status = data?.status || "-";
+      const tagClass = status === "pending" ? "pending" : status === "approved" ? "approved" : status === "rejected" ? "rejected" : "";
+      const created = formatDate(data?.createdAt);
+      const userId = data?.userId || "-";
+      const text = data?.text || "";
 
       const el = document.createElement("div");
-      el.className = "item";
+      el.className = "card";
+
       el.innerHTML = `
-        <div class="item-head">
-          <div>
-            <div><b>${id}</b> ${pill(status)}</div>
-            <div class="item-meta">userId: <b>${userId}</b> • createdAt: <b>${createdAt}</b></div>
-          </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <div style="font-weight:700; font-size:18px; word-break:break-all;">${docId}</div>
+          <span class="tag ${tagClass}">${status}</span>
         </div>
-        <div class="item-text">${(text + "").replaceAll("<","&lt;").replaceAll(">","&gt;")}</div>
-        <div class="actions">
-          <button class="approve">Onayla → readings</button>
-          <button class="danger reject">Reddet</button>
-          <button class="gray raw">JSON</button>
+        <div class="muted" style="margin-top:6px;">
+          userId: <b>${userId}</b> • createdAt: <b>${created}</b>
         </div>
+        <div style="margin-top:10px; white-space:pre-wrap; word-break:break-word;">${escapeHtml(text)}</div>
+
+        <div class="row" style="margin-top:12px;">
+          <button class="btnApprove">Onayla → readings</button>
+          <button class="danger btnReject">Reddet</button>
+          <button class="gray btnJson">JSON</button>
+        </div>
+
+        <pre class="jsonBox hidden"></pre>
       `;
 
-      el.querySelector(".raw").onclick = () => dbg({ id, ...data });
-      el.querySelector(".approve").onclick = async () => approveUpload(id, data);
-      el.querySelector(".reject").onclick = async () => rejectUpload(id, data);
+      const btnApprove = el.querySelector(".btnApprove");
+      const btnReject = el.querySelector(".btnReject");
+      const btnJson = el.querySelector(".btnJson");
+      const jsonBox = el.querySelector(".jsonBox");
 
-      // status pending değilse onay/ret kilitle
-      if (String(status).toLowerCase() !== "pending") {
-        el.querySelector(".approve").disabled = true;
-        el.querySelector(".reject").disabled = true;
+      btnJson.addEventListener("click", () => {
+        jsonBox.classList.toggle("hidden");
+        jsonBox.textContent = JSON.stringify({ id: docId, ...data }, null, 2);
+      });
+
+      btnApprove.addEventListener("click", async () => {
+        await approveUpload(docId, data);
+      });
+
+      btnReject.addEventListener("click", async () => {
+        await rejectUpload(docId, data);
+      });
+
+      return el;
+    }
+
+    function escapeHtml(s) {
+      return String(s || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function loadPendingUploads() {
+      if (!currentUser || !currentIsAdmin) return;
+
+      uploadsList.innerHTML = "";
+      uploadsInfo.textContent = "yükleniyor...";
+      setDebug({ action: "loadPendingUploads" });
+
+      try {
+        // Index gerektiren sorgu:
+        // where(status == "pending") + orderBy(createdAt desc)
+        const q = query(
+          collection(db, "uploads"),
+          where("status", "==", "pending"),
+          orderBy("createdAt", "desc"),
+          limit(50)
+        );
+
+        const snap = await getDocs(q);
+        const items = [];
+        snap.forEach(d => items.push({ id: d.id, data: d.data() }));
+
+        uploadsInfo.textContent = `pending: ${items.length} (max 50)`;
+        setDebug({ pendingCount: items.length, ids: items.map(x => x.id) });
+
+        if (!items.length) {
+          uploadsList.innerHTML = `<div class="muted">Pending upload yok.</div>`;
+          return;
+        }
+
+        for (const it of items) {
+          uploadsList.appendChild(renderUploadCard(it.id, it.data));
+        }
+
+        setStatusOk("Uploads yüklendi (pending)");
+      } catch (e) {
+        setStatusBad("Uploads okuma HATA: " + (e?.message || e));
+        setDebug({ error: e?.message || String(e) });
       }
-
-      list.appendChild(el);
     }
-  }
 
-  async function loadPending() {
-    const u = auth.currentUser;
-    if (!u) { setStatus(false, "Önce giriş yap."); return; }
-    if (u.uid !== ADMIN_UID) { setStatus(false, "Bu kullanıcı admin değil (UID uyuşmuyor)."); return; }
+    async function loadLastUploadsAll() {
+      if (!currentUser || !currentIsAdmin) return;
 
-    try {
-      // pending uploads: status == "pending", createdAt desc
-      const q = query(
-        collection(db, "uploads"),
-        where("status", "==", "pending"),
-        orderBy("createdAt", "desc"),
-        limit(50)
-      );
-      const snap = await getDocs(q);
-      const docs = snap.docs;
+      uploadsList.innerHTML = "";
+      uploadsInfo.textContent = "yükleniyor...";
+      setDebug({ action: "loadLastUploadsAll" });
 
-      $("pendingInfo").innerHTML = `Durum: <b>Uploads yüklendi</b> • pending: <b>${docs.length}</b> (max 50)`;
-      setStatus(true, `Durum: <b>Uploads yüklendi</b><br>pending: <b>${docs.length}</b>`);
-      renderList(docs);
-      dbg({ pendingCount: docs.length, ids: docs.map(x => x.id) });
-    } catch (e) {
-      setStatus(false, "Uploads okuma HATA: " + (e?.message || e));
-      dbg(e);
+      try {
+        const q = query(
+          collection(db, "uploads"),
+          orderBy("createdAt", "desc"),
+          limit(50)
+        );
+
+        const snap = await getDocs(q);
+        const items = [];
+        snap.forEach(d => items.push({ id: d.id, data: d.data() }));
+
+        uploadsInfo.textContent = `toplam: ${items.length} (son 50)`;
+        setDebug({ count: items.length, ids: items.map(x => x.id) });
+
+        if (!items.length) {
+          uploadsList.innerHTML = `<div class="muted">Upload yok.</div>`;
+          return;
+        }
+
+        for (const it of items) {
+          uploadsList.appendChild(renderUploadCard(it.id, it.data));
+        }
+
+        setStatusOk("Uploads yüklendi (son 50)");
+      } catch (e) {
+        setStatusBad("Uploads okuma HATA: " + (e?.message || e));
+        setDebug({ error: e?.message || String(e) });
+      }
     }
-  }
 
-  async function loadAll() {
-    const u = auth.currentUser;
-    if (!u) { setStatus(false, "Önce giriş yap."); return; }
-    if (u.uid !== ADMIN_UID) { setStatus(false, "Bu kullanıcı admin değil (UID uyuşmuyor)."); return; }
+    btnLoadPending.addEventListener("click", loadPendingUploads);
+    btnLoadAll.addEventListener("click", loadLastUploadsAll);
 
-    try {
-      const q = query(collection(db, "uploads"), orderBy("createdAt", "desc"), limit(50));
-      const snap = await getDocs(q);
-      const docs = snap.docs;
+    // === EN ÖNEMLİ KISIM: ONAYLA ===
+    async function approveUpload(uploadId, uploadDataMaybe) {
+      if (!currentUser || !currentIsAdmin) return;
 
-      $("pendingInfo").innerHTML = `Durum: <b>Uploads yüklendi</b> • toplam: <b>${docs.length}</b> (son 50)`;
-      setStatus(true, `Durum: <b>Uploads yüklendi</b><br>toplam: <b>${docs.length}</b>`);
-      renderList(docs);
-      dbg({ totalCount: docs.length, ids: docs.map(x => x.id) });
-    } catch (e) {
-      setStatus(false, "Uploads okuma HATA: " + (e?.message || e));
-      dbg(e);
+      try {
+        setStatusOk("Onay işlemi yapılıyor...");
+
+        // upload doc’u garanti oku (UI'dan gelen data eksik olabilir)
+        const uploadRef = doc(db, "uploads", uploadId);
+        const uploadSnap = await getDoc(uploadRef);
+        if (!uploadSnap.exists()) {
+          setStatusBad("Upload dokümanı bulunamadı: " + uploadId);
+          return;
+        }
+        const uploadData = uploadSnap.data();
+
+        // Yeni reading dokümanı:
+        // İstersen aynı ID ile de yazabilirsin ama ben "reading_..." yapıyorum
+        const newReadingId = `reading_${uploadId}`;
+        const readingRef = doc(db, "readings", newReadingId);
+
+        const now = serverTimestamp();
+
+        const readingData = {
+          // kullanıcıya gösterilecek asıl içerik
+          text: uploadData.text || "",
+          userId: uploadData.userId || "",
+
+          // durum
+          status: "approved",
+
+          // zamanlar
+          createdAt: uploadData.createdAt || now,   // upload'dan gelen
+          approvedAt: now,
+
+          // kim onayladı
+          approvedBy: currentUser.uid,
+
+          // kaynak link
+          sourceUploadId: uploadId
+        };
+
+        // Upload güncelleme
+        const uploadPatch = {
+          status: "approved",
+          approvedAt: now,
+          approvedBy: currentUser.uid
+        };
+
+        const batch = writeBatch(db);
+        batch.set(readingRef, readingData, { merge: false });
+        batch.update(uploadRef, uploadPatch);
+
+        await batch.commit();
+
+        setStatusOk(`Onaylandı → readings/${newReadingId}`);
+        setDebug({ approved: true, uploadId, readingId: newReadingId });
+
+        // UI yenile
+        await loadPendingUploads();
+
+      } catch (e) {
+        setStatusBad("Onay HATA: " + (e?.message || e));
+        setDebug({ error: e?.message || String(e), uploadId });
+      }
     }
-  }
 
-  async function approveUpload(uploadId, data) {
-    const u = auth.currentUser;
-    if (!u) { setStatus(false, "Önce giriş yap."); return; }
-    if (u.uid !== ADMIN_UID) { setStatus(false, "Bu kullanıcı admin değil."); return; }
+    // === REDDET ===
+    async function rejectUpload(uploadId) {
+      if (!currentUser || !currentIsAdmin) return;
 
-    try {
-      // 1) readings/{uploadId} yaz
-      const text = data.text ?? data.test ?? "";
-      const userId = data.userId ?? null;
+      try {
+        setStatusOk("Reddetme işlemi yapılıyor...");
 
-      await setDoc(doc(db, "readings", uploadId), {
-        text,
-        userId,
-        uploadId,
-        status: "approved",
-        createdAt: serverTimestamp(),
-        approvedAt: serverTimestamp(),
-        approvedBy: u.uid
-      });
+        const uploadRef = doc(db, "uploads", uploadId);
+        const now = serverTimestamp();
 
-      // 2) uploads/{uploadId} status approved yap
-      await updateDoc(doc(db, "uploads", uploadId), {
-        status: "approved",
-        approvedAt: serverTimestamp(),
-        approvedBy: u.uid
-      });
+        const batch = writeBatch(db);
+        batch.update(uploadRef, {
+          status: "rejected",
+          rejectedAt: now,
+          rejectedBy: currentUser.uid
+        });
 
-      setStatus(true, `Onaylandı: <b>${uploadId}</b> → readings/${uploadId}`);
-      await loadPending(); // listeyi yenile
-    } catch (e) {
-      setStatus(false, "Onaylama HATA: " + (e?.message || e));
-      dbg(e);
+        await batch.commit();
+
+        setStatusOk(`Reddedildi → uploads/${uploadId} status=rejected`);
+        setDebug({ rejected: true, uploadId });
+
+        await loadPendingUploads();
+
+      } catch (e) {
+        setStatusBad("Reddet HATA: " + (e?.message || e));
+        setDebug({ error: e?.message || String(e), uploadId });
+      }
     }
-  }
-
-  async function rejectUpload(uploadId, data) {
-    const u = auth.currentUser;
-    if (!u) { setStatus(false, "Önce giriş yap."); return; }
-    if (u.uid !== ADMIN_UID) { setStatus(false, "Bu kullanıcı admin değil."); return; }
-
-    try {
-      await updateDoc(doc(db, "uploads", uploadId), {
-        status: "rejected",
-        rejectedAt: serverTimestamp(),
-        rejectedBy: u.uid
-      });
-      setStatus(true, `Reddedildi: <b>${uploadId}</b> (uploads içinde status=rejected)`);
-      await loadPending();
-    } catch (e) {
-      setStatus(false, "Reddetme HATA: " + (e?.message || e));
-      dbg(e);
-    }
-  }
-
-  $("btnLogin").onclick = login;
-  $("btnLogout").onclick = logout;
-  $("btnLoadPending").onclick = loadPending;
-  $("btnLoadAll").onclick = loadAll;
-
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      $("who").textContent = "-";
-      return;
-    }
-    $("who").textContent = `${user.email || "-"} | UID: ${user.uid}`;
-    if (user.uid === ADMIN_UID) {
-      await ensureAdminDoc(user.uid);
-      // otomatik pending yükle (istersen kapat)
-      await loadPending();
-    }
-  });
-</script>
+  </script>
 </body>
 </html>
