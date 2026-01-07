@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin İşlemleri</title>
+  <title>Falcı İşlemleri</title>
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#f3f6fb;color:#111}
     .wrap{max-width:980px;margin:0 auto;padding:22px}
     h1{font-size:44px;line-height:1.05;margin:12px 0 16px}
     .card{background:#fff;border:1px solid #e6e8ef;border-radius:18px;padding:16px 16px 18px;margin:14px 0;box-shadow:0 6px 24px rgba(12,19,33,.06)}
     .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-    .btn{border:0;border-radius:14px;padding:10px 14px;font-weight:800;cursor:pointer}
+    .btn{border:0;border-radius:14px;padding:10px 14px;font-weight:900;cursor:pointer}
     .btnPrimary{background:#2563eb;color:#fff}
     .btnGhost{background:#e9eefb;color:#0f172a}
     .btnDanger{background:#111827;color:#fff}
@@ -18,10 +18,10 @@
     .btnBad{background:#ef4444;color:#fff}
     .pill{display:inline-block;background:#eef2ff;color:#1e3a8a;padding:8px 10px;border-radius:999px;font-weight:900}
     .muted{color:#64748b}
-    .warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:14px;font-weight:800}
+    .warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:14px;font-weight:900}
     .debug{white-space:pre-wrap;background:#0b1220;color:#e5e7eb;border-radius:16px;padding:12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
     .listItem{border:1px solid #e6e8ef;border-radius:18px;padding:14px;margin:10px 0;background:#fff}
-    textarea{width:100%;min-height:110px;border-radius:14px;border:1px solid #e5e7eb;padding:12px;font-size:15px}
+    textarea{width:100%;min-height:120px;border-radius:14px;border:1px solid #e5e7eb;padding:12px;font-size:15px}
     .thumbs{display:flex;gap:10px;align-items:center;justify-content:flex-end}
     .thumbs img{width:76px;height:76px;border-radius:14px;object-fit:cover;border:1px solid #e6e8ef}
     .right{margin-left:auto}
@@ -29,13 +29,13 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Admin İşlemleri</h1>
+  <h1>Falcı İşlemleri</h1>
 
   <div id="banner" class="warn" style="display:none"></div>
 
   <div class="card">
     <div class="row">
-      <div class="pill" id="adminPill">Admin: HAYIR</div>
+      <div class="pill" id="rolePill">Falcı: HAYIR</div>
       <div class="pill" id="loginPill">Giriş yapan: -</div>
       <div class="pill" id="uidPill">UID: -</div>
       <div class="right row">
@@ -44,7 +44,7 @@
       </div>
     </div>
     <div class="muted" style="margin-top:10px">
-      Not: Admin yetkisi için Firestore'da <b>admins/{UID}</b> dokümanı olmalı.
+      Not: Falcı yetkisi için Firestore'da <b>admins/{UID}</b> dokümanı olmalı.
     </div>
     <div class="muted" id="statusLine" style="margin-top:8px">Durum: Oturum kapalı.</div>
   </div>
@@ -91,6 +91,9 @@
   const log = (s)=>$("debugBox").textContent = String(s);
   const banner = (s)=>{ $("banner").style.display = s ? "block":"none"; $("banner").textContent = s||""; };
 
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
   function fmtDate(ts){
     try{
       if(!ts) return "-";
@@ -100,18 +103,14 @@
     }catch{return "-";}
   }
 
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  }
-
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  log("BOOT: admin\nBOOT: persistence=browserLocalPersistence");
+  log("BOOT: falci\nBOOT: persistence=browserLocalPersistence");
   await setPersistence(auth, browserLocalPersistence);
 
-  let isAdmin = false;
+  let isFalci = false;
   let mode = "pending"; // pending | all
 
   $("btnGoogle").onclick = async ()=>{
@@ -137,8 +136,8 @@
 
   onAuthStateChanged(auth, async (user)=>{
     if(!user){
-      isAdmin = false;
-      $("adminPill").textContent = "Admin: HAYIR";
+      isFalci = false;
+      $("rolePill").textContent = "Falcı: HAYIR";
       $("loginPill").textContent = "Giriş yapan: -";
       $("uidPill").textContent = "UID: -";
       $("statusLine").textContent = "Durum: Oturum kapalı.";
@@ -150,16 +149,16 @@
     $("loginPill").textContent = "Giriş yapan: " + (user.email || "-");
     $("uidPill").textContent = "UID: " + (user.uid || "-");
 
-    // Admin check: admins/{uid} var mı?
+    // Role check (admins/{uid})
     const aRef = doc(db, "admins", user.uid);
     const aSnap = await getDoc(aRef);
-    isAdmin = aSnap.exists();
+    isFalci = aSnap.exists();
 
-    $("adminPill").textContent = "Admin: " + (isAdmin ? "EVET" : "HAYIR");
-    $("adminPill").style.background = isAdmin ? "#dcfce7" : "#fee2e2";
-    $("adminPill").style.color = isAdmin ? "#14532d" : "#7f1d1d";
+    $("rolePill").textContent = "Falcı: " + (isFalci ? "EVET" : "HAYIR");
+    $("rolePill").style.background = isFalci ? "#dcfce7" : "#fee2e2";
+    $("rolePill").style.color = isFalci ? "#14532d" : "#7f1d1d";
 
-    $("statusLine").textContent = isAdmin ? "Durum: Giriş OK. Admin ise listeleyebilirsin." : "Durum: Admin değilsin.";
+    $("statusLine").textContent = isFalci ? "Durum: Giriş OK. Listeleyebilirsin." : "Durum: Yetkin yok.";
     await refresh();
   });
 
@@ -168,7 +167,7 @@
       banner("");
       const user = auth.currentUser;
       if(!user){ $("countLine").textContent="Durum: Oturum kapalı."; return; }
-      if(!isAdmin){ $("countLine").textContent="Durum: Admin değilsin."; $("list").innerHTML=""; return; }
+      if(!isFalci){ $("countLine").textContent="Durum: Yetkin yok."; $("list").innerHTML=""; return; }
 
       $("countLine").textContent = "Yükleniyor...";
 
@@ -193,14 +192,14 @@
       snap.forEach(d=>items.push({id:d.id, ...d.data()}));
 
       $("countLine").textContent = `Durum: ${items.length} kayıt. (${mode==="pending" ? "bekleyen" : "tümü"})`;
-      $("list").innerHTML = items.map(renderItem).join("");
+      $("list").innerHTML = items.map(renderItem).join("") || `<div class="muted">Kayıt yok.</div>`;
       bindRowButtons(items);
+
       log($("debugBox").textContent + "\nREFRESH OK: " + items.length);
     }catch(e){
       const msg = e?.message || e?.code || String(e);
       log($("debugBox").textContent + "\nREFRESH ERROR: " + msg);
-
-      if (String(msg).includes("requires an index") || String(msg).includes("FAILED_PRECONDITION")) {
+      if(String(msg).includes("requires an index") || String(msg).includes("FAILED_PRECONDITION")){
         banner("Firestore index lazım. Hata mesajındaki linkten Create Index yap.");
       } else {
         banner("Hata: " + msg);
@@ -212,7 +211,6 @@
     const created = fmtDate(x.createdAt);
     const status = x.status || "-";
     const sign = x.sign || "-";
-    const st = x.statusText || "";
     const comment = x.comment || "";
 
     return `
@@ -232,8 +230,6 @@
           <span class="pill">Durum: ${escapeHtml(status)}</span>
         </div>
 
-        <div class="muted" style="margin-top:10px">${escapeHtml(st)}</div>
-
         <div style="margin-top:12px">
           <b>Fal Yorumu (müşteri görecek)</b>
           <textarea id="c_${x.id}" placeholder="Fal yorumunu buraya yaz...">${escapeHtml(comment)}</textarea>
@@ -241,11 +237,11 @@
 
         <div class="row" style="margin-top:12px">
           <button class="btn btnGhost" data-copy="${x.id}">Resimleri Kopyala</button>
-          <button class="btn btnOk" data-approve="${x.id}">Onayla + Yorumu Kaydet</button>
+          <button class="btn btnOk" data-answer="${x.id}">Yorumu Kaydet + Sonuçlandır</button>
           <button class="btn btnBad" data-reject="${x.id}">Reddet</button>
         </div>
 
-        <div class="muted small" style="margin-top:8px">
+        <div class="muted" style="margin-top:8px">
           UserId: ${escapeHtml(x.userId || "-")} | Doc: ${escapeHtml(x.id)}
         </div>
       </div>
@@ -253,7 +249,6 @@
   }
 
   function bindRowButtons(items){
-    // copy
     document.querySelectorAll("[data-copy]").forEach(btn=>{
       btn.onclick = async ()=>{
         const id = btn.getAttribute("data-copy");
@@ -265,41 +260,33 @@
       };
     });
 
-    // approve
-    document.querySelectorAll("[data-approve]").forEach(btn=>{
+    document.querySelectorAll("[data-answer]").forEach(btn=>{
       btn.onclick = async ()=>{
-        const id = btn.getAttribute("data-approve");
-        const x = items.find(i=>i.id===id);
-        if(!x) return;
-
-        const user = auth.currentUser;
+        const id = btn.getAttribute("data-answer");
         const comment = document.getElementById("c_"+id).value.trim();
-        if(!comment) { banner("Yorum boş olamaz."); return; }
-
+        if(!comment){ banner("Yorum boş olamaz."); return; }
         try{
           await updateDoc(doc(db,"uploads",id),{
-            status: "approved",
+            status: "answered",
             comment: comment,
-            approvedAt: serverTimestamp(),
-            approvedBy: user.uid
+            answeredAt: serverTimestamp()
           });
-          banner("Onaylandı. Müşteri geçmişinde yorumu görecek.");
+          banner("Sonuçlandı. Müşteri 'Sonuçlanan fallarım' kısmında görecek.");
           await refresh();
         }catch(e){
-          banner("Onay hatası: " + (e?.message||e?.code||String(e)));
+          banner("Kaydet hatası: " + (e?.message||e?.code||String(e)));
         }
       };
     });
 
-    // reject
     document.querySelectorAll("[data-reject]").forEach(btn=>{
       btn.onclick = async ()=>{
         const id = btn.getAttribute("data-reject");
         try{
           await updateDoc(doc(db,"uploads",id),{
             status: "rejected",
-            approvedAt: serverTimestamp(),
-            approvedBy: auth.currentUser?.uid || null
+            answeredAt: serverTimestamp(),
+            comment: "Falcı tarafından reddedildi."
           });
           banner("Reddedildi.");
           await refresh();
