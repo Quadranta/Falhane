@@ -5,128 +5,149 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Falhane Kullanıcı Paneli</title>
   <style>
-    :root { --bg:#f4f7fb; --card:#fff; --text:#0f172a; --muted:#64748b; --blue:#2563eb; --green:#16a34a; --red:#ef4444; --dark:#0b1220; --line:#e5e7eb; }
-    *{ box-sizing:border-box; }
-    body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text); }
-    .wrap{ max-width:760px; margin:0 auto; padding:18px 14px 40px; }
-    h1{ margin:6px 0 14px; font-size:40px; letter-spacing:-.5px; }
-    .card{ background:var(--card); border:1px solid var(--line); border-radius:18px; padding:16px; box-shadow:0 8px 25px rgba(2,6,23,.05); margin-bottom:14px; }
-    .banner{ background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; padding:10px 12px; border-radius:14px; margin-bottom:14px; font-weight:700; }
-    .ok{ background:#ecfdf5; border-color:#bbf7d0; color:#166534; }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .btn{ border:0; border-radius:12px; padding:11px 14px; font-weight:800; cursor:pointer; }
-    .btn.blue{ background:var(--blue); color:#fff; }
-    .btn.dark{ background:var(--dark); color:#fff; }
-    .btn.green{ background:var(--green); color:#fff; }
-    .btn.ghost{ background:#eef2ff; color:#1e3a8a; }
-    .btn:disabled{ opacity:.55; cursor:not-allowed; }
-    .meta{ color:var(--muted); font-size:14px; line-height:1.35; margin-top:8px; }
-    label{ display:block; font-weight:800; margin:10px 0 6px; }
-    input, select{ width:100%; padding:12px 12px; border:1px solid var(--line); border-radius:12px; font-size:16px; background:#fff; }
-    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .small{ font-size:13px; color:var(--muted); }
-    .previews{ display:flex; gap:10px; margin-top:10px; }
-    .ph{ width:92px; height:120px; border:1px dashed #cbd5e1; border-radius:14px; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-    .ph img{ width:100%; height:100%; object-fit:cover; display:block; }
-    .debug{ background:#0b1220; color:#e2e8f0; border-radius:14px; padding:12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; white-space:pre-wrap; }
-    .hr{ height:1px; background:var(--line); margin:14px 0; }
-    .hide{ display:none !important; }
-    .pill{ display:inline-block; padding:4px 10px; border-radius:999px; font-weight:900; font-size:12px; background:#eef2ff; color:#1e3a8a; }
+    :root{
+      --bg:#f4f7fb; --card:#ffffff; --text:#0f172a; --muted:#64748b;
+      --primary:#2563eb; --danger:#ef4444; --ok:#16a34a; --border:#e2e8f0;
+      --shadow:0 8px 24px rgba(2,6,23,.08);
+      --radius:18px;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    body{margin:0;background:var(--bg);color:var(--text);}
+    .wrap{max-width:720px;margin:24px auto;padding:0 14px 28px;}
+    h1{font-size:44px;line-height:1.05;margin:10px 0 18px;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:14px 0;}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:10px 12px;border-radius:999px;border:1px solid var(--border);background:#f8fafc;color:var(--muted);font-weight:600;}
+    .alert{padding:12px 14px;border-radius:14px;border:1px solid #fed7aa;background:#fff7ed;color:#9a3412;font-weight:700;}
+    .ok{border-color:#bbf7d0;background:#f0fdf4;color:#166534;}
+    button{
+      border:0;border-radius:14px;padding:12px 14px;font-weight:800;
+      cursor:pointer;transition:.15s transform,.15s opacity;
+    }
+    button:active{transform:scale(.98)}
+    .btn-primary{background:var(--primary);color:#fff;}
+    .btn-ghost{background:#0b1220;color:#fff;}
+    .btn-danger{background:var(--danger);color:#fff;}
+    .btn-ok{background:var(--ok);color:#fff;}
+    .btn-light{background:#e5e7eb;color:#111827;}
+    .btn-disabled{opacity:.5;cursor:not-allowed;}
+    .muted{color:var(--muted);}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px;}
+    label{font-weight:800;margin-bottom:6px;display:block}
+    input[type="text"], input[type="number"], select, textarea{
+      width:100%;box-sizing:border-box;
+      padding:13px 12px;border-radius:14px;border:1px solid var(--border);
+      outline:none;font-size:16px;background:#fff;
+    }
+    textarea{min-height:90px;resize:vertical}
+    .disabled{opacity:.55;pointer-events:none;}
+    .fileBox{border:1px dashed #cbd5e1;border-radius:16px;padding:12px;background:#f8fafc;}
+    .fileBtns{display:flex;gap:10px;flex-wrap:wrap}
+    .thumbs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .thumb{
+      width:92px;height:120px;border-radius:14px;border:1px solid var(--border);
+      object-fit:cover;background:#fff;
+    }
+    .small{font-size:13px}
+    .debug{
+      white-space:pre-wrap;background:#0b1220;color:#dbeafe;border-radius:16px;padding:14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size:12px;line-height:1.4;
+    }
+    .sep{height:1px;background:var(--border);margin:12px 0;}
+    .title{font-size:22px;margin:0 0 10px;font-weight:900}
   </style>
 </head>
-
 <body>
   <div class="wrap">
-    <h1>Falhane Kullanıcı Paneli</h1>
+    <h1>Falhane Kullanıcı<br/>Paneli</h1>
 
-    <div id="banner" class="banner">Oturum kapalı. Google ile giriş yap.</div>
+    <div id="banner" class="alert">Oturum kapalı. Google ile giriş yap.</div>
 
     <div class="card">
-      <h2 style="margin:0 0 10px;">Giriş (Google)</h2>
+      <div class="title">Giriş (Google)</div>
       <div class="row">
-        <button id="btnGoogleLogin" class="btn blue" type="button">Google ile giriş</button>
-        <button id="btnLogout" class="btn dark" type="button">Çıkış</button>
+        <button id="btnGoogle" class="btn-primary">Google ile giriş</button>
+        <button id="btnLogout" class="btn-ghost">Çıkış</button>
       </div>
-
-      <div class="meta">
-        Giriş yapan: <b id="lblEmail">-</b><br>
-        UID: <b id="lblUid">-</b><br>
-        <span class="small">Not: Bu sayfa upload oluşturur. Admin paneli “uploads” içinden onaylayınca “readings”e taşır.</span>
+      <div class="sep"></div>
+      <div class="muted">
+        <div><b>Giriş yapan:</b> <span id="who">-</span></div>
+        <div><b>UID:</b> <span id="uid">-</span></div>
+        <div class="small" style="margin-top:8px;">
+          Not: Bu sayfa <b>upload</b> oluşturur. Admin paneli “uploads” içinden onaylayınca “readings”e taşır.
+        </div>
       </div>
     </div>
 
-    <div class="card" id="formCard">
-      <h2 style="margin:0 0 8px;">Fal Başvurusu (2 Foto)</h2>
-      <div class="small">Bu formu göndermek için giriş yapman gerekiyor.</div>
-      <div class="hr"></div>
+    <div id="formCard" class="card disabled">
+      <div class="title">Fal Başvurusu (2 Foto)</div>
+      <div class="muted small" style="margin-bottom:10px;">Bu formu göndermek için giriş yapman gerekiyor.</div>
 
-      <label for="inpName">Ad</label>
-      <input id="inpName" placeholder="Adın" autocomplete="name" />
+      <div class="grid">
+        <div>
+          <label>Ad</label>
+          <input id="name" type="text" placeholder="Adın" autocomplete="name" />
+        </div>
+        <div>
+          <label>Yaş</label>
+          <input id="age" type="number" placeholder="Örn: 26" min="10" max="120" />
+        </div>
+        <div>
+          <label>Burç</label>
+          <select id="sign">
+            <option value="">Seç</option>
+            <option>Koç</option><option>Boğa</option><option>İkizler</option><option>Yengeç</option>
+            <option>Aslan</option><option>Başak</option><option>Terazi</option><option>Akrep</option>
+            <option>Yay</option><option>Oğlak</option><option>Kova</option><option>Balık</option>
+          </select>
+        </div>
 
-      <label for="inpAge">Yaş</label>
-      <input id="inpAge" placeholder="Örn: 26" inputmode="numeric" />
+        <div class="fileBox">
+          <label>Foto 1</label>
+          <!-- gerçek inputlar gizli -->
+          <input id="file1" type="file" accept="image/*" style="display:none" />
+          <input id="cam1" type="file" accept="image/*" capture="environment" style="display:none" />
+          <div class="fileBtns">
+            <button id="btnPick1" class="btn-light" type="button">Galeriden seç</button>
+            <button id="btnCam1" class="btn-light" type="button">Kamera ile çek</button>
+          </div>
+          <div class="thumbs"><img id="prev1" class="thumb" alt="" style="display:none" /></div>
+        </div>
 
-      <label for="selSign">Burç</label>
-      <select id="selSign">
-        <option value="">Seç</option>
-        <option value="Koç">Koç</option>
-        <option value="Boğa">Boğa</option>
-        <option value="İkizler">İkizler</option>
-        <option value="Yengeç">Yengeç</option>
-        <option value="Aslan">Aslan</option>
-        <option value="Başak">Başak</option>
-        <option value="Terazi">Terazi</option>
-        <option value="Akrep">Akrep</option>
-        <option value="Yay">Yay</option>
-        <option value="Oğlak">Oğlak</option>
-        <option value="Kova">Kova</option>
-        <option value="Balık">Balık</option>
-      </select>
+        <div class="fileBox">
+          <label>Foto 2</label>
+          <input id="file2" type="file" accept="image/*" style="display:none" />
+          <input id="cam2" type="file" accept="image/*" capture="environment" style="display:none" />
+          <div class="fileBtns">
+            <button id="btnPick2" class="btn-light" type="button">Galeriden seç</button>
+            <button id="btnCam2" class="btn-light" type="button">Kamera ile çek</button>
+          </div>
+          <div class="thumbs"><img id="prev2" class="thumb" alt="" style="display:none" /></div>
+        </div>
 
-      <div class="hr"></div>
-
-      <label>Foto 1 <span class="pill">Galeri</span></label>
-      <input id="file1" type="file" accept="image/*" />
-
-      <div style="margin-top:8px;">
-        <button id="cam1" type="button" class="btn ghost">Kamera ile çek</button>
-        <input id="camFile1" class="hide" type="file" accept="image/*" capture="environment" />
-      </div>
-
-      <label style="margin-top:14px;">Foto 2 <span class="pill">Galeri</span></label>
-      <input id="file2" type="file" accept="image/*" />
-
-      <div style="margin-top:8px;">
-        <button id="cam2" type="button" class="btn ghost">Kamera ile çek</button>
-        <input id="camFile2" class="hide" type="file" accept="image/*" capture="environment" />
-      </div>
-
-      <div class="previews">
-        <div class="ph" title="Foto 1 önizleme"><img id="prev1" alt="" /></div>
-        <div class="ph" title="Foto 2 önizleme"><img id="prev2" alt="" /></div>
-      </div>
-
-      <div class="hr"></div>
-      <button id="btnSubmit" class="btn green" type="button">Başvuruyu Gönder</button>
-
-      <div class="meta" id="submitStatus"></div>
-      <div class="small" style="margin-top:6px;">
-        İpucu: “Kamera ile çek” butonu telefonda kamerayı açar. Normal seçim alanı galeriden seçmek içindir.
+        <div>
+          <button id="btnSubmit" class="btn-ok" style="width:100%">Başvuruyu Gönder</button>
+          <div class="small muted" style="margin-top:10px;">
+            İpucu: “Kamera ile çek” telefonda kamerayı açar. “Galeriden seç” galeriden seçmek içindir.
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="card">
-      <h2 style="margin:0 0 10px;">Debug</h2>
-      <div id="debugBox" class="debug">Hazır.</div>
+      <div class="title">Debug</div>
+      <div id="debug" class="debug">Hazır.\n</div>
     </div>
   </div>
 
   <script type="module">
+    // Firebase v10 (modular)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
-      getAuth, GoogleAuthProvider,
-      signInWithRedirect, getRedirectResult,
-      onAuthStateChanged, signOut
+      getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
+      getRedirectResult, onAuthStateChanged, setPersistence, browserLocalPersistence,
+      signOut
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
     import {
       getFirestore, collection, addDoc, serverTimestamp
@@ -135,7 +156,7 @@
       getStorage, ref, uploadBytes, getDownloadURL
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 
-    // ✅ Senin config’in
+    // SENİN CONFIG (DEĞİŞTİRME)
     const firebaseConfig = {
       apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
       authDomain: "falhane-e3057.firebaseapp.com",
@@ -146,120 +167,100 @@
       measurementId: "G-94TZ14VWPX"
     };
 
-    // ---- init ----
+    // ---------- helpers ----------
+    const $ = (id) => document.getElementById(id);
+    const log = (s) => { $("debug").textContent += String(s) + "\\n"; };
+    const setBanner = (text, ok=false) => {
+      const b = $("banner");
+      b.textContent = text;
+      b.classList.toggle("ok", ok);
+    };
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    // ---------- init ----------
+    log("BOOT: auth ready");
+    log("UA: " + navigator.userAgent);
+    log("MODE: " + (isIOS && isSafari ? "iOS Safari (redirect)" : "Popup"));
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
-
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account" });
 
-    // ---- UI ----
-    const banner = document.getElementById("banner");
-    const debugBox = document.getElementById("debugBox");
-    const log = (m) => { debugBox.textContent += "\n" + m; };
+    await setPersistence(auth, browserLocalPersistence);
 
-    const btnGoogleLogin = document.getElementById("btnGoogleLogin");
-    const btnLogout = document.getElementById("btnLogout");
-    const lblEmail = document.getElementById("lblEmail");
-    const lblUid = document.getElementById("lblUid");
+    // Redirect sonucu (iOS Safari için kritik)
+    try {
+      log("REDIRECT: getRedirectResult() çağrılıyor...");
+      const rr = await getRedirectResult(auth);
+      if (rr?.user) {
+        log("REDIRECT: OK user=" + (rr.user.email || rr.user.uid));
+      } else {
+        log("REDIRECT: boş (normal olabilir)");
+      }
+    } catch (e) {
+      log("REDIRECT ERROR: " + e.code + " / " + e.message);
+    }
 
-    const formCard = document.getElementById("formCard");
-    const inpName = document.getElementById("inpName");
-    const inpAge = document.getElementById("inpAge");
-    const selSign = document.getElementById("selSign");
+    // ---------- UI refs ----------
+    const btnGoogle = $("btnGoogle");
+    const btnLogout = $("btnLogout");
+    const formCard = $("formCard");
+    const who = $("who");
+    const uidEl = $("uid");
 
-    const file1 = document.getElementById("file1");
-    const file2 = document.getElementById("file2");
-    const cam1Btn = document.getElementById("cam1");
-    const cam2Btn = document.getElementById("cam2");
-    const camFile1 = document.getElementById("camFile1");
-    const camFile2 = document.getElementById("camFile2");
+    // file inputs
+    const file1 = $("file1"), file2 = $("file2");
+    const cam1 = $("cam1"), cam2 = $("cam2");
+    const prev1 = $("prev1"), prev2 = $("prev2");
 
-    const prev1 = document.getElementById("prev1");
-    const prev2 = document.getElementById("prev2");
+    const pick1 = $("btnPick1"), pick2 = $("btnPick2");
+    const take1 = $("btnCam1"),  take2 = $("btnCam2");
 
-    const btnSubmit = document.getElementById("btnSubmit");
-    const submitStatus = document.getElementById("submitStatus");
+    let photo1 = null;
+    let photo2 = null;
 
-    let currentUser = null;
-    let selected1 = null;
-    let selected2 = null;
-
-    const setSignedOutUI = () => {
-      banner.classList.remove("ok");
-      banner.textContent = "Oturum kapalı. Google ile giriş yap.";
-      lblEmail.textContent = "-";
-      lblUid.textContent = "-";
-      formCard.style.opacity = "0.55";
-      formCard.style.pointerEvents = "none";
-      btnLogout.disabled = true;
-    };
-
-    const setSignedInUI = (user) => {
-      banner.classList.add("ok");
-      banner.textContent = "Oturum açık.";
-      lblEmail.textContent = user.email || "-";
-      lblUid.textContent = user.uid || "-";
-      formCard.style.opacity = "1";
-      formCard.style.pointerEvents = "auto";
-      btnLogout.disabled = false;
-    };
-
-    // ---- helpers ----
-    function fileToPreview(file, imgEl) {
-      if (!file) { imgEl.removeAttribute("src"); return; }
+    const showPreview = (file, imgEl) => {
+      if (!file) { imgEl.style.display = "none"; imgEl.src = ""; return; }
       const url = URL.createObjectURL(file);
       imgEl.src = url;
-    }
+      imgEl.style.display = "block";
+    };
 
-    function nowId() {
-      return Date.now().toString();
-    }
+    pick1.addEventListener("click", () => file1.click());
+    pick2.addEventListener("click", () => file2.click());
+    take1.addEventListener("click", () => cam1.click());
+    take2.addEventListener("click", () => cam2.click());
 
-    async function uploadOne(uid, docId, file, index) {
-      const ext = (file.name && file.name.includes(".")) ? file.name.split(".").pop() : "jpg";
-      const path = `uploads/${uid}/${docId}/photo${index}.${ext}`;
-      const r = ref(storage, path);
-      await uploadBytes(r, file);
-      return await getDownloadURL(r);
-    }
+    file1.addEventListener("change", () => { photo1 = file1.files?.[0] || null; showPreview(photo1, prev1); });
+    file2.addEventListener("change", () => { photo2 = file2.files?.[0] || null; showPreview(photo2, prev2); });
+    cam1.addEventListener("change",  () => { photo1 = cam1.files?.[0]  || null; showPreview(photo1, prev1); });
+    cam2.addEventListener("change",  () => { photo2 = cam2.files?.[0]  || null; showPreview(photo2, prev2); });
 
-    function requireSignedIn() {
-      if (!currentUser) throw new Error("signed_out");
-    }
+    // ---------- auth ----------
+    btnGoogle.addEventListener("click", async () => {
+      btnGoogle.classList.add("btn-disabled");
+      btnGoogle.disabled = true;
 
-    // ---- Auth redirect result ----
-    log("BOOT: auth ready");
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result && result.user) log("REDIRECT RESULT: OK");
-        else log("REDIRECT RESULT: boş (normal olabilir)");
-      })
-      .catch((err) => {
-        log("REDIRECT ERROR: " + (err?.code || err?.message || err));
-      });
-
-    onAuthStateChanged(auth, (user) => {
-      currentUser = user || null;
-      if (user) {
-        log("AUTH STATE: signed in");
-        setSignedInUI(user);
-      } else {
-        log("AUTH STATE: signed out");
-        setSignedOutUI();
-      }
-    });
-
-    // ---- Login/Logout ----
-    btnGoogleLogin.addEventListener("click", async () => {
       try {
-        log("LOGIN: redirect başlatılıyor...");
-        await signInWithRedirect(auth, provider);
-      } catch (err) {
-        log("LOGIN ERROR: " + (err?.code || err?.message || err));
-        alert("Giriş hatası: " + (err?.code || err?.message || err));
+        if (isIOS && isSafari) {
+          log("LOGIN: signInWithRedirect()");
+          await signInWithRedirect(auth, provider);
+          // redirect ile sayfa gidecek, buradan sonrası çalışmayabilir
+        } else {
+          log("LOGIN: signInWithPopup()");
+          const res = await signInWithPopup(auth, provider);
+          log("LOGIN OK: " + (res.user.email || res.user.uid));
+        }
+      } catch (e) {
+        log("LOGIN ERROR: " + e.code + " / " + e.message);
+        setBanner("Giriş hatası: " + e.code, false);
+      } finally {
+        btnGoogle.disabled = false;
+        btnGoogle.classList.remove("btn-disabled");
       }
     });
 
@@ -267,109 +268,94 @@
       try {
         await signOut(auth);
         log("LOGOUT: OK");
-      } catch (err) {
-        log("LOGOUT ERROR: " + (err?.code || err?.message || err));
+      } catch (e) {
+        log("LOGOUT ERROR: " + e.code + " / " + e.message);
       }
     });
 
-    // ---- File selection (Gallery) ----
-    file1.addEventListener("change", (e) => {
-      selected1 = e.target.files?.[0] || null;
-      fileToPreview(selected1, prev1);
-    });
-    file2.addEventListener("change", (e) => {
-      selected2 = e.target.files?.[0] || null;
-      fileToPreview(selected2, prev2);
-    });
-
-    // ---- Camera buttons ----
-    cam1Btn.addEventListener("click", () => camFile1.click());
-    cam2Btn.addEventListener("click", () => camFile2.click());
-
-    camFile1.addEventListener("change", (e) => {
-      selected1 = e.target.files?.[0] || null;
-      fileToPreview(selected1, prev1);
-      // galeri inputunu temizle (karışmasın)
-      file1.value = "";
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        who.textContent = user.email || "-";
+        uidEl.textContent = user.uid || "-";
+        setBanner("Oturum açık. Formu gönderebilirsin.", true);
+        formCard.classList.remove("disabled");
+      } else {
+        who.textContent = "-";
+        uidEl.textContent = "-";
+        setBanner("Oturum kapalı. Google ile giriş yap.", false);
+        formCard.classList.add("disabled");
+      }
+      log("AUTH STATE: " + (user ? "signed in" : "signed out"));
     });
 
-    camFile2.addEventListener("change", (e) => {
-      selected2 = e.target.files?.[0] || null;
-      fileToPreview(selected2, prev2);
-      file2.value = "";
-    });
+    // ---------- submit ----------
+    $("btnSubmit").addEventListener("click", async (ev) => {
+      ev.preventDefault();
 
-    // ---- Submit ----
-    btnSubmit.addEventListener("click", async () => {
-      submitStatus.textContent = "";
-      btnSubmit.disabled = true;
+      const user = auth.currentUser;
+      if (!user) { setBanner("Önce Google ile giriş yap.", false); return; }
+
+      const name = $("name").value.trim();
+      const age = Number($("age").value);
+      const sign = $("sign").value.trim();
+
+      if (!name) { setBanner("Ad boş olamaz.", false); return; }
+      if (!age || age < 10 || age > 120) { setBanner("Yaş yanlış.", false); return; }
+      if (!sign) { setBanner("Burç seçmelisin.", false); return; }
+      if (!photo1 || !photo2) { setBanner("2 foto da zorunlu.", false); return; }
+
+      const btn = $("btnSubmit");
+      btn.disabled = true; btn.classList.add("btn-disabled");
+      setBanner("Yükleniyor...", true);
 
       try {
-        requireSignedIn();
-
-        const name = (inpName.value || "").trim();
-        const age = (inpAge.value || "").trim();
-        const sign = (selSign.value || "").trim();
-
-        if (!name) throw new Error("Lütfen ad gir.");
-        if (!age || isNaN(Number(age))) throw new Error("Yaş sayı olmalı.");
-        if (!sign) throw new Error("Lütfen burç seç.");
-        if (!selected1 || !selected2) throw new Error("2 foto seçmelisin.");
-
-        const uid = currentUser.uid;
-        const docId = `u_${nowId()}_${Math.random().toString(36).slice(2,8)}`;
-
-        submitStatus.textContent = "Yükleniyor...";
-
-        const url1 = await uploadOne(uid, docId, selected1, 1);
-        const url2 = await uploadOne(uid, docId, selected2, 2);
-
-        await addDoc(collection(db, "uploads"), {
+        // 1) önce uploads dokümanı oluştur
+        const docRef = await addDoc(collection(db, "uploads"), {
           status: "pending",
+          createdAt: serverTimestamp(),
+          userId: user.uid,
+          userEmail: user.email || null,
           name,
-          age: Number(age),
-          sign,
-          userId: uid,
-          photo1Url: url1,
-          photo2Url: url2,
-          createdAt: serverTimestamp()
+          age,
+          sign
         });
 
-        submitStatus.textContent = "Başvuru gönderildi (pending). Admin onaylayınca reading oluşacak.";
-        submitStatus.style.color = "#166534";
+        const docId = docRef.id;
+        log("UPLOAD DOC: " + docId);
 
-        // temizle
-        inpName.value = "";
-        inpAge.value = "";
-        selSign.value = "";
-        file1.value = "";
-        file2.value = "";
-        camFile1.value = "";
-        camFile2.value = "";
-        selected1 = null;
-        selected2 = null;
-        prev1.removeAttribute("src");
-        prev2.removeAttribute("src");
+        // 2) storage'a foto yükle
+        const basePath = `uploads/${user.uid}/${docId}`;
+        const r1 = ref(storage, `${basePath}/photo1.jpg`);
+        const r2 = ref(storage, `${basePath}/photo2.jpg`);
 
-        log("UPLOAD: OK");
-      } catch (err) {
-        const msg = (err?.message || err?.code || err || "").toString();
-        submitStatus.textContent = "Hata: " + msg;
-        submitStatus.style.color = "#b91c1c";
-        log("SUBMIT ERROR: " + (err?.code || err?.message || err));
+        await uploadBytes(r1, photo1, { contentType: photo1.type || "image/jpeg" });
+        await uploadBytes(r2, photo2, { contentType: photo2.type || "image/jpeg" });
 
-        if (err?.code === "storage/unauthorized" || err?.code === "permission-denied") {
-          alert("Yetki hatası: Storage/Firestore rules kontrol et. (userId bazlı yazma izni lazım)");
-        } else {
-          alert("Hata: " + msg);
-        }
+        const url1 = await getDownloadURL(r1);
+        const url2 = await getDownloadURL(r2);
+
+        // 3) foto url'lerini aynı doc'a yazmak yerine (şimdilik) admin tarafı storage path'ten çekebilir.
+        //    Ama istersen burada ayrıca Firestore update ekleriz.
+        log("PHOTO1 URL: " + url1);
+        log("PHOTO2 URL: " + url2);
+
+        setBanner("Başvuru gönderildi (pending). Admin onaylayınca reading oluşacak.", true);
+
+        // form reset
+        $("name").value = "";
+        $("age").value = "";
+        $("sign").value = "";
+        photo1 = null; photo2 = null;
+        file1.value = ""; file2.value = ""; cam1.value = ""; cam2.value = "";
+        showPreview(null, prev1); showPreview(null, prev2);
+
+      } catch (e) {
+        log("SUBMIT ERROR: " + e.code + " / " + e.message);
+        setBanner("Hata: " + (e.code || e.message), false);
       } finally {
-        btnSubmit.disabled = false;
+        btn.disabled = false; btn.classList.remove("btn-disabled");
       }
     });
-
-    // initial
-    setSignedOutUI();
   </script>
 </body>
 </html>
