@@ -3,460 +3,605 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin İşlemleri</title>
-  <style>
-    :root { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial, sans-serif; }
-    body { margin: 0; background:#f4f6fb; color:#111; }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 18px; }
-    h1 { font-size: 44px; margin: 8px 0 16px; }
-    .card { background:#fff; border-radius: 18px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.06); margin: 12px 0; }
-    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid #d7dbe6; font-size: 16px; }
-    label { font-weight: 700; display:block; margin: 10px 0 6px; }
-    button { border:0; padding: 12px 14px; border-radius: 12px; font-weight: 800; cursor:pointer; }
-    .btn { background:#1e66ff; color:#fff; }
-    .btn2 { background:#0e1626; color:#fff; }
-    .pill { display:inline-block; padding:8px 12px; border-radius: 999px; font-weight:800; }
-    .ok { background:#dff7e8; color:#0b6b2f; }
-    .bad { background:#ffe1e1; color:#7f1d1d; }
-    .muted { color:#5a6477; }
-    .tabs { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-    .tab { padding:10px 12px; border-radius: 12px; border:1px solid #e5e9f3; background:#fff; cursor:pointer; font-weight:800; }
-    .tab.active { background:#0e1626; color:#fff; border-color:#0e1626; }
-    .hidden { display:none !important; }
+  <title>Falhane Admin</title>
 
-    /* list (tek satır) */
-    .list { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
-    .line {
-      display:grid;
-      grid-template-columns: 1.2fr 1.2fr 1.2fr 0.9fr 0.9fr;
-      gap:10px;
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --primary:#2563eb;
+      --dark:#0b1220;
+      --danger:#ef4444;
+      --radius:18px;
+    }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .container{ max-width: 980px; margin:0 auto; padding: 18px 14px 50px; }
+    h1{
+      margin: 10px 0 16px;
+      font-size: clamp(32px, 6vw, 54px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    .panel{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, .06);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .badge{
+      display:inline-flex;
       align-items:center;
-      border:1px solid #e5e9f3;
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 14px;
+      border: 1px solid var(--border);
+    }
+    .badge-ok{ background:#ecfdf5; color:#065f46; border-color:#bbf7d0;}
+    .badge-no{ background:#fef2f2; color:#991b1b; border-color:#fecaca;}
+    .muted{ color: var(--muted); }
+
+    .btn{
+      appearance:none;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
       border-radius: 14px;
-      padding: 12px;
+      padding: 12px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      line-height:1;
+      white-space: nowrap;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-primary{ background: var(--primary); color:#fff; border-color: transparent; }
+    .btn-dark{ background: var(--dark); color:#fff; border-color: transparent; }
+    .btn-danger{ background: var(--danger); color:#fff; border-color: transparent; }
+    .btn-sm{ padding: 10px 12px; border-radius: 12px; font-size: 14px; }
+
+    .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    .row .spacer{ flex:1 1 auto; }
+
+    .input{
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      font-size: 16px;
+      outline: none;
+    }
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 760px){ .grid2{ grid-template-columns: 1fr; } }
+
+    /* Pending card */
+    .pending-card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .pending-grid{
+      display:grid;
+      grid-template-columns: 1.4fr 1fr 0.9fr;
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 760px){
+      .pending-grid{ grid-template-columns: 1fr; }
+    }
+
+    .pending-info h3{
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.15;
+    }
+    .kv{
+      display:grid;
+      grid-template-columns: 92px 1fr;
+      gap: 6px 10px;
+      font-size: 15px;
+      color: var(--muted);
+    }
+    .kv b{ color: var(--text); }
+
+    .wrap-anywhere{ overflow-wrap:anywhere; word-break: break-word; }
+
+    .thumbs{ display:flex; gap: 10px; flex-wrap: wrap; }
+    .thumb{
+      width: 86px; height: 86px;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 1px solid var(--border);
       background:#fff;
     }
-    .cell b { display:block; }
-    .small { font-size:13px; color:#556; word-break: break-word; }
-    .chip { display:inline-block; padding:6px 10px; border-radius:999px; background:#f0f3fa; font-weight:800; }
-    .thumbs { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    .thumb {
-      width:54px; height:54px; border-radius: 12px;
-      object-fit:cover; border:1px solid #e5e9f3; background:#fafafa;
-    }
-    .actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .thumb-note{ font-size: 12px; color: var(--muted); margin-top: 6px; }
 
-    pre { white-space: pre-wrap; word-break: break-word; background:#0e1626; color:#eaf0ff; padding:12px; border-radius: 14px; margin:0; }
+    .actions{ display:flex; flex-direction: column; gap: 10px; }
+    @media (max-width: 760px){
+      .actions{ flex-direction: row; flex-wrap: wrap; }
+      .actions .btn{ flex: 1 1 160px; }
+    }
+
+    .divider{ height:1px; background: var(--border); margin: 12px 0; }
+
+    .debug{
+      background: #0b1220;
+      color: #e2e8f0;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
   </style>
 </head>
+
 <body>
-  <div class="wrap">
+  <div class="container">
     <h1>Admin İşlemleri</h1>
 
-    <div class="card">
-      <div id="adminBadge" class="pill bad">Admin: HAYIR</div>
-      <p class="muted" style="margin-top:10px">
+    <!-- ÜST PANEL -->
+    <div class="panel">
+      <div class="row">
+        <span id="adminBadge" class="badge badge-no">Admin: HAYIR</span>
+        <span class="spacer"></span>
+        <button id="btnSignOutTop" class="btn btn-dark btn-sm" style="display:none;">Çıkış</button>
+      </div>
+
+      <p class="muted" style="margin:10px 0 0;">
         Not: Admin yetkisi için Firestore’da <b>admins/{UID}</b> dokümanı olmalı.
       </p>
 
-      <!-- LOGIN FORM (giriş varsa gizlenecek) -->
-      <div id="loginBox">
-        <label>Email</label>
-        <input id="email" type="email" placeholder="admin@email.com" autocomplete="email" />
-        <label>Şifre</label>
-        <div class="row">
-          <input id="pass" type="password" placeholder="••••••••" autocomplete="current-password" style="flex:1" />
-          <button id="btnLogin" class="btn" style="min-width:120px">Giriş</button>
+      <!-- LOGIN FORM (GİRİŞ YOKSA GÖRÜNECEK) -->
+      <div id="loginBox" style="margin-top:12px;">
+        <div class="grid2">
+          <div>
+            <div class="muted" style="font-weight:800;margin:4px 0;">Email</div>
+            <input id="email" class="input" type="email" placeholder="admin@mail.com" />
+          </div>
+          <div>
+            <div class="muted" style="font-weight:800;margin:4px 0;">Şifre</div>
+            <input id="pass" class="input" type="password" placeholder="••••••••" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <button id="btnLogin" class="btn btn-primary">Giriş</button>
+          <button id="btnSignOut" class="btn btn-dark">Çıkış</button>
+          <span id="loginStatus" class="muted"></span>
         </div>
       </div>
 
-      <!-- SESSION BOX (giriş yoksa gizlenecek) -->
-      <div id="sessionBox" class="hidden" style="margin-top:10px">
-        <div><b>Giriş yapan:</b> <span id="who">-</span></div>
-        <div><b>UID:</b> <span id="uid">-</span></div>
+      <!-- USER INFO (GİRİŞ VARSA GÖRÜNECEK) -->
+      <div id="userBox" style="display:none; margin-top:12px;">
+        <div style="font-weight:800;">Giriş yapan: <span id="whoEmail" class="wrap-anywhere"></span></div>
+        <div class="muted" style="font-weight:800;">UID: <span id="whoUid" class="wrap-anywhere"></span></div>
       </div>
 
-      <div class="row" style="margin-top:12px">
-        <button id="btnLogout" class="btn2">Çıkış</button>
+      <div class="divider"></div>
+
+      <div class="row">
+        <button id="tabPending" class="btn btn-dark btn-sm">Bekleyen Fallar</button>
+        <button id="tabLast50" class="btn btn-sm">Son 50 Upload (tümü)</button>
+        <span class="spacer"></span>
+        <button id="btnRefresh" class="btn btn-primary btn-sm">Yenile</button>
+      </div>
+
+      <div class="muted" style="margin-top:10px;">
+        Durum: <span id="statusText">-</span>
       </div>
     </div>
 
-    <div class="card">
-      <div class="tabs">
-        <button id="tabPending" class="tab active">Bekleyen Fallar</button>
-        <button id="tabAll" class="tab">Son 50 Upload (tümü)</button>
-      </div>
+    <!-- LİSTE -->
+    <div id="list"></div>
 
-      <div class="row" style="margin-top:10px">
-        <button id="btnLoadPending" class="btn2">Bekleyenleri Yenile</button>
-        <button id="btnLoadAll" class="btn2">Son 50’yi Yenile</button>
-      </div>
-
-      <div class="muted" style="margin-top:10px" id="statusLine">Durum: Oturum kapalı.</div>
-
-      <div class="list" id="list"></div>
-    </div>
-
-    <div class="card">
-      <h2 style="margin:0 0 10px">Debug</h2>
-      <pre id="debug">Hazır.</pre>
+    <!-- DEBUG -->
+    <div class="panel">
+      <div style="font-weight:900;margin-bottom:8px;">Debug</div>
+      <div id="debug" class="debug">BOOT: -</div>
     </div>
   </div>
 
+  <!-- Firebase (modular) -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signInWithEmailAndPassword,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      collection,
-      query,
-      where,
-      orderBy,
-      limit,
-      getDocs,
-      addDoc,
-      updateDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
+    // ============================
+    // 1) BURAYA Firebase config gireceksin
+    // Firebase Console > Project Settings > Your apps (Web) > config
+    // ============================
     const firebaseConfig = {
-      apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
-      authDomain: "falhane-e3057.firebaseapp.com",
-      projectId: "falhane-e3057",
-      storageBucket: "falhane-e3057.firebasestorage.app",
-      messagingSenderId: "117754512778",
-      appId: "1:117754512778:web:52aee440472568bc6cb473",
-      measurementId: "G-94TZ14VWPX"
+      apiKey: "(SENİN apiKey)",
+      authDomain: "(SENİN authDomain)",
+      projectId: "(SENİN projectId)",
+      storageBucket: "(SENİN storageBucket)",
+      messagingSenderId: "(SENİN messagingSenderId)",
+      appId: "(SENİN appId)"
     };
 
+    // ============================
+    // Imports
+    // ============================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged,
+      signInWithEmailAndPassword, signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    import {
+      getFirestore, doc, getDoc,
+      collection, query, where, orderBy, limit, getDocs,
+      setDoc, deleteDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    // ============================
+    // Init
+    // ============================
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // ============================
+    // UI helpers
+    // ============================
     const $ = (id) => document.getElementById(id);
-    const log = (msg) => { $("debug").textContent = (msg + "\n\n" + $("debug").textContent).slice(0, 7000); };
 
-    let currentUser = null;
-    let isAdmin = false;
-    let activeTab = "pending"; // "pending" | "all"
-
-    function setAdminBadge(val) {
-      isAdmin = val;
-      $("adminBadge").textContent = val ? "Admin: EVET" : "Admin: HAYIR";
-      $("adminBadge").className = "pill " + (val ? "ok" : "bad");
+    const debugLines = [];
+    function log(s){
+      debugLines.push(String(s));
+      $("debug").textContent = debugLines.slice(-25).join("\\n");
     }
 
-    function showLoggedInUI(user) {
-      // 1) giriş yaptıktan sonra login form görünmesin
-      if (user) {
-        $("loginBox").classList.add("hidden");
-        $("sessionBox").classList.remove("hidden");
-        $("who").textContent = user.email || "(email yok)";
-        $("uid").textContent = user.uid;
-      } else {
-        $("loginBox").classList.remove("hidden");
-        $("sessionBox").classList.add("hidden");
-        $("who").textContent = "-";
-        $("uid").textContent = "-";
+    function fmtDate(ts){
+      // Firestore Timestamp -> Date
+      try{
+        const d = ts?.toDate ? ts.toDate() : (ts instanceof Date ? ts : null);
+        if(!d) return "-";
+        const pad = (n) => String(n).padStart(2,"0");
+        return `${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      } catch { return "-"; }
+    }
+
+    function setAdminBadge(isAdmin){
+      const badge = $("adminBadge");
+      badge.classList.remove("badge-ok","badge-no");
+      if(isAdmin){
+        badge.classList.add("badge-ok");
+        badge.textContent = "Admin: EVET";
+      }else{
+        badge.classList.add("badge-no");
+        badge.textContent = "Admin: HAYIR";
       }
     }
 
-    async function checkAdmin(uid) {
+    // ============================
+    // State
+    // ============================
+    let currentUser = null;
+    let isAdmin = false;
+    let activeTab = "pending"; // "pending" | "last50"
+
+    // ============================
+    // Auth UI
+    // ============================
+    async function checkAdmin(uid){
+      // admins/{uid} dokümanı varsa admin
       const ref = doc(db, "admins", uid);
       const snap = await getDoc(ref);
       return snap.exists();
     }
 
-    function tsToText(ts) {
-      try {
-        if (!ts) return "-";
-        if (ts.toDate) return ts.toDate().toLocaleString();
-        // bazen plain date/string gelebilir
-        return String(ts);
-      } catch { return "-"; }
+    function showLoggedOut(){
+      $("loginBox").style.display = "block";
+      $("userBox").style.display = "none";
+      $("btnSignOutTop").style.display = "none";
+      $("statusText").textContent = "Oturum kapalı.";
+      setAdminBadge(false);
+      $("list").innerHTML = "";
     }
 
-    function pickPhotoUrls(data) {
-      // Olası alan adları (senin yapına göre):
-      const candidates = [
-        data.photo1Url, data.photo2Url,
-        data.photo1, data.photo2,
-        data.image1Url, data.image2Url,
-        data.img1, data.img2
-      ].filter(Boolean);
-
-      // photos array ise
-      if (Array.isArray(data.photos)) {
-        for (const p of data.photos) {
-          if (typeof p === "string") candidates.push(p);
-          else if (p?.url) candidates.push(p.url);
-        }
-      }
-
-      const u1 = candidates[0] || "";
-      const u2 = candidates[1] || "";
-      return [u1, u2];
+    function showLoggedIn(){
+      $("loginBox").style.display = "none";    // GİRİŞ FORMU GİDİYOR
+      $("userBox").style.display = "block";
+      $("btnSignOutTop").style.display = "inline-flex";
+      $("whoEmail").textContent = currentUser?.email || "-";
+      $("whoUid").textContent = currentUser?.uid || "-";
     }
 
-    async function copyLine(item) {
-      const [u1, u2] = pickPhotoUrls(item);
-      const text =
-`İsim: ${item.name || "-"}
-Yaş: ${item.age ?? "-"}
-Burç: ${item.zodiac || "-"}
-Gönderim: ${item.createdAtText || "-"}
-UID: ${item.userId || "-"}
-Foto1: ${u1 || "-"}
-Foto2: ${u2 || "-"}`;
+    // ============================
+    // Data fetch
+    // uploads koleksiyonu: pending item’lar burada
+    // readings koleksiyonu: admin onaylayınca buraya taşınır (senin önceki sistemin)
+    // ============================
+    async function loadPending(){
+      $("statusText").textContent = "Bekleyenler yükleniyor...";
+      $("list").innerHTML = "";
 
-      try {
-        await navigator.clipboard.writeText(text);
-        log("KOPYA OK: " + item.id);
-      } catch (e) {
-        log("KOPYA HATA: " + (e?.message || e));
-        // iOS bazen clipboard izin sorunu çıkarır; fallback:
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
-      }
-    }
-
-    function renderList(items) {
-      const wrap = $("list");
-      wrap.innerHTML = "";
-
-      if (!items.length) {
-        wrap.innerHTML = `<div class="muted">Kayıt yok.</div>`;
-        return;
-      }
-
-      for (const it of items) {
-        const [u1, u2] = pickPhotoUrls(it);
-
-        const div = document.createElement("div");
-        div.className = "line";
-
-        div.innerHTML = `
-          <div class="cell">
-            <b>${it.name || "(isim yok)"}</b>
-            <div class="small">Yaş: ${it.age ?? "-"} • Burç: ${it.zodiac || "-"}</div>
-          </div>
-
-          <div class="cell">
-            <span class="chip">Gönderim</span>
-            <div class="small">${it.createdAtText || "-"}</div>
-          </div>
-
-          <div class="cell">
-            <span class="chip">UserId</span>
-            <div class="small">${it.userId || "-"}</div>
-          </div>
-
-          <div class="cell">
-            <div class="thumbs">
-              ${u1 ? `<a href="${u1}" target="_blank" rel="noopener"><img class="thumb" src="${u1}" alt="foto1"></a>` : `<div class="small">Foto1 yok</div>`}
-              ${u2 ? `<a href="${u2}" target="_blank" rel="noopener"><img class="thumb" src="${u2}" alt="foto2"></a>` : ``}
-            </div>
-            <div class="small">${(u1 || u2) ? "Resme tıklayınca açılır." : ""}</div>
-          </div>
-
-          <div class="cell">
-            <div class="actions">
-              <button class="btn2" data-copy="${it.id}">Resimleri Kopyala</button>
-              ${activeTab === "pending" ? `<button class="btn" data-approve="${it.id}">Onayla</button>` : ``}
-              ${activeTab === "pending" ? `<button class="btn2" data-reject="${it.id}">Reddet</button>` : ``}
-            </div>
-          </div>
-        `;
-
-        wrap.appendChild(div);
-      }
-
-      wrap.querySelectorAll("[data-copy]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const id = btn.getAttribute("data-copy");
-          const item = items.find(x => x.id === id);
-          if (item) copyLine(item);
-        });
-      });
-
-      wrap.querySelectorAll("[data-approve]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const id = btn.getAttribute("data-approve");
-          await approveUpload(id);
-        });
-      });
-
-      wrap.querySelectorAll("[data-reject]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const id = btn.getAttribute("data-reject");
-          await rejectUpload(id);
-        });
-      });
-    }
-
-    async function loadPending() {
-      if (!currentUser) { $("statusLine").textContent = "Durum: Oturum kapalı."; return; }
-      if (!isAdmin) { $("statusLine").textContent = "Durum: Admin değilsin."; return; }
-
-      activeTab = "pending";
-      $("tabPending").classList.add("active");
-      $("tabAll").classList.remove("active");
-
-      $("statusLine").textContent = "Durum: Bekleyen fallar yükleniyor...";
-      const q = query(
+      // uploads içinde status == "pending" gibi bir alan kullanıyorsan:
+      // Eğer sende farklıysa where kısmını değiştir.
+      const qy = query(
         collection(db, "uploads"),
         where("status", "==", "pending"),
         orderBy("createdAt", "desc"),
         limit(50)
       );
-      const snap = await getDocs(q);
 
-      const items = snap.docs.map(d => {
-        const data = d.data() || {};
-        return {
-          id: d.id,
-          ...data,
-          createdAtText: tsToText(data.createdAt)
-        };
-      });
+      const snap = await getDocs(qy);
+      $("statusText").textContent = `${snap.size} bekleyen fal.`;
 
-      $("statusLine").textContent = `Durum: ${items.length} bekleyen fal.`;
-      renderList(items);
-    }
-
-    async function loadAllLast50() {
-      if (!currentUser) { $("statusLine").textContent = "Durum: Oturum kapalı."; return; }
-      if (!isAdmin) { $("statusLine").textContent = "Durum: Admin değilsin."; return; }
-
-      activeTab = "all";
-      $("tabAll").classList.add("active");
-      $("tabPending").classList.remove("active");
-
-      $("statusLine").textContent = "Durum: Son 50 upload yükleniyor...";
-      const q = query(collection(db, "uploads"), orderBy("createdAt", "desc"), limit(50));
-      const snap = await getDocs(q);
-
-      const items = snap.docs.map(d => {
-        const data = d.data() || {};
-        return {
-          id: d.id,
-          ...data,
-          createdAtText: tsToText(data.createdAt)
-        };
-      });
-
-      $("statusLine").textContent = `Durum: ${items.length} kayıt geldi.`;
-      renderList(items);
-    }
-
-    async function approveUpload(uploadId) {
-      if (!currentUser || !isAdmin) return;
-
-      const uploadRef = doc(db, "uploads", uploadId);
-      const upSnap = await getDoc(uploadRef);
-      if (!upSnap.exists()) { log("APPROVE: upload bulunamadı: " + uploadId); return; }
-      const data = upSnap.data() || {};
-
-      await addDoc(collection(db, "readings"), {
-        ...data,
-        status: "approved",
-        approvedBy: currentUser.uid,
-        approvedAt: serverTimestamp()
-      });
-
-      await updateDoc(uploadRef, {
-        status: "approved",
-        approvedBy: currentUser.uid,
-        approvedAt: serverTimestamp()
-      });
-
-      log("APPROVE OK: " + uploadId);
-      await loadPending();
-    }
-
-    async function rejectUpload(uploadId) {
-      if (!currentUser || !isAdmin) return;
-
-      const uploadRef = doc(db, "uploads", uploadId);
-      await updateDoc(uploadRef, {
-        status: "rejected",
-        reviewedBy: currentUser.uid,
-        reviewedAt: serverTimestamp()
-      });
-
-      log("REJECT OK: " + uploadId);
-      await loadPending();
-    }
-
-    // UI events
-    $("btnLogin").addEventListener("click", async () => {
-      const email = $("email").value.trim();
-      const pass = $("pass").value;
-      try {
-        log("LOGIN: email/password deniyor...");
-        await signInWithEmailAndPassword(auth, email, pass);
-        log("LOGIN OK");
-      } catch (e) {
-        log("LOGIN ERROR: " + (e?.message || e));
-      }
-    });
-
-    $("btnLogout").addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-        log("LOGOUT OK");
-      } catch (e) {
-        log("LOGOUT ERROR: " + (e?.message || e));
-      }
-    });
-
-    $("btnLoadPending").addEventListener("click", loadPending);
-    $("btnLoadAll").addEventListener("click", loadAllLast50);
-
-    $("tabPending").addEventListener("click", loadPending);
-    $("tabAll").addEventListener("click", loadAllLast50);
-
-    // Auth listener
-    onAuthStateChanged(auth, async (user) => {
-      currentUser = user || null;
-      showLoggedInUI(user);
-
-      if (!user) {
-        setAdminBadge(false);
-        $("statusLine").textContent = "Durum: Oturum kapalı.";
-        $("list").innerHTML = "";
+      if(snap.empty){
+        $("list").innerHTML = `<div class="panel"><b>Bekleyen yok.</b></div>`;
         return;
       }
 
-      try {
-        const ok = await checkAdmin(user.uid);
-        setAdminBadge(ok);
-        $("statusLine").textContent = ok
-          ? "Durum: Giriş OK. Admin ise listeleyebilirsin."
-          : "Durum: Giriş OK ama admin değilsin. Firestore admins/{UID} lazım.";
+      snap.forEach((d) => {
+        const data = d.data();
 
-        log(`BOOT:\nurl=${location.href}\nAUTH STATE: signed in\nADMIN CHECK: ${ok ? "OK" : "NO"}`);
+        const name = data?.name || data?.ad || "-";
+        const age  = data?.age || data?.yas || "-";
+        const zodiac = data?.zodiac || data?.burc || "-";
 
-        // girişten sonra otomatik bekleyenleri yükle
-        if (ok) await loadPending();
-      } catch (e) {
-        setAdminBadge(false);
-        $("statusLine").textContent = "Durum: Admin kontrol hatası.";
-        log("ADMIN CHECK ERROR: " + (e?.message || e));
+        const createdAt = data?.createdAt || data?.submittedAt || null;
+        const createdText = fmtDate(createdAt);
+
+        const userId = data?.userId || data?.uid || "-";
+        const photo1 = data?.photo1Url || data?.foto1Url || data?.photo1 || data?.foto1 || "";
+        const photo2 = data?.photo2Url || data?.foto2Url || data?.photo2 || data?.foto2 || "";
+
+        const card = document.createElement("div");
+        card.className = "pending-card";
+        card.innerHTML = `
+          <div class="pending-grid">
+            <div class="pending-info">
+              <h3 class="wrap-anywhere">${escapeHtml(name)}</h3>
+              <div class="kv">
+                <div>Yaş:</div><div><b>${escapeHtml(String(age))}</b></div>
+                <div>Burç:</div><div><b class="wrap-anywhere">${escapeHtml(String(zodiac))}</b></div>
+                <div>Gönderim:</div><div><b>${escapeHtml(createdText)}</b></div>
+                <div>UserId:</div><div class="wrap-anywhere"><b>${escapeHtml(String(userId))}</b></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="thumbs">
+                ${photo1 ? `<a href="${photo1}" target="_blank" rel="noopener"><img class="thumb" src="${photo1}" alt="Foto 1"></a>` : ``}
+                ${photo2 ? `<a href="${photo2}" target="_blank" rel="noopener"><img class="thumb" src="${photo2}" alt="Foto 2"></a>` : ``}
+              </div>
+              <div class="thumb-note">${(photo1||photo2) ? "Resme tıklayınca büyük açılır." : "Foto yok."}</div>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn-dark btn-sm" data-copy="${encodeAttr(`${photo1}\\n${photo2}`)}">Resimleri Kopyala</button>
+              <button class="btn btn-primary btn-sm" data-approve="${d.id}">Onayla</button>
+              <button class="btn btn-danger btn-sm" data-reject="${d.id}">Reddet</button>
+            </div>
+          </div>
+        `;
+        $("list").appendChild(card);
+      });
+    }
+
+    async function loadLast50(){
+      $("statusText").textContent = "Son 50 yükleniyor...";
+      $("list").innerHTML = "";
+
+      const qy = query(
+        collection(db, "uploads"),
+        orderBy("createdAt", "desc"),
+        limit(50)
+      );
+
+      const snap = await getDocs(qy);
+      $("statusText").textContent = `Son 50: ${snap.size} kayıt.`;
+
+      if(snap.empty){
+        $("list").innerHTML = `<div class="panel"><b>Kayıt yok.</b></div>`;
+        return;
+      }
+
+      snap.forEach((d) => {
+        const data = d.data();
+        const name = data?.name || data?.ad || "-";
+        const age  = data?.age || data?.yas || "-";
+        const zodiac = data?.zodiac || data?.burc || "-";
+        const createdText = fmtDate(data?.createdAt || null);
+        const userId = data?.userId || data?.uid || "-";
+        const status = data?.status || "-";
+
+        const card = document.createElement("div");
+        card.className = "panel";
+        card.innerHTML = `
+          <div style="font-weight:900">${escapeHtml(name)} <span class="muted" style="font-weight:700">(${escapeHtml(status)})</span></div>
+          <div class="muted">Yaş: <b>${escapeHtml(String(age))}</b> | Burç: <b>${escapeHtml(String(zodiac))}</b></div>
+          <div class="muted">Gönderim: <b>${escapeHtml(createdText)}</b></div>
+          <div class="muted wrap-anywhere">UserId: <b>${escapeHtml(String(userId))}</b></div>
+        `;
+        $("list").appendChild(card);
+      });
+    }
+
+    async function refresh(){
+      if(!currentUser){
+        $("statusText").textContent = "Oturum kapalı.";
+        $("list").innerHTML = "";
+        return;
+      }
+      if(!isAdmin){
+        $("statusText").textContent = "Giriş var ama admin değilsin.";
+        $("list").innerHTML = "";
+        return;
+      }
+      if(activeTab === "pending") await loadPending();
+      else await loadLast50();
+    }
+
+    // ============================
+    // Approve / Reject
+    // ============================
+    async function approveUpload(uploadId){
+      if(!isAdmin) return alert("Admin değilsin.");
+      const upRef = doc(db, "uploads", uploadId);
+      const upSnap = await getDoc(upRef);
+      if(!upSnap.exists()) return alert("Kayıt bulunamadı.");
+
+      const data = upSnap.data();
+
+      // readings'e kopyala
+      // (istersen id aynı kalsın diye uploadId kullanıyorum)
+      const rdRef = doc(db, "readings", uploadId);
+      await setDoc(rdRef, {
+        ...data,
+        status: "approved",
+        approvedAt: new Date(),
+        approvedBy: currentUser.uid
+      }, { merge: true });
+
+      // uploads status update
+      await setDoc(upRef, {
+        status: "approved",
+        approvedAt: new Date(),
+        approvedBy: currentUser.uid
+      }, { merge: true });
+
+      alert("Onaylandı (readings'e yazıldı).");
+      await refresh();
+    }
+
+    async function rejectUpload(uploadId){
+      if(!isAdmin) return alert("Admin değilsin.");
+      const upRef = doc(db, "uploads", uploadId);
+
+      // basit: status rejected
+      await setDoc(upRef, {
+        status: "rejected",
+        rejectedAt: new Date(),
+        rejectedBy: currentUser.uid
+      }, { merge: true });
+
+      alert("Reddedildi.");
+      await refresh();
+    }
+
+    // ============================
+    // Click handlers
+    // ============================
+    document.addEventListener("click", async (e) => {
+      // kopyala
+      const c = e.target.closest("[data-copy]");
+      if(c){
+        const text = c.getAttribute("data-copy") || "";
+        try{
+          await navigator.clipboard.writeText(text.replace(/\\n/g,"\n"));
+          c.textContent = "Kopyalandı";
+          setTimeout(()=> c.textContent = "Resimleri Kopyala", 1200);
+        } catch {
+          alert("Kopyalama başarısız (iPhone Safari bazen izin vermez).");
+        }
+      }
+
+      // approve
+      const a = e.target.closest("[data-approve]");
+      if(a){
+        const id = a.getAttribute("data-approve");
+        await approveUpload(id);
+      }
+
+      // reject
+      const r = e.target.closest("[data-reject]");
+      if(r){
+        const id = r.getAttribute("data-reject");
+        await rejectUpload(id);
       }
     });
+
+    $("btnLogin").addEventListener("click", async () => {
+      const email = $("email").value.trim();
+      const pass  = $("pass").value;
+      $("loginStatus").textContent = "Giriş deneniyor...";
+      try{
+        await signInWithEmailAndPassword(auth, email, pass);
+        $("loginStatus").textContent = "Giriş OK.";
+      }catch(err){
+        $("loginStatus").textContent = "Hata: " + (err?.code || err?.message || err);
+        log("LOGIN ERROR: " + (err?.code || err?.message || err));
+      }
+    });
+
+    $("btnSignOut").addEventListener("click", async () => {
+      await signOut(auth);
+    });
+    $("btnSignOutTop").addEventListener("click", async () => {
+      await signOut(auth);
+    });
+
+    $("tabPending").addEventListener("click", async () => {
+      activeTab = "pending";
+      $("tabPending").classList.add("btn-dark");
+      $("tabLast50").classList.remove("btn-dark");
+      await refresh();
+    });
+
+    $("tabLast50").addEventListener("click", async () => {
+      activeTab = "last50";
+      $("tabLast50").classList.add("btn-dark");
+      $("tabPending").classList.remove("btn-dark");
+      await refresh();
+    });
+
+    $("btnRefresh").addEventListener("click", refresh);
+
+    // ============================
+    // Auth state
+    // ============================
+    log("BOOT: url=" + location.href);
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user || null;
+
+      if(!currentUser){
+        isAdmin = false;
+        showLoggedOut();
+        log("AUTH STATE: signed out");
+        return;
+      }
+
+      showLoggedIn();
+      log("AUTH STATE: signed in");
+      log("EMAIL: " + (currentUser.email || "-"));
+      log("UID: " + currentUser.uid);
+
+      // admin check
+      isAdmin = await checkAdmin(currentUser.uid);
+      setAdminBadge(isAdmin);
+      log("ADMIN CHECK: " + (isAdmin ? "OK" : "NO"));
+
+      await refresh();
+    });
+
+    // ============================
+    // Small helpers
+    // ============================
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+    function encodeAttr(str){
+      return escapeHtml(str).replaceAll('"',"&quot;");
+    }
   </script>
 </body>
 </html>
