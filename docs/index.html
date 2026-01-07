@@ -2,82 +2,101 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Falhane Kullanıcı Paneli</title>
   <style>
-    :root { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-    body { margin:0; background:#f4f6fb; color:#111; }
-    .wrap { max-width: 760px; margin: 0 auto; padding: 18px; }
-    h1 { font-size: 54px; letter-spacing: -1px; margin: 10px 0 18px; }
-    .card { background:#fff; border-radius: 18px; padding: 18px; margin: 14px 0; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
-    .row { display:flex; gap: 12px; flex-wrap: wrap; align-items:center; }
-    .btn {
-      border:0; border-radius: 12px; padding: 14px 16px; font-weight: 700;
-      cursor: pointer; width: 260px; max-width: 100%;
-    }
-    .btn-primary { background:#1f6fff; color:#fff; }
-    .btn-dark { background:#0f172a; color:#fff; }
-    .muted { color:#6b7280; font-size: 14px; }
-    .pill { display:inline-block; padding: 8px 10px; border-radius: 999px; font-weight:700; font-size: 13px; }
-    .ok { background:#e8fff1; color:#0a7a3b; border: 1px solid #bff2d0; }
-    .warn { background:#fff7ed; color:#9a3412; border: 1px solid #fed7aa; }
-    .err { background:#ffecec; color:#991b1b; border: 1px solid #fecaca; }
-    .list { display:flex; flex-direction: column; gap: 12px; }
-    .item { border: 1px solid #eef2ff; border-radius: 14px; padding: 14px; background:#fbfdff; }
-    .item h3 { margin:0 0 6px; font-size: 16px; }
-    .item .meta { font-size: 13px; color:#6b7280; margin-bottom: 10px; }
-    pre { white-space: pre-wrap; word-break: break-word; margin:0; }
-    .debug { background:#0b1220; color:#d1d5db; border-radius: 14px; padding: 14px; font-size: 13px; }
-    .hr { height:1px; background:#eef2ff; margin: 12px 0; }
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#f3f4f6;margin:0;padding:24px}
+    h1{font-size:44px;line-height:1.05;margin:0 0 18px}
+    .card{background:#fff;border-radius:18px;padding:18px 18px;margin:14px 0;box-shadow:0 10px 25px rgba(0,0,0,.06)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    button{border:0;border-radius:12px;padding:14px 16px;font-weight:700;cursor:pointer}
+    .btn{background:#2563eb;color:#fff}
+    .btn2{background:#111827;color:#fff}
+    input,select{width:100%;padding:14px;border-radius:12px;border:1px solid #e5e7eb;font-size:16px;box-sizing:border-box}
+    label{font-weight:700;margin:10px 0 6px;display:block}
+    .status{padding:12px 14px;border-radius:12px;background:#ecfdf5;color:#065f46;font-weight:700}
+    .warn{background:#fef2f2;color:#991b1b}
+    .muted{color:#6b7280}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;white-space:pre-wrap;background:#0b1220;color:#e5e7eb;border-radius:14px;padding:14px}
+    .disabled{opacity:.5;pointer-events:none}
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <h1>Falhane Kullanıcı Paneli</h1>
+  <h1>Falhane Kullanıcı Paneli</h1>
 
-    <div id="statusCard" class="card">
-      <span id="statusPill" class="pill warn">Oturum kapalı. Google ile giriş yap.</span>
-      <div class="hr"></div>
-
-      <h2 style="margin:0 0 10px;">Giriş (Google)</h2>
-      <div class="row">
-        <button id="btnLogin" class="btn btn-primary">Google ile giriş</button>
-        <button id="btnLogout" class="btn btn-dark">Çıkış</button>
-      </div>
-
-      <div style="margin-top:12px;">
-        <div><b>Giriş yapan:</b> <span id="userEmail">-</span></div>
-        <div><b>UID:</b> <span id="userUid">-</span></div>
-        <div class="muted" style="margin-top:8px;">
-          Not: Bu sayfa sadece <b>readings</b> koleksiyonundan <b>kendi</b> kayıtlarını gösterir.
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 style="margin:0 0 10px;">Benim Fal Sonuçlarım (readings)</h2>
-      <div class="row" style="justify-content: space-between;">
-        <button id="btnRefresh" class="btn btn-primary" style="width: 100%;">Yenile</button>
-      </div>
-      <div class="muted" style="margin-top: 10px;">Toplam: <span id="count">0</span></div>
-      <div class="hr"></div>
-      <div id="list" class="list"></div>
-    </div>
-
-    <div class="card">
-      <h2 style="margin:0 0 10px;">Debug</h2>
-      <div class="debug"><pre id="debug">Hazır.</pre></div>
-    </div>
+  <div class="card">
+    <div id="msg" class="status">Hazır.</div>
   </div>
 
-  <!-- Firebase compat (kolay) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <div class="card">
+    <h2>Giriş (Google)</h2>
+    <div class="row">
+      <button id="btnLogin" class="btn">Google ile giriş</button>
+      <button id="btnLogout" class="btn2">Çıkış</button>
+    </div>
+    <p style="margin:10px 0 0">
+      <b>Giriş yapan:</b> <span id="who">-</span><br/>
+      <b>UID:</b> <span id="uid">-</span>
+    </p>
+    <p class="muted" style="margin:10px 0 0">
+      Not: Bu sayfa upload oluşturur. Admin paneli “uploads” içinden onaylayınca “readings”e taşınır.
+    </p>
+  </div>
 
-  <script>
-    // === Senin config (aynı bıraktım) ===
+  <div class="card">
+    <h2>Fal Başvurusu (2 Foto)</h2>
+
+    <label>Ad</label>
+    <input id="name" placeholder="Örn: Sinan" />
+
+    <label>Yaş</label>
+    <input id="age" type="number" min="1" max="120" placeholder="Örn: 30" />
+
+    <label>Burç</label>
+    <select id="zodiac">
+      <option value="">Seç</option>
+      <option>Koç</option><option>Boğa</option><option>İkizler</option><option>Yengeç</option>
+      <option>Aslan</option><option>Başak</option><option>Terazi</option><option>Akrep</option>
+      <option>Yay</option><option>Oğlak</option><option>Kova</option><option>Balık</option>
+    </select>
+
+    <label>Fotoğraf 1 (fincan / telve)</label>
+    <input id="photo1" type="file" accept="image/*" />
+
+    <label>Fotoğraf 2 (ikinci açı)</label>
+    <input id="photo2" type="file" accept="image/*" />
+
+    <div class="row" style="margin-top:12px">
+      <button id="btnSend" class="btn">Gönder (uploads/pending)</button>
+      <button id="btnClear" class="btn2">Temizle</button>
+    </div>
+
+    <p class="muted" style="margin-top:10px">
+      Gönderince: Storage’a 2 foto yüklenir + Firestore “uploads” içine “pending” kayıt açılır.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Debug</h2>
+    <div id="dbg" class="mono">Booting...</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth, GoogleAuthProvider,
+      signInWithRedirect, getRedirectResult,
+      onAuthStateChanged, signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import {
+      getFirestore, doc, setDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import {
+      getStorage, ref, uploadBytes, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+
+    // === Firebase config (SENİN PROJE) ===
     const firebaseConfig = {
       apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
       authDomain: "falhane-e3057.firebaseapp.com",
@@ -88,167 +107,164 @@
       measurementId: "G-94TZ14VWPX"
     };
 
-    // --- helpers ---
-    const el = (id) => document.getElementById(id);
-    const log = (s) => { el("debug").textContent += "\n" + s; };
-    const setStatus = (type, text) => {
-      const pill = el("statusPill");
-      pill.classList.remove("ok","warn","err");
-      pill.classList.add(type);
-      pill.textContent = text;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    const elMsg = document.getElementById("msg");
+    const elDbg = document.getElementById("dbg");
+    const elWho = document.getElementById("who");
+    const elUid = document.getElementById("uid");
+
+    const btnLogin = document.getElementById("btnLogin");
+    const btnLogout = document.getElementById("btnLogout");
+    const btnSend = document.getElementById("btnSend");
+    const btnClear = document.getElementById("btnClear");
+
+    const iName = document.getElementById("name");
+    const iAge = document.getElementById("age");
+    const iZodiac = document.getElementById("zodiac");
+    const iP1 = document.getElementById("photo1");
+    const iP2 = document.getElementById("photo2");
+
+    function log(x){ elDbg.textContent += "\\n" + x; }
+    function setMsg(text, isError=false){
+      elMsg.textContent = text;
+      elMsg.classList.toggle("warn", !!isError);
+    }
+    function requireUser(){
+      const u = auth.currentUser;
+      if(!u) throw new Error("Oturum kapalı. Önce Google ile giriş yap.");
+      return u;
+    }
+    function validate(){
+      if(!iName.value.trim()) throw new Error("Ad boş olamaz.");
+      const age = Number(iAge.value);
+      if(!Number.isFinite(age) || age < 1 || age > 120) throw new Error("Yaş hatalı.");
+      if(!iZodiac.value) throw new Error("Burç seç.");
+      if(!iP1.files?.[0]) throw new Error("Fotoğraf 1 seç.");
+      if(!iP2.files?.[0]) throw new Error("Fotoğraf 2 seç.");
+    }
+    function uidSafeId(){
+      // basit benzersiz id
+      return "u_" + Date.now() + "_" + Math.random().toString(36).slice(2,10);
+    }
+
+    elDbg.textContent = "BOOT:\\nurl=" + location.href + "\\nua=" + navigator.userAgent + "\\n";
+
+    // Redirect sonucu (iOS Safari için şart)
+    try{
+      log("REDIRECT: getRedirectResult() çağrılıyor...");
+      const res = await getRedirectResult(auth);
+      if(res?.user){
+        log("REDIRECT: user geldi: " + res.user.email);
+        setMsg("Giriş başarılı (redirect).");
+      } else {
+        log("REDIRECT: sonuç yok (normal).");
+      }
+    } catch (e){
+      log("REDIRECT ERROR: " + (e?.code || "") + " " + (e?.message || e));
+      setMsg("Redirect hatası: " + (e?.message || e), true);
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if(user){
+        elWho.textContent = user.email || "(email yok)";
+        elUid.textContent = user.uid;
+        setMsg("Oturum açık.");
+        log("AUTH STATE: signed in: " + user.uid);
+      } else {
+        elWho.textContent = "-";
+        elUid.textContent = "-";
+        setMsg("Oturum kapalı. Google ile giriş yap.");
+        log("AUTH STATE: null");
+      }
+    });
+
+    btnLogin.onclick = async () => {
+      try{
+        setMsg("Google giriş başlatılıyor...");
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: "select_account" }); // hesap seçtir
+        await signInWithRedirect(auth, provider);
+      } catch(e){
+        setMsg("Giriş hatası: " + (e?.message || e), true);
+        log("LOGIN ERROR: " + (e?.code || "") + " " + (e?.message || e));
+      }
     };
 
-    // --- boot ---
-    el("debug").textContent =
-      "BOOT:\n" +
-      "url=" + location.href + "\n" +
-      "ua=" + navigator.userAgent + "\n";
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Provider
-    const provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account" });
-
-    // A) Persistence (kritik)
-    (async () => {
-      try {
-        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-        log("PERSISTENCE: LOCAL ok");
-      } catch (e) {
-        log("PERSISTENCE: hata => " + (e && e.code ? e.code : e));
+    btnLogout.onclick = async () => {
+      try{
+        await signOut(auth);
+        setMsg("Çıkış yapıldı.");
+      } catch(e){
+        setMsg("Çıkış hatası: " + (e?.message || e), true);
       }
-    })();
+    };
 
-    // Auth state watcher (en kritik)
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        setStatus("warn", "Oturum kapalı. Google ile giriş yap.");
-        el("userEmail").textContent = "-";
-        el("userUid").textContent = "-";
-        el("list").innerHTML = "";
-        el("count").textContent = "0";
-        log("AUTH STATE: null");
-        return;
+    btnClear.onclick = () => {
+      iName.value = "";
+      iAge.value = "";
+      iZodiac.value = "";
+      iP1.value = "";
+      iP2.value = "";
+      setMsg("Temizlendi.");
+    };
+
+    btnSend.onclick = async () => {
+      btnSend.classList.add("disabled");
+      try{
+        const user = requireUser();
+        validate();
+
+        const requestId = uidSafeId();
+        setMsg("Yükleniyor... (requestId: " + requestId + ")");
+        log("UPLOAD START: " + requestId);
+
+        const f1 = iP1.files[0];
+        const f2 = iP2.files[0];
+
+        // Storage path (rules buna göre)
+        const p1Ref = ref(storage, `uploads/${user.uid}/${requestId}/photo1.jpg`);
+        const p2Ref = ref(storage, `uploads/${user.uid}/${requestId}/photo2.jpg`);
+
+        await uploadBytes(p1Ref, f1, { contentType: f1.type || "image/jpeg" });
+        await uploadBytes(p2Ref, f2, { contentType: f2.type || "image/jpeg" });
+
+        const url1 = await getDownloadURL(p1Ref);
+        const url2 = await getDownloadURL(p2Ref);
+
+        // Firestore uploads doc
+        const uploadDoc = {
+          status: "pending",
+          userId: user.uid,
+          userEmail: user.email || null,
+          name: iName.value.trim(),
+          age: Number(iAge.value),
+          zodiac: iZodiac.value,
+          photo1Url: url1,
+          photo2Url: url2,
+          storagePath1: `uploads/${user.uid}/${requestId}/photo1.jpg`,
+          storagePath2: `uploads/${user.uid}/${requestId}/photo2.jpg`,
+          createdAt: serverTimestamp()
+        };
+
+        await setDoc(doc(db, "uploads", requestId), uploadDoc);
+
+        setMsg("Başvuru gönderildi (pending). Admin onaylayınca reading oluşacak.");
+        log("UPLOAD OK: " + requestId);
+
+        // Form temizle
+        iP1.value = "";
+        iP2.value = "";
+      } catch(e){
+        setMsg("Gönderme hatası: " + (e?.message || e), true);
+        log("SEND ERROR: " + (e?.code || "") + " " + (e?.message || e));
+      } finally {
+        btnSend.classList.remove("disabled");
       }
-
-      setStatus("ok", "Oturum açık");
-      el("userEmail").textContent = user.email || "(email yok)";
-      el("userUid").textContent = user.uid;
-      log("AUTH STATE: user=" + (user.email || "-") + " uid=" + user.uid);
-
-      await loadMyReadings();
-    });
-
-    // B) Login: Popup (öncelik) + Redirect fallback
-    el("btnLogin").addEventListener("click", async () => {
-      el("debug").textContent = "Hazır.\nBOOT:\nurl=" + location.href + "\nua=" + navigator.userAgent + "\n";
-      log("LOGIN: tıklandı");
-
-      try {
-        // iOS Safari’de en stabil bu:
-        const res = await auth.signInWithPopup(provider);
-        log("LOGIN: popup ok => " + (res.user?.email || "-"));
-      } catch (e) {
-        const code = e?.code || "";
-        log("LOGIN: popup hata => " + code);
-
-        // Popup bloklanırsa redirect dene
-        if (code.includes("popup-blocked") || code.includes("popup-closed-by-user") || code.includes("cancelled-popup-request")) {
-          try {
-            log("LOGIN: redirect fallback başlıyor...");
-            await auth.signInWithRedirect(provider);
-          } catch (e2) {
-            log("LOGIN: redirect hata => " + (e2?.code || e2));
-            setStatus("err", "Giriş HATA: " + (e2?.code || "redirect hata"));
-          }
-        } else {
-          setStatus("err", "Giriş HATA: " + (code || "bilinmeyen"));
-        }
-      }
-    });
-
-    el("btnLogout").addEventListener("click", async () => {
-      try {
-        await auth.signOut();
-        log("LOGOUT: ok");
-      } catch (e) {
-        log("LOGOUT: hata => " + (e?.code || e));
-      }
-    });
-
-    el("btnRefresh").addEventListener("click", async () => {
-      await loadMyReadings();
-    });
-
-    async function loadMyReadings() {
-      const user = auth.currentUser;
-      if (!user) {
-        log("READINGS: user yok");
-        return;
-      }
-
-      setStatus("ok", "Okuma yapılıyor...");
-      el("list").innerHTML = "";
-      el("count").textContent = "0";
-
-      try {
-        // Bu sorgu index isteyebilir:
-        // readings where userId==uid orderBy createdAt desc
-        const snap = await db.collection("readings")
-          .where("userId", "==", user.uid)
-          .orderBy("createdAt", "desc")
-          .limit(50)
-          .get();
-
-        el("count").textContent = String(snap.size);
-
-        if (snap.empty) {
-          el("list").innerHTML = `<div class="muted">Kayıt yok.</div>`;
-          setStatus("ok", "Okuma başarılı");
-          log("READINGS: 0 kayıt");
-          return;
-        }
-
-        const frag = document.createDocumentFragment();
-        snap.forEach(doc => {
-          const d = doc.data() || {};
-          const createdAt = d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt || "-");
-          const text = (d.text || d.result || d.reading || "").toString();
-
-          const div = document.createElement("div");
-          div.className = "item";
-          div.innerHTML = `
-            <h3>${doc.id}</h3>
-            <div class="meta">createdAt: ${createdAt}</div>
-            <div style="white-space:pre-wrap">${escapeHtml(text)}</div>
-          `;
-          frag.appendChild(div);
-        });
-
-        el("list").appendChild(frag);
-        setStatus("ok", "Okuma başarılı");
-        log("READINGS: ok => " + snap.size + " kayıt");
-      } catch (e) {
-        const msg = (e?.message || "").toString();
-        setStatus("err", "Okuma HATA: " + (e?.code || "bilinmeyen"));
-        log("READINGS: hata => " + (e?.code || e));
-        log("READINGS: message => " + msg);
-
-        // Index hatası olursa ekranda link verir zaten ama kısa yönlendirme:
-        if (msg.includes("requires an index")) {
-          log("INDEX: Firestore composite index lazım (userId + createdAt).");
-        }
-      }
-    }
-
-    function escapeHtml(s) {
-      return s.replace(/[&<>"']/g, (c) => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[c]));
-    }
+    };
   </script>
 </body>
 </html>
