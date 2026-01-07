@@ -2,114 +2,137 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Falhane Kullanıcı Paneli</title>
   <style>
-    :root { --bg:#f6f7fb; --card:#fff; --text:#0f172a; --muted:#64748b; --b:#e5e7eb; --ok:#16a34a; --bad:#f59e0b; --pri:#2563eb; }
-    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--text); }
-    .wrap{ max-width:820px; margin:0 auto; padding:18px; }
-    h1{ font-size:44px; margin:8px 0 16px; }
-    .card{ background:var(--card); border:1px solid var(--b); border-radius:16px; padding:14px; margin:12px 0; box-shadow:0 8px 24px rgba(15,23,42,.06); }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .alert{ background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; padding:10px 12px; border-radius:12px; font-weight:800; }
-    .btn{ border:0; border-radius:12px; padding:10px 14px; font-weight:900; cursor:pointer; }
-    .btn.blue{ background:var(--pri); color:#fff; }
-    .btn.gray{ background:#111827; color:#fff; }
-    .btn.ok{ background:var(--ok); color:#fff; }
-    .muted{ color:var(--muted); }
-    input, select{ width:100%; padding:12px; border-radius:12px; border:1px solid var(--b); font-size:16px; }
-    label{ display:block; font-weight:900; margin:10px 0 8px; }
-    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .box{ border:1px dashed #cbd5e1; border-radius:14px; padding:12px; background:#f8fafc; }
-    .smallbtn{ border:1px solid var(--b); border-radius:12px; padding:10px 12px; font-weight:900; cursor:pointer; background:#fff; }
-    .thumbs{ display:flex; gap:10px; margin-top:10px; }
-    .thumb{ width:110px; height:150px; border-radius:14px; border:1px dashed #cbd5e1; background:#fff; object-fit:cover; }
-    .debug{ background:#0b1220; color:#d1d5db; border-radius:16px; padding:12px; white-space:pre-wrap; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-    .disabled{ opacity:.45; pointer-events:none; }
+    :root{
+      --bg:#f3f6fb; --card:#fff; --ink:#0b1220; --muted:#6b7280;
+      --primary:#2563eb; --ok:#16a34a; --danger:#ef4444; --line:#e5e7eb;
+      --chip:#eef2ff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+    .wrap{max-width:920px;margin:0 auto;padding:20px}
+    h1{font-size:44px;line-height:1.05;margin:10px 0 18px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 16px;margin:14px 0;box-shadow:0 4px 16px rgba(11,18,32,.06)}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .grow{flex:1}
+    .btn{border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .btn.primary{background:var(--primary);color:#fff}
+    .btn.dark{background:#111827;color:#fff}
+    .btn.ghost{background:#f1f5f9;color:#0b1220;border:1px solid var(--line)}
+    .btn.ok{background:var(--ok);color:#fff}
+    .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:#f8fafc;font-weight:700}
+    .badge.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+    .badge.good{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}
+    .muted{color:var(--muted)}
+    label{display:block;font-weight:800;margin:10px 0 6px}
+    input,select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--line);font-size:16px;background:#fff}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:720px){ .grid2{grid-template-columns:1fr} h1{font-size:36px} }
+    .hint{font-size:13px;color:var(--muted);margin-top:8px}
+    .previewRow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+    .ph{border:1px dashed #cbd5e1;border-radius:16px;height:180px;background:#f8fafc;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .ph img{width:100%;height:100%;object-fit:cover}
+    .tiny{font-size:12px}
+    .debug{white-space:pre-wrap;background:#0b1220;color:#e5e7eb;border-radius:16px;padding:14px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;line-height:1.35}
+    .sep{height:1px;background:var(--line);margin:12px 0}
+    .disabledBox{opacity:.45;pointer-events:none}
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <h1>Falhane Kullanıcı Paneli</h1>
 
-    <div id="alert" class="alert">Oturum kapalı. Google ile giriş yap.</div>
-
-    <div class="card">
-      <h2 style="margin:0 0 10px">Giriş (Google)</h2>
+    <div class="card" id="statusCard">
       <div class="row">
-        <button id="btnGoogle" class="btn blue" type="button">Google ile giriş</button>
-        <button id="btnLogout" class="btn gray" type="button" style="display:none">Çıkış</button>
+        <div class="badge warn" id="authBadge">Oturum kapalı. Google ile giriş yap.</div>
+        <div class="grow"></div>
+        <button class="btn primary" id="btnGoogle">Google ile giriş</button>
+        <button class="btn dark" id="btnLogout" style="display:none">Çıkış</button>
       </div>
-
-      <div class="muted" style="margin-top:10px">
-        Giriş yapan: <b id="who">-</b><br/>
-        UID: <b id="uid">-</b><br/>
-        Not: Bu sayfa upload oluşturur. Admin paneli “uploads” içinden onaylayınca “readings”e taşır.
+      <div class="sep"></div>
+      <div class="muted">
+        <div><b>Giriş yapan:</b> <span id="who">-</span></div>
+        <div><b>UID:</b> <span id="uid">-</span></div>
+        <div class="tiny" style="margin-top:6px">
+          Not: Bu sayfa upload oluşturur. Admin paneli “uploads” içinden onaylayınca “readings”e taşır.
+        </div>
       </div>
     </div>
 
     <div class="card" id="formCard">
-      <h2 style="margin:0 0 6px">Fal Başvurusu (2 Foto)</h2>
-      <div class="muted" style="margin:0 0 12px">Bu formu göndermek için giriş yapman gerekiyor.</div>
+      <h2 style="margin:0 0 10px">Fal Başvurusu (2 Foto)</h2>
+      <div class="muted" id="needLogin" style="margin-bottom:10px">
+        Bu formu göndermek için giriş yapman gerekiyor.
+      </div>
 
-      <label>Ad</label>
-      <input id="name" placeholder="Adın" />
-
-      <label>Yaş</label>
-      <input id="age" type="number" inputmode="numeric" placeholder="Örn: 26" />
-
-      <label>Burç</label>
-      <select id="sign">
-        <option value="">Seç</option>
-        <option>Koç</option><option>Boğa</option><option>İkizler</option><option>Yengeç</option>
-        <option>Aslan</option><option>Başak</option><option>Terazi</option><option>Akrep</option>
-        <option>Yay</option><option>Oğlak</option><option>Kova</option><option>Balık</option>
-      </select>
-
-      <div class="grid2" style="margin-top:12px">
-        <div class="box">
-          <div style="font-weight:900;margin-bottom:8px">Foto 1</div>
-          <input id="file1" type="file" accept="image/*" style="display:none" />
-          <input id="cam1" type="file" accept="image/*" capture="environment" style="display:none" />
-          <div class="row">
-            <button class="smallbtn" id="pick1" type="button">Galeriden seç</button>
-            <button class="smallbtn" id="take1" type="button">Kamera ile çek</button>
+      <div id="formWrap" class="disabledBox">
+        <div class="grid2">
+          <div>
+            <label>Ad</label>
+            <input id="inpName" placeholder="Adın" autocomplete="name" />
+          </div>
+          <div>
+            <label>Yaş</label>
+            <input id="inpAge" placeholder="Örn: 26" inputmode="numeric" />
           </div>
         </div>
 
-        <div class="box">
-          <div style="font-weight:900;margin-bottom:8px">Foto 2</div>
-          <input id="file2" type="file" accept="image/*" style="display:none" />
-          <input id="cam2" type="file" accept="image/*" capture="environment" style="display:none" />
-          <div class="row">
-            <button class="smallbtn" id="pick2" type="button">Galeriden seç</button>
-            <button class="smallbtn" id="take2" type="button">Kamera ile çek</button>
+        <label>Burç</label>
+        <select id="selSign">
+          <option value="">Seç</option>
+          <option>Koç</option><option>Boğa</option><option>İkizler</option><option>Yengeç</option>
+          <option>Aslan</option><option>Başak</option><option>Terazi</option><option>Akrep</option>
+          <option>Yay</option><option>Oğlak</option><option>Kova</option><option>Balık</option>
+        </select>
+
+        <div class="sep"></div>
+
+        <div class="grid2">
+          <div>
+            <label>Foto 1</label>
+            <div class="row">
+              <input id="f1" type="file" accept="image/*" style="flex:1" />
+              <button class="btn ghost" id="cam1" type="button">Kamera ile çek</button>
+            </div>
+            <input id="c1" type="file" accept="image/*" capture="environment" style="display:none" />
+          </div>
+          <div>
+            <label>Foto 2</label>
+            <div class="row">
+              <input id="f2" type="file" accept="image/*" style="flex:1" />
+              <button class="btn ghost" id="cam2" type="button">Kamera ile çek</button>
+            </div>
+            <input id="c2" type="file" accept="image/*" capture="environment" style="display:none" />
           </div>
         </div>
-      </div>
 
-      <div class="thumbs">
-        <img id="prev1" class="thumb" alt="prev1" />
-        <img id="prev2" class="thumb" alt="prev2" />
-      </div>
+        <div class="previewRow">
+          <div class="ph" id="ph1"><span class="muted">Önizleme 1</span></div>
+          <div class="ph" id="ph2"><span class="muted">Önizleme 2</span></div>
+        </div>
 
-      <div class="row" style="margin-top:14px">
-        <button id="btnSend" class="btn ok" type="button" style="flex:1">Başvuruyu Gönder</button>
-      </div>
+        <div class="sep"></div>
 
-      <div class="muted" style="margin-top:10px">
-        İpucu: “Kamera ile çek” telefonda kamerayı açar. “Galeriden seç” galeriden seçmek içindir.
+        <button class="btn ok" id="btnSend" type="button">Başvuruyu Gönder</button>
+        <div class="hint">
+          İpucu: “Kamera ile çek” telefonda kamerayı açar. Normal seçim alanı galeriden seçmek içindir.
+        </div>
+        <div class="hint" id="sendInfo"></div>
       </div>
     </div>
 
     <div class="card">
       <h2 style="margin:0 0 10px">Debug</h2>
-      <div id="dbg" class="debug">Hazır.</div>
+      <div class="debug" id="dbg">Hazır.</div>
     </div>
   </div>
 
   <script type="module">
-    // ===== Firebase Config =====
+    // ========= Firebase config (SENİN CONFIG) =========
     const firebaseConfig = {
       apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
       authDomain: "falhane-e3057.firebaseapp.com",
@@ -120,11 +143,12 @@
       measurementId: "G-94TZ14VWPX"
     };
 
-    // ===== Imports =====
+    // ========= Firebase imports =========
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
       getAuth, onAuthStateChanged,
       signInWithRedirect, getRedirectResult, signOut,
+      signInWithPopup,
       GoogleAuthProvider,
       setPersistence, browserLocalPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
@@ -132,148 +156,228 @@
       getFirestore, collection, addDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
     import {
-      getStorage, ref, uploadBytes, getDownloadURL
+      getStorage, ref as sRef, uploadBytes, getDownloadURL
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 
+    // ========= Helpers =========
+    const $ = (id) => document.getElementById(id);
+    const dbg = (msg) => { $("dbg").textContent = msg; };
+    const log = (line) => { $("dbg").textContent += "\n" + line; };
+
+    const isIOS = (() => {
+      const ua = navigator.userAgent || "";
+      return /iPhone|iPad|iPod/i.test(ua);
+    })();
+
+    // ========= Init =========
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const st = getStorage(app);
+    const storage = getStorage(app);
 
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account" });
+    // İstersen scope ekleyebilirsin; gerek yok:
+    // provider.addScope("email");
 
-    const $ = (id) => document.getElementById(id);
-    const dbg = (s) => $("dbg").textContent = (typeof s === "string" ? s : JSON.stringify(s,null,2));
-
-    // ===== iOS Safari için en kritik satır: persistence =====
-    try {
-      await setPersistence(auth, browserLocalPersistence);
-      dbg("BOOT: persistence=browserLocalPersistence\n");
-    } catch (e) {
-      dbg("BOOT: persistence set ERROR\n" + (e.code || "") + " " + (e.message || e));
-    }
-
-    // ===== Redirect result =====
-    try {
-      const r = await getRedirectResult(auth);
-      dbg($("dbg").textContent + "\nREDIRECT RESULT: " + (r?.user?.email || "boş (normal olabilir)"));
-    } catch (e) {
-      dbg($("dbg").textContent + "\nREDIRECT ERROR: " + (e.code || "") + " " + (e.message || e));
-    }
-
-    // ===== UI =====
-    const alert = $("alert");
-    const who = $("who");
-    const uid = $("uid");
+    // ========= UI refs =========
     const btnGoogle = $("btnGoogle");
     const btnLogout = $("btnLogout");
-    const formCard = $("formCard");
+    const authBadge = $("authBadge");
+    const who = $("who");
+    const uid = $("uid");
+
+    const formWrap = $("formWrap");
+    const needLogin = $("needLogin");
+    const sendInfo = $("sendInfo");
     const btnSend = $("btnSend");
 
-    const file1 = $("file1"), file2 = $("file2"), cam1 = $("cam1"), cam2 = $("cam2");
-    const prev1 = $("prev1"), prev2 = $("prev2");
-    let f1 = null, f2 = null;
-
-    $("pick1").onclick = () => file1.click();
-    $("pick2").onclick = () => file2.click();
-    $("take1").onclick = () => cam1.click();
-    $("take2").onclick = () => cam2.click();
-
-    function setPreview(imgEl, file){
-      if (!file) { imgEl.removeAttribute("src"); return; }
-      const url = URL.createObjectURL(file);
-      imgEl.src = url;
+    // ========= iOS + auth persistence =========
+    // iOS Safari bazen persistence sorun çıkarır; yine de local deniyoruz.
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+      log("BOOT: persistence=browserLocalPersistence");
+    } catch (e) {
+      log("BOOT: persistence set FAIL: " + (e.code || "") + " " + (e.message || e));
     }
 
-    file1.onchange = (e)=>{ f1 = e.target.files?.[0] || null; setPreview(prev1, f1); };
-    file2.onchange = (e)=>{ f2 = e.target.files?.[0] || null; setPreview(prev2, f2); };
-    cam1.onchange  = (e)=>{ f1 = e.target.files?.[0] || null; setPreview(prev1, f1); };
-    cam2.onchange  = (e)=>{ f2 = e.target.files?.[0] || null; setPreview(prev2, f2); };
+    log("BOOT: auth ready");
+    log("UA: " + navigator.userAgent);
+    log("MODE: " + (isIOS ? "iOS Safari/Browser" : "desktop/android"));
 
-    btnGoogle.onclick = async () => {
-      try {
-        dbg($("dbg").textContent + "\nLOGIN: redirect başlıyor...");
-        await signInWithRedirect(auth, provider);
-      } catch (e) {
-        dbg($("dbg").textContent + "\nLOGIN ERROR: " + (e.code || "") + " " + (e.message || e));
-      }
-    };
-
-    btnLogout.onclick = async () => {
-      await signOut(auth);
-    };
-
-    function setSignedIn(user){
-      alert.textContent = "Giriş yapıldı.";
-      who.textContent = user.email || "-";
-      uid.textContent = user.uid || "-";
-      btnGoogle.style.display = "none";
-      btnLogout.style.display = "inline-block";
-      formCard.classList.remove("disabled");
-      btnSend.classList.remove("disabled");
+    // ========= Redirect result (fallback) =========
+    try {
+      log("REDIRECT: getRedirectResult() çağrılıyor...");
+      const rr = await getRedirectResult(auth);
+      if (rr && rr.user) log("REDIRECT: user geldi: " + (rr.user.email || rr.user.uid));
+      else log("REDIRECT: boş (normal olabilir)");
+    } catch (e) {
+      log("REDIRECT ERROR: " + (e.code || "") + " " + (e.message || e));
     }
 
-    function setSignedOut(){
-      alert.textContent = "Oturum kapalı. Google ile giriş yap.";
-      who.textContent = "-";
-      uid.textContent = "-";
-      btnGoogle.style.display = "inline-block";
-      btnLogout.style.display = "none";
-      formCard.classList.add("disabled");
-      btnSend.classList.add("disabled");
-    }
-
+    // ========= Auth state =========
     onAuthStateChanged(auth, (user) => {
-      dbg($("dbg").textContent + "\nAUTH STATE: " + (user ? "signed in" : "signed out"));
-      if (user) setSignedIn(user); else setSignedOut();
+      if (user) {
+        authBadge.className = "badge good";
+        authBadge.textContent = "Oturum açık";
+        who.textContent = user.email || "-";
+        uid.textContent = user.uid || "-";
+        btnGoogle.style.display = "none";
+        btnLogout.style.display = "inline-block";
+        formWrap.classList.remove("disabledBox");
+        needLogin.style.display = "none";
+        log("AUTH STATE: signed in");
+      } else {
+        authBadge.className = "badge warn";
+        authBadge.textContent = "Oturum kapalı. Google ile giriş yap.";
+        who.textContent = "-";
+        uid.textContent = "-";
+        btnGoogle.style.display = "inline-block";
+        btnLogout.style.display = "none";
+        formWrap.classList.add("disabledBox");
+        needLogin.style.display = "block";
+        log("AUTH STATE: signed out");
+      }
     });
 
-    async function uploadOne(userId, which, file){
-      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-      const id = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
-      const path = `uploads/${userId}/${id}/${which}.${ext}`;
-      const r = ref(st, path);
-      await uploadBytes(r, file);
-      return await getDownloadURL(r);
+    // ========= Google Sign-in (popup first, redirect fallback) =========
+    btnGoogle.addEventListener("click", async () => {
+      btnGoogle.disabled = true;
+      try {
+        log("LOGIN: popup deneniyor (iOS için daha stabil)...");
+        await signInWithPopup(auth, provider);
+        log("LOGIN: popup OK");
+      } catch (e) {
+        log("POPUP FAIL: " + (e.code || "") + " " + (e.message || e));
+        log("LOGIN: redirect fallback...");
+        try {
+          await signInWithRedirect(auth, provider);
+        } catch (e2) {
+          log("REDIRECT FAIL: " + (e2.code || "") + " " + (e2.message || e2));
+        }
+      } finally {
+        btnGoogle.disabled = false;
+      }
+    });
+
+    btnLogout.addEventListener("click", async () => {
+      await signOut(auth);
+      log("LOGOUT: OK");
+    });
+
+    // ========= Camera buttons =========
+    $("cam1").addEventListener("click", () => $("c1").click());
+    $("cam2").addEventListener("click", () => $("c2").click());
+
+    // ========= File selection + preview =========
+    let file1 = null, file2 = null;
+
+    function setPreview(boxId, file) {
+      const box = $(boxId);
+      box.innerHTML = "";
+      if (!file) {
+        box.innerHTML = '<span class="muted">Önizleme</span>';
+        return;
+      }
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.onload = () => URL.revokeObjectURL(img.src);
+      box.appendChild(img);
     }
 
-    btnSend.onclick = async () => {
+    function handlePick(which, file) {
+      if (!file) return;
+      if (which === 1) {
+        file1 = file;
+        setPreview("ph1", file1);
+      } else {
+        file2 = file;
+        setPreview("ph2", file2);
+      }
+    }
+
+    $("f1").addEventListener("change", (e) => handlePick(1, e.target.files?.[0]));
+    $("f2").addEventListener("change", (e) => handlePick(2, e.target.files?.[0]));
+    $("c1").addEventListener("change", (e) => handlePick(1, e.target.files?.[0]));
+    $("c2").addEventListener("change", (e) => handlePick(2, e.target.files?.[0]));
+
+    // ========= Submit =========
+    function cleanName(s){ return (s || "").trim(); }
+    function cleanAge(s){
+      const n = parseInt(String(s || "").trim(), 10);
+      if (Number.isNaN(n)) return null;
+      return n;
+    }
+
+    btnSend.addEventListener("click", async () => {
+      sendInfo.textContent = "";
+      btnSend.disabled = true;
+
       try {
         const user = auth.currentUser;
-        if (!user) { alert.textContent = "Önce Google ile giriş yap."; return; }
+        if (!user) throw new Error("Önce Google ile giriş yap.");
 
-        const name = $("name").value.trim();
-        const age  = Number($("age").value);
-        const sign = $("sign").value;
+        const name = cleanName($("inpName").value);
+        const age = cleanAge($("inpAge").value);
+        const sign = ($("selSign").value || "").trim();
 
-        if (!name) { alert.textContent = "Ad zorunlu."; return; }
-        if (!age || age < 1) { alert.textContent = "Yaş geçersiz."; return; }
-        if (!sign) { alert.textContent = "Burç seç."; return; }
-        if (!f1 || !f2) { alert.textContent = "2 foto zorunlu."; return; }
+        if (!name) throw new Error("Ad zorunlu.");
+        if (!age || age < 1 || age > 120) throw new Error("Yaş geçersiz.");
+        if (!sign) throw new Error("Burç seç.");
 
-        alert.textContent = "Yükleniyor...";
+        if (!file1 || !file2) throw new Error("2 foto zorunlu.");
 
-        const photo1Url = await uploadOne(user.uid, "photo1", f1);
-        const photo2Url = await uploadOne(user.uid, "photo2", f2);
+        // upload to storage
+        const docId = "u_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
+        const basePath = `uploads/${user.uid}/${docId}`;
+        const p1 = sRef(storage, `${basePath}/photo1.jpg`);
+        const p2 = sRef(storage, `${basePath}/photo2.jpg`);
 
+        sendInfo.textContent = "Yükleniyor...";
+        log("UPLOAD: start docId=" + docId);
+
+        await uploadBytes(p1, file1, { contentType: file1.type || "image/jpeg" });
+        await uploadBytes(p2, file2, { contentType: file2.type || "image/jpeg" });
+
+        const url1 = await getDownloadURL(p1);
+        const url2 = await getDownloadURL(p2);
+
+        // firestore write
         await addDoc(collection(db, "uploads"), {
           status: "pending",
+          createdAt: serverTimestamp(),
+          name,
+          age,
+          sign,            // burç burada
           userId: user.uid,
           email: user.email || null,
-          name, age, sign,
-          photo1Url, photo2Url,
-          createdAt: serverTimestamp()
+          docId,
+          photo1: url1,
+          photo2: url2
         });
 
-        alert.textContent = "Başvuru gönderildi (pending). Admin onaylayınca reading oluşacak.";
-        dbg($("dbg").textContent + "\nUPLOAD: OK");
+        sendInfo.textContent = "Başvuru gönderildi (pending). Admin onaylayınca reading oluşacak.";
+        log("UPLOAD: OK -> Firestore uploads + Storage");
+
+        // reset (optional)
+        $("inpName").value = "";
+        $("inpAge").value = "";
+        $("selSign").value = "";
+        $("f1").value = "";
+        $("f2").value = "";
+        $("c1").value = "";
+        $("c2").value = "";
+        file1 = null; file2 = null;
+        setPreview("ph1", null);
+        setPreview("ph2", null);
 
       } catch (e) {
-        alert.textContent = "Hata: " + (e.code || e.message || e);
-        dbg($("dbg").textContent + "\nSEND ERROR: " + (e.code || "") + " " + (e.message || e));
+        const msg = e?.message || String(e);
+        sendInfo.textContent = "Hata: " + msg;
+        log("SEND ERROR: " + msg);
+      } finally {
+        btnSend.disabled = false;
       }
-    };
+    });
   </script>
 </body>
 </html>
