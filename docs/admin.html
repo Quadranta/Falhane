@@ -2,186 +2,49 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin İşlemleri</title>
-
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Falhane - Admin</title>
   <style>
     :root{
-      --bg:#f3f6fb;
-      --card:#ffffff;
-      --text:#0b1220;
-      --muted:#667085;
-      --primary:#2563eb;
-      --dark:#111827;
-      --ok:#16a34a;
-      --bad:#dc2626;
-      --line:#e5e7eb;
-      --chip:#eef2ff;
-      --shadow: 0 12px 28px rgba(16,24,40,.10);
-      --radius:18px;
+      --bg:#f5f7fb; --card:#fff; --text:#0f172a; --muted:#64748b;
+      --ok:#16a34a; --bad:#ef4444; --primary:#2563eb; --dark:#111827;
+      --border:#e5e7eb;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background:var(--bg); color:var(--text);
-    }
-    .wrap{
-      max-width: 980px; margin: 22px auto; padding: 0 14px 50px;
-    }
-    h1{
-      margin: 10px 0 18px;
-      font-size: clamp(30px, 6vw, 54px);
-      letter-spacing: -0.02em;
-    }
-    .panel{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .row{display:flex; gap:12px; flex-wrap:wrap; align-items:center;}
-    .spacer{flex:1}
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px; border-radius:999px;
-      background: #fef2f2; color: var(--bad);
-      border: 1px solid #fecaca;
-      font-weight: 700;
-      width: fit-content;
-    }
-    .chip.ok{
-      background: #ecfdf3; color: var(--ok); border-color:#bbf7d0;
-    }
-    .note{
-      margin-top:10px; color: var(--muted);
-      line-height:1.35;
-    }
-    label{display:block; font-weight:700; margin: 10px 0 6px;}
-    input{
-      width: min(520px, 100%);
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background:#fff;
-      font-size: 16px;
-      outline:none;
-    }
-    input:focus{border-color:#93c5fd; box-shadow:0 0 0 4px rgba(37,99,235,.10)}
-    .btn{
-      border:0; cursor:pointer;
-      padding: 12px 14px;
-      border-radius: 12px;
-      font-weight: 800;
-      font-size: 15px;
-      color:#fff;
-      background: var(--primary);
-      transition: .12s ease;
-      white-space:nowrap;
-    }
-    .btn:hover{filter:brightness(.95)}
-    .btn.dark{background: var(--dark)}
-    .btn.ghost{
-      background: #fff; color: var(--text);
-      border: 1px solid var(--line);
-    }
-    .btn.small{padding:10px 12px; border-radius: 12px; font-size: 14px}
-    .btn.warn{background:#ef4444}
-    .btn.ok{background:#16a34a}
-
-    .tabs{
-      display:flex; gap:10px; flex-wrap:wrap;
-      margin-top: 12px;
-    }
-    .tab{
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background:#fff;
-      font-weight: 900;
-      cursor:pointer;
-    }
-    .tab.active{
-      background: var(--dark);
-      color:#fff;
-      border-color: transparent;
-    }
-
-    .statusline{
-      margin-top: 10px;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .list{display:flex; flex-direction:column; gap:12px; margin-top: 14px;}
-    .item{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px;
-    }
-    .itemGrid{
-      display:grid;
-      grid-template-columns: 1.3fr 1fr 220px;
-      gap: 12px;
-      align-items:start;
-    }
-    @media (max-width: 760px){
-      .itemGrid{grid-template-columns: 1fr}
-    }
-    .who{
-      display:flex; flex-direction:column; gap:6px;
-    }
-    .who .name{
-      font-size: 22px; font-weight: 1000;
-      letter-spacing: -0.01em;
-    }
-    .kv{
-      display:flex; flex-wrap:wrap; gap:10px;
-      color: var(--muted);
-      font-weight: 800;
-    }
-    .pill{
-      background: var(--chip);
-      border:1px solid #dbe4ff;
-      padding: 6px 10px;
-      border-radius: 999px;
-      width: fit-content;
-      color:#1e40af;
-      font-weight: 900;
-    }
-    .meta{
-      color: var(--muted);
-      font-weight: 800;
-      line-height: 1.35;
-    }
-    .thumbs{
-      display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap;
-    }
-    .thumb{
-      width:76px; height:76px;
-      border-radius: 14px;
-      border:1px solid var(--line);
-      object-fit: cover;
-      background:#f8fafc;
-    }
-    .actions{
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
-      margin-top: 10px;
-    }
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 13px;
-      background:#0b1220;
-      color:#d1d5db;
-      padding: 12px;
-      border-radius: 14px;
-      white-space: pre-wrap;
-      word-break: break-word;
-      border: 1px solid rgba(255,255,255,.06);
-    }
-    .hide{display:none !important;}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);}
+    .wrap{max-width:980px;margin:0 auto;padding:18px;}
+    h1{font-size:42px;letter-spacing:-.02em;margin:10px 0 16px;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 6px 24px rgba(15,23,42,.06);}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#f8fafc;color:var(--muted);font-weight:600}
+    .pill.ok{background:#ecfdf5;color:#065f46;border-color:#bbf7d0}
+    .pill.bad{background:#fef2f2;color:#991b1b;border-color:#fecaca}
+    button{border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+    button.primary{background:var(--primary);color:#fff}
+    button.dark{background:var(--dark);color:#fff}
+    button.ok{background:var(--ok);color:#fff}
+    button.bad{background:var(--bad);color:#fff}
+    button.ghost{background:#eef2ff;color:#1e40af}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .muted{color:var(--muted)}
+    .small{font-size:13px}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap}
+    .tab{background:#fff;border:1px solid var(--border);padding:10px 14px;border-radius:999px;font-weight:800;color:#0f172a}
+    .tab.active{background:#111827;color:#fff;border-color:#111827}
+    .req{display:flex;gap:12px;align-items:flex-start}
+    .reqCard{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px}
+    .reqHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .name{font-size:28px;margin:0}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+    .chip{background:#eef2ff;color:#1e40af;border:1px solid #c7d2fe;padding:6px 10px;border-radius:999px;font-weight:800}
+    .kv{display:grid;grid-template-columns:140px 1fr;gap:6px 10px;margin:8px 0}
+    .kv div:nth-child(odd){color:var(--muted);font-weight:700}
+    .photos{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .thumb{width:92px;height:92px;border-radius:14px;border:1px solid var(--border);object-fit:cover;background:#f1f5f9}
+    textarea{width:100%;min-height:110px;resize:vertical;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:15px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .hr{height:1px;background:var(--border);margin:12px 0}
+    pre{white-space:pre-wrap;background:#0b1220;color:#dbeafe;padding:12px;border-radius:14px;overflow:auto}
   </style>
 </head>
 
@@ -189,63 +52,67 @@
   <div class="wrap">
     <h1>Admin İşlemleri</h1>
 
-    <div class="panel">
-      <div class="row">
-        <div id="adminChip" class="chip">Admin: HAYIR</div>
-        <div class="spacer"></div>
-      </div>
-
-      <div class="note">
-        Not: Admin yetkisi için Firestore'da <b>admins/{UID}</b> dokümanı olmalı.
-      </div>
-
-      <!-- LOGIN BOX -->
-      <div id="loginBox">
-        <label>Email</label>
-        <input id="email" type="email" autocomplete="email" placeholder="admin@mail.com" />
-        <label>Şifre</label>
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
         <div class="row">
-          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
-          <button id="btnLogin" class="btn">Giriş</button>
+          <span id="adminBadge" class="pill bad">Admin: HAYIR</span>
+          <span class="pill">Giriş yapan: <span id="who">-</span></span>
+          <span class="pill">UID: <span id="uid">-</span></span>
+        </div>
+        <div class="row">
+          <button id="btnGoogleLogin" class="primary">Google ile giriş</button>
+          <button id="btnLogout" class="dark" style="display:none">Çıkış</button>
         </div>
       </div>
-
-      <!-- SIGNED IN BOX -->
-      <div id="signedBox" class="hide">
-        <div class="row" style="margin-top:10px">
-          <div>
-            <div style="font-weight:1000">Giriş yapan: <span id="whoEmail" class="mono" style="background:#fff;color:#111;border:1px solid var(--line); padding:6px 10px; border-radius:10px;"></span></div>
-            <div style="margin-top:6px; font-weight:1000">UID: <span id="whoUid" class="mono" style="background:#fff;color:#111;border:1px solid var(--line); padding:6px 10px; border-radius:10px;"></span></div>
-          </div>
-          <div class="spacer"></div>
-          <button id="btnLogout" class="btn dark">Çıkış</button>
-        </div>
+      <div class="hr"></div>
+      <div class="muted">
+        Not: Admin yetkisi için Firestore’da <b>admins/{UID}</b> dokümanı olmalı.
       </div>
-
-      <div id="errLine" class="statusline"></div>
+      <div class="small muted" id="status">Durum: Oturum kapalı.</div>
     </div>
 
-    <div class="panel">
+    <div class="card">
       <div class="tabs">
         <button id="tabPending" class="tab active">Bekleyen Fallar</button>
-        <button id="tabLast50" class="tab">Son 50 Upload (tümü)</button>
-        <div class="spacer"></div>
-        <button id="btnRefresh" class="btn small">Yenile</button>
+        <button id="tabLast" class="tab">Son 50 (tümü)</button>
+        <button id="btnRefresh" class="tab" style="background:#2563eb;color:#fff;border-color:#2563eb">Yenile</button>
       </div>
-
-      <div id="statusLine" class="statusline">Durum: Oturum kapalı.</div>
-
-      <div id="list" class="list"></div>
+      <div class="small muted" id="countInfo">Durum: -</div>
+      <div id="list" class="grid" style="margin-top:12px"></div>
     </div>
 
-    <div class="panel">
+    <div class="card">
       <h2 style="margin:0 0 10px">Debug</h2>
-      <div id="debug" class="mono">BOOT: hazırlanıyor...</div>
+      <pre id="debug">Hazır.</pre>
     </div>
   </div>
 
   <script type="module">
-    // ====== 1) Firebase Config (SENİN VERDİĞİN) ======
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      GoogleAuthProvider,
+      signInWithRedirect,
+      getRedirectResult,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      where,
+      orderBy,
+      limit,
+      getDocs,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    // ✅ SENİN CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
       authDomain: "falhane-e3057.firebaseapp.com",
@@ -256,233 +123,106 @@
       measurementId: "G-94TZ14VWPX"
     };
 
-    // ====== 2) Imports ======
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signInWithEmailAndPassword,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      collection,
-      query,
-      where,
-      orderBy,
-      limit,
-      getDocs,
-      updateDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-    // ====== 3) Init ======
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ====== 4) UI Helpers ======
-    const $ = (id) => document.getElementById(id);
-    const log = (s) => { $("debug").textContent = String(s); };
-    const addLog = (s) => { $("debug").textContent += "\\n" + String(s); };
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
 
-    function fmtDate(ts){
-      // Firestore Timestamp or Date
-      try{
-        const d = ts?.toDate ? ts.toDate() : (ts instanceof Date ? ts : null);
-        if(!d) return "-";
-        // TR format
-        const pad = (n) => String(n).padStart(2,"0");
-        return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-      }catch(e){ return "-"; }
-    }
+    // UI
+    const btnGoogleLogin = document.getElementById("btnGoogleLogin");
+    const btnLogout = document.getElementById("btnLogout");
+    const adminBadge = document.getElementById("adminBadge");
+    const who = document.getElementById("who");
+    const uidEl = document.getElementById("uid");
+    const statusEl = document.getElementById("status");
+    const debugEl = document.getElementById("debug");
+    const listEl = document.getElementById("list");
+    const countInfo = document.getElementById("countInfo");
+    const tabPending = document.getElementById("tabPending");
+    const tabLast = document.getElementById("tabLast");
+    const btnRefresh = document.getElementById("btnRefresh");
 
-    async function copyTextToClipboard(text){
-      try{
-        await navigator.clipboard.writeText(text);
-        return true;
-      }catch(e){
-        // iOS Safari fallback
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        ta.style.position="fixed";
-        ta.style.opacity="0";
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        let ok=false;
-        try{ ok = document.execCommand("copy"); }catch(_){ ok=false; }
-        document.body.removeChild(ta);
-        return ok;
-      }
-    }
-
-    // ====== 5) State ======
     let currentUser = null;
     let isAdmin = false;
-    let activeTab = "pending"; // pending | last50
+    let viewMode = "pending"; // pending | last
 
-    // ====== 6) Auth UI ======
-    function setAdminChip(v){
-      const chip = $("adminChip");
-      if(v){
-        chip.textContent = "Admin: EVET";
-        chip.classList.add("ok");
-        chip.classList.remove("bad");
-      }else{
-        chip.textContent = "Admin: HAYIR";
-        chip.classList.remove("ok");
-      }
+    function log(msg){
+      console.log(msg);
+      debugEl.textContent = (debugEl.textContent + "\n" + msg).slice(-6000);
     }
 
-    function setSignedUI(user){
-      if(user){
-        $("loginBox").classList.add("hide");
-        $("signedBox").classList.remove("hide");
-        $("whoEmail").textContent = user.email || "-";
-        $("whoUid").textContent = user.uid;
-      }else{
-        $("loginBox").classList.remove("hide");
-        $("signedBox").classList.add("hide");
-        $("whoEmail").textContent = "";
-        $("whoUid").textContent = "";
+    function fmtDate(d){
+      if(!d) return "-";
+      try{
+        const dt = d instanceof Date ? d : d.toDate();
+        const pad = (n)=> String(n).padStart(2,"0");
+        return `${pad(dt.getDate())}-${pad(dt.getMonth()+1)}-${dt.getFullYear()} ${pad(dt.getHours())}:${pad(dt.getMinutes())}:${pad(dt.getSeconds())}`;
+      }catch{
+        return "-";
       }
     }
 
     async function checkAdmin(uid){
-      try{
-        const ref = doc(db, "admins", uid);
-        const snap = await getDoc(ref);
-        return snap.exists();
-      }catch(e){
-        addLog("ADMIN CHECK ERROR: " + (e?.message || e));
-        return false;
-      }
+      const ref = doc(db, "admins", uid);
+      const snap = await getDoc(ref);
+      return snap.exists();
     }
 
-    // ====== 7) Listing ======
-    function renderEmpty(msg){
-      $("list").innerHTML = `<div class="item"><div class="meta">${msg}</div></div>`;
+    function setAdminBadge(ok){
+      adminBadge.className = "pill " + (ok ? "ok" : "bad");
+      adminBadge.textContent = ok ? "Admin: EVET" : "Admin: HAYIR";
     }
 
-    function renderUploads(items){
-      if(!items.length){
-        renderEmpty(activeTab === "pending" ? "Bekleyen fal yok." : "Kayıt yok.");
+    async function refreshAuthUI(user){
+      if(!user){
+        currentUser = null;
+        isAdmin = false;
+        who.textContent = "-";
+        uidEl.textContent = "-";
+        setAdminBadge(false);
+        statusEl.textContent = "Durum: Oturum kapalı.";
+        btnGoogleLogin.style.display = "";
+        btnLogout.style.display = "none";
+        listEl.innerHTML = "";
+        countInfo.textContent = "Durum: Oturum kapalı.";
         return;
       }
 
-      const html = items.map((it) => {
-        const name = it.name || "-";
-        const age = it.age ?? "-";
-        const sign = it.sign || "-";
-        const userId = it.userId || "-";
-        const createdAt = fmtDate(it.createdAt);
-        const photo1 = it.photo1Url || "";
-        const photo2 = it.photo2Url || "";
-        const docId = it._id;
+      currentUser = user;
+      who.textContent = user.email || "-";
+      uidEl.textContent = user.uid || "-";
+      btnGoogleLogin.style.display = "none";
+      btnLogout.style.display = "";
+      statusEl.textContent = "Durum: Giriş OK. Admin isen listeleyebilirsin.";
 
-        return `
-          <div class="item" data-id="${docId}">
-            <div class="itemGrid">
-              <div class="who">
-                <div class="name">${escapeHtml(name)}</div>
-                <div class="kv">
-                  <span class="pill">Yaş: ${escapeHtml(String(age))}</span>
-                  <span class="pill">Burç: ${escapeHtml(String(sign))}</span>
-                  <span class="pill">Gönderim: ${escapeHtml(createdAt)}</span>
-                </div>
-                <div class="meta" style="margin-top:6px">
-                  <b>UserId</b>: <span class="mono" style="background:#fff;color:#111;border:1px solid var(--line); padding:4px 8px; border-radius:10px;">${escapeHtml(userId)}</span>
-                  <div style="margin-top:6px;color:var(--muted)"><b>Doc</b>: ${escapeHtml(docId)}</div>
-                </div>
-              </div>
+      try{
+        isAdmin = await checkAdmin(user.uid);
+      }catch(e){
+        isAdmin = false;
+        log("ADMIN CHECK ERROR: " + (e?.message || e));
+      }
+      setAdminBadge(isAdmin);
 
-              <div class="meta">
-                <div style="font-weight:1000;margin-bottom:8px">Fotoğraflar</div>
-                <div style="color:var(--muted)">Resme tıklayınca açılır.</div>
-              </div>
-
-              <div>
-                <div class="thumbs">
-                  ${photo1 ? `<a href="${photo1}" target="_blank" rel="noopener"><img class="thumb" src="${photo1}" alt="photo1"></a>` : `<div class="thumb" title="photo1 yok"></div>`}
-                  ${photo2 ? `<a href="${photo2}" target="_blank" rel="noopener"><img class="thumb" src="${photo2}" alt="photo2"></a>` : `<div class="thumb" title="photo2 yok"></div>`}
-                </div>
-
-                <div class="actions">
-                  <button class="btn small dark" data-act="copyImgs">Resimleri Kopyala</button>
-                  ${activeTab === "pending" ? `
-                    <button class="btn small ok" data-act="approve">Onayla</button>
-                    <button class="btn small warn" data-act="reject">Reddet</button>
-                  ` : ``}
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      $("list").innerHTML = html;
-
-      // attach click handlers
-      $("list").querySelectorAll(".item").forEach((card) => {
-        card.addEventListener("click", async (ev) => {
-          const btn = ev.target.closest("button");
-          if(!btn) return;
-
-          const act = btn.getAttribute("data-act");
-          const id = card.getAttribute("data-id");
-          const item = items.find(x => x._id === id);
-          if(!item) return;
-
-          if(act === "copyImgs"){
-            const text =
-`Foto1: ${item.photo1Url || "-"}
-Foto2: ${item.photo2Url || "-"}`;
-            const ok = await copyTextToClipboard(text);
-            $("statusLine").textContent = ok ? "Durum: Resim linkleri kopyalandı." : "Durum: Kopyalama başarısız (iOS izin vermedi).";
-          }
-
-          if(act === "approve"){
-            if(!confirm("Onayla: Bu upload 'approved' olacak. Devam?")) return;
-            await approveUpload(item);
-          }
-
-          if(act === "reject"){
-            if(!confirm("Reddet: Bu upload 'rejected' olacak. Devam?")) return;
-            await rejectUpload(item);
-          }
-        });
-      });
-    }
-
-    function escapeHtml(s){
-      return String(s)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+      if(isAdmin){
+        await loadList();
+      }else{
+        listEl.innerHTML = `<div class="reqCard"><b>Bu hesap admin değil.</b><div class="muted small">Firestore’da admins/${user.uid} dokümanı yok.</div></div>`;
+        countInfo.textContent = "Durum: Admin değilsin.";
+      }
     }
 
     async function loadList(){
-      if(!currentUser){
-        $("statusLine").textContent = "Durum: Oturum kapalı.";
-        renderEmpty("Oturum kapalı. Giriş yap.");
-        return;
-      }
-      if(!isAdmin){
-        $("statusLine").textContent = "Durum: Giriş OK ama Admin değilsin.";
-        renderEmpty("Admin değilsin. Firestore'da admins/{UID} dokümanı yok.");
-        return;
-      }
+      if(!currentUser) { countInfo.textContent = "Durum: Oturum kapalı."; return; }
+      if(!isAdmin) { countInfo.textContent = "Durum: Admin değilsin."; return; }
+
+      listEl.innerHTML = "";
+      countInfo.textContent = "Yükleniyor...";
 
       try{
-        $("statusLine").textContent = "Durum: Yükleniyor...";
         let q;
-
-        if(activeTab === "pending"){
+        if(viewMode === "pending"){
           q = query(
             collection(db, "uploads"),
             where("status","==","pending"),
@@ -499,111 +239,237 @@ Foto2: ${item.photo2Url || "-"}`;
 
         const snap = await getDocs(q);
         const items = [];
-        snap.forEach((d) => items.push({ _id: d.id, ...d.data() }));
-
-        $("statusLine").textContent =
-          activeTab === "pending"
-            ? `Durum: ${items.length} bekleyen fal.`
-            : `Durum: Son 50 upload yüklendi (${items.length}).`;
-
-        renderUploads(items);
-      }catch(e){
-        $("statusLine").textContent = "Durum: Listeleme hatası.";
-        addLog("LIST ERROR: " + (e?.message || e));
-        renderEmpty("Hata: Liste alınamadı. Debug'a bak.");
-      }
-    }
-
-    async function approveUpload(item){
-      try{
-        // Burada şimdilik sadece status'u "approved" yapıyoruz.
-        // (Senin sistemin daha önce uploads->readings taşıyordu; eğer onu da istiyorsan ayrıca ekleriz.)
-        await updateDoc(doc(db, "uploads", item._id), {
-          status: "approved",
-          approvedAt: new Date(),
-          approvedBy: currentUser.uid
+        snap.forEach(docSnap => {
+          items.push({ id: docSnap.id, ...docSnap.data() });
         });
-        $("statusLine").textContent = "Durum: Onaylandı.";
-        await loadList();
+
+        countInfo.textContent = `Durum: ${items.length} kayıt.`;
+
+        if(items.length === 0){
+          listEl.innerHTML = `<div class="reqCard"><b>Kayıt yok.</b></div>`;
+          return;
+        }
+
+        for(const it of items){
+          listEl.appendChild(renderItem(it));
+        }
       }catch(e){
-        $("statusLine").textContent = "Durum: Onay hatası.";
-        addLog("APPROVE ERROR: " + (e?.message || e));
+        log("LOAD LIST ERROR: " + (e?.message || e));
+        countInfo.textContent = "Hata: Liste çekilemedi.";
       }
     }
 
-    async function rejectUpload(item){
-      try{
-        await updateDoc(doc(db, "uploads", item._id), {
-          status: "rejected",
-          rejectedAt: new Date(),
-          rejectedBy: currentUser.uid
-        });
-        $("statusLine").textContent = "Durum: Reddedildi.";
-        await loadList();
-      }catch(e){
-        $("statusLine").textContent = "Durum: Red hatası.";
-        addLog("REJECT ERROR: " + (e?.message || e));
-      }
+    function safeText(v){
+      if(v === null || v === undefined) return "-";
+      const s = String(v).trim();
+      return s ? s : "-";
     }
 
-    // ====== 8) Buttons ======
-    $("btnLogin").addEventListener("click", async () => {
-      $("errLine").textContent = "";
-      const email = $("email").value.trim();
-      const pass  = $("password").value;
+    function renderItem(it){
+      const wrap = document.createElement("div");
+      wrap.className = "reqCard";
 
-      addLog("LOGIN: email/password...");
+      const name = safeText(it.name);
+      const age = safeText(it.age);
+      const sign = safeText(it.sign);
+      const userId = safeText(it.userId);
+      const createdAt = it.createdAt ? fmtDate(it.createdAt) : (it.createdAtText ? safeText(it.createdAtText) : "-");
+
+      const photo1 = it.photo1Url || it.photo1 || it.image1Url || "";
+      const photo2 = it.photo2Url || it.photo2 || it.image2Url || "";
+      const status = safeText(it.status);
+
+      wrap.innerHTML = `
+        <div class="reqHead">
+          <div>
+            <h3 class="name">${name}</h3>
+            <div class="chips">
+              <span class="chip">Yaş: ${age}</span>
+              <span class="chip">Burç: ${sign}</span>
+              <span class="chip">Gönderim: ${createdAt}</span>
+              <span class="chip">Durum: ${status}</span>
+            </div>
+          </div>
+          <div class="muted small" style="text-align:right">
+            <div><b>Doc:</b> ${it.id}</div>
+            <div><b>UserId:</b> ${userId}</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div>
+          <div style="font-weight:900;margin-bottom:8px">Fotoğraflar</div>
+          <div class="photos">
+            ${photo1 ? `<a href="${photo1}" target="_blank" rel="noopener"><img class="thumb" src="${photo1}" alt="foto1"></a>` : `<div class="thumb"></div>`}
+            ${photo2 ? `<a href="${photo2}" target="_blank" rel="noopener"><img class="thumb" src="${photo2}" alt="foto2"></a>` : `<div class="thumb"></div>`}
+            <button class="dark" data-copy>Resimleri Kopyala</button>
+          </div>
+          <div class="small muted" style="margin-top:6px">Resme tıklayınca büyük açılır.</div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div>
+          <div style="font-weight:900;margin-bottom:8px">Fal Yorumu (zorunlu)</div>
+          <textarea placeholder="Admin fal yorumunu buraya yazacak..."></textarea>
+          <div class="actions">
+            <button class="ok" data-approve>Onayla (readings'e taşı)</button>
+            <button class="bad" data-reject>Reddet</button>
+          </div>
+          <div class="small muted">Not: Yorum boşsa onaylamaz.</div>
+        </div>
+      `;
+
+      // Events
+      const btnCopy = wrap.querySelector("[data-copy]");
+      const btnApprove = wrap.querySelector("[data-approve]");
+      const btnReject = wrap.querySelector("[data-reject]");
+      const ta = wrap.querySelector("textarea");
+
+      btnCopy.addEventListener("click", async () => {
+        const txt = [
+          `Foto1: ${photo1 || "-"}`,
+          `Foto2: ${photo2 || "-"}`
+        ].join("\n");
+        try{
+          await navigator.clipboard.writeText(txt);
+          btnCopy.textContent = "Kopyalandı";
+          setTimeout(()=> btnCopy.textContent="Resimleri Kopyala", 1200);
+        }catch{
+          alert("Kopyalama başarısız. iPhone bazen izin vermiyor.");
+        }
+      });
+
+      btnApprove.addEventListener("click", async () => {
+        if(!isAdmin){ alert("Admin değilsin."); return; }
+        const readingText = ta.value.trim();
+        if(!readingText){
+          alert("Yorum zorunlu. Boş bırakamazsın.");
+          return;
+        }
+        btnApprove.disabled = true;
+        btnReject.disabled = true;
+        try{
+          // 1) readings/{sameId} oluştur / güncelle
+          const readingRef = doc(db, "readings", it.id);
+          await setDoc(readingRef, {
+            ...it,
+            status: "approved",
+            readingText,
+            approvedAt: serverTimestamp(),
+            approvedBy: currentUser.uid,
+            approvedByEmail: currentUser.email || null
+          }, { merge: true });
+
+          // 2) uploads/{id} status=approved yap (istersen sonra bu dokümanı silebiliriz)
+          const uploadRef = doc(db, "uploads", it.id);
+          await updateDoc(uploadRef, {
+            status: "approved",
+            readingText,
+            approvedAt: serverTimestamp(),
+            approvedBy: currentUser.uid,
+            approvedByEmail: currentUser.email || null
+          });
+
+          wrap.style.opacity = "0.6";
+          btnApprove.textContent = "Onaylandı";
+          log(`APPROVED: ${it.id}`);
+          await loadList();
+        }catch(e){
+          log("APPROVE ERROR: " + (e?.message || e));
+          alert("Onay hata verdi. Debug'e bak.");
+        }finally{
+          btnApprove.disabled = false;
+          btnReject.disabled = false;
+        }
+      });
+
+      btnReject.addEventListener("click", async () => {
+        if(!isAdmin){ alert("Admin değilsin."); return; }
+        const reason = prompt("Reddetme nedeni (opsiyonel):") || "";
+        btnApprove.disabled = true;
+        btnReject.disabled = true;
+        try{
+          const uploadRef = doc(db, "uploads", it.id);
+          await updateDoc(uploadRef, {
+            status: "rejected",
+            rejectedAt: serverTimestamp(),
+            rejectedBy: currentUser.uid,
+            rejectedByEmail: currentUser.email || null,
+            rejectReason: reason.trim() || null
+          });
+          wrap.style.opacity = "0.6";
+          btnReject.textContent = "Reddedildi";
+          log(`REJECTED: ${it.id}`);
+          await loadList();
+        }catch(e){
+          log("REJECT ERROR: " + (e?.message || e));
+          alert("Reddet hata verdi. Debug'e bak.");
+        }finally{
+          btnApprove.disabled = false;
+          btnReject.disabled = false;
+        }
+      });
+
+      return wrap;
+    }
+
+    // Events
+    btnGoogleLogin.addEventListener("click", async () => {
       try{
-        await signInWithEmailAndPassword(auth, email, pass);
+        log("LOGIN: signInWithRedirect (Google) ...");
+        await signInWithRedirect(auth, provider);
       }catch(e){
-        const msg = e?.code || e?.message || String(e);
-        $("errLine").textContent = "Hata: " + msg;
-        addLog("LOGIN ERROR: " + msg);
+        log("LOGIN ERROR: " + (e?.message || e));
+        alert("Google giriş hata verdi. Debug'e bak.");
       }
     });
 
-    $("btnLogout").addEventListener("click", async () => {
-      try{ await signOut(auth); }catch(e){ addLog("LOGOUT ERROR: " + (e?.message || e)); }
+    btnLogout.addEventListener("click", async () => {
+      try{
+        await signOut(auth);
+        log("LOGOUT: ok");
+      }catch(e){
+        log("LOGOUT ERROR: " + (e?.message || e));
+      }
     });
 
-    $("tabPending").addEventListener("click", async () => {
-      activeTab = "pending";
-      $("tabPending").classList.add("active");
-      $("tabLast50").classList.remove("active");
+    tabPending.addEventListener("click", async () => {
+      viewMode = "pending";
+      tabPending.classList.add("active");
+      tabLast.classList.remove("active");
       await loadList();
     });
 
-    $("tabLast50").addEventListener("click", async () => {
-      activeTab = "last50";
-      $("tabLast50").classList.add("active");
-      $("tabPending").classList.remove("active");
+    tabLast.addEventListener("click", async () => {
+      viewMode = "last";
+      tabLast.classList.add("active");
+      tabPending.classList.remove("active");
       await loadList();
     });
 
-    $("btnRefresh").addEventListener("click", loadList);
+    btnRefresh.addEventListener("click", loadList);
 
-    // ====== 9) Auth State ======
-    log(`BOOT:
-url=${location.href}
-ua=${navigator.userAgent}`);
-
-    onAuthStateChanged(auth, async (user) => {
-      currentUser = user || null;
-      addLog("AUTH STATE: " + (user ? "signed in" : "signed out"));
-
-      setSignedUI(user);
-
-      if(user){
-        isAdmin = await checkAdmin(user.uid);
-        setAdminChip(isAdmin);
-        $("errLine").textContent = "";
-      }else{
-        isAdmin = false;
-        setAdminChip(false);
+    // Boot: redirect result + auth state
+    (async () => {
+      try{
+        log("BOOT: getRedirectResult() ...");
+        const res = await getRedirectResult(auth);
+        if(res?.user){
+          log("REDIRECT RESULT: user geldi -> " + (res.user.email || "-"));
+        }else{
+          log("REDIRECT RESULT: boş (normal olabilir)");
+        }
+      }catch(e){
+        log("REDIRECT ERROR: " + (e?.message || e));
       }
 
-      await loadList();
-    });
+      onAuthStateChanged(auth, async (user) => {
+        log("AUTH STATE: " + (user ? "signed in" : "signed out"));
+        await refreshAuthUI(user);
+      });
+    })();
   </script>
 </body>
 </html>
