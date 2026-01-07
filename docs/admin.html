@@ -3,99 +3,92 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Falhane Admin Panel</title>
+  <title>Falhane Admin Paneli</title>
   <style>
-    :root { --bg:#f3f5f9; --card:#fff; --text:#111827; --muted:#6b7280; --blue:#2563eb; --dark:#0f172a; --ok:#065f46; --bad:#991b1b; --pill:#e5e7eb;}
+    :root { --bg:#f4f6fb; --card:#fff; --text:#0b1220; --muted:#5b667a; --pri:#2563eb; --dark:#0b1220; --ok:#16a34a; --bad:#dc2626; }
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);}
-    .wrap{max-width:820px;margin:0 auto;padding:24px;}
-    h1{font-size:44px;line-height:1.05;margin:8px 0 18px;}
-    .card{background:var(--card);border-radius:16px;padding:18px 18px;box-shadow:0 8px 24px rgba(0,0,0,.06);margin:14px 0;}
-    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
-    .btn{border:0;border-radius:12px;padding:14px 16px;font-weight:700;cursor:pointer;}
-    .btn.blue{background:var(--blue);color:#fff;}
-    .btn.dark{background:var(--dark);color:#fff;}
-    .btn.gray{background:#374151;color:#fff;}
-    .btn.red{background:#b91c1c;color:#fff;}
-    .btn.small{padding:10px 12px;border-radius:10px;font-weight:700}
-    input{width:100%;padding:14px 14px;border-radius:12px;border:1px solid #e5e7eb;font-size:16px;}
-    .label{font-weight:700;margin-top:8px;margin-bottom:6px;}
-    .muted{color:var(--muted);}
-    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--pill);font-weight:800;font-size:13px;}
-    .pill.pending{background:#fef3c7;color:#92400e;}
-    .pill.approved{background:#d1fae5;color:var(--ok);}
-    .pill.rejected{background:#fee2e2;color:var(--bad);}
-    .notice{border-radius:14px;padding:12px 14px;font-weight:700;}
-    .notice.ok{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0;}
-    .notice.bad{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;}
-    pre{white-space:pre-wrap;word-break:break-word;background:#0b1220;color:#e5e7eb;border-radius:14px;padding:14px;margin:0;}
-    .list{display:flex;flex-direction:column;gap:12px;margin-top:10px;}
-    .item{border:1px solid #eef2f7;border-radius:14px;padding:14px;}
-    .itemTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
-    .id{font-weight:900;font-size:18px;}
-    .meta{font-size:13px;color:var(--muted);margin-top:6px;}
-    .text{font-size:18px;margin:10px 0 10px;}
-    .spacer{height:6px;}
+    .wrap{max-width:980px;margin:0 auto;padding:22px;}
+    h1{font-size:44px;line-height:1.02;margin:8px 0 18px;font-weight:800;}
+    .grid{display:grid;gap:16px;}
+    .card{background:var(--card);border-radius:18px;padding:16px 16px;box-shadow:0 12px 30px rgba(10,20,40,.08);}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{border:0;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer}
+    .btn.pri{background:var(--pri);color:#fff}
+    .btn.dark{background:var(--dark);color:#fff}
+    .btn.ok{background:var(--ok);color:#fff}
+    .btn.bad{background:var(--bad);color:#fff}
+    .btn.ghost{background:#eef2ff;color:#1e40af}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
+    .pill.ok{background:#dcfce7;color:#166534}
+    .pill.pending{background:#fff7ed;color:#9a3412}
+    .pill.bad{background:#fee2e2;color:#991b1b}
+    .muted{color:var(--muted)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .debugbox{background:#0b1220;color:#dbeafe;border-radius:14px;padding:14px;white-space:pre-wrap;overflow:auto}
+    .list{display:grid;gap:12px}
+    .item{border:1px solid rgba(10,20,40,.10);border-radius:14px;padding:12px}
+    .item h3{margin:0 0 6px;font-size:18px}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+    .photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+    .ph{border-radius:12px;border:1px solid rgba(10,20,40,.12);overflow:hidden;background:#fff}
+    .ph img{display:block;width:100%;height:240px;object-fit:cover}
+    .small{font-size:12px}
+    .hr{height:1px;background:rgba(10,20,40,.10);margin:10px 0}
+    .right{margin-left:auto}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Falhane Admin<br/>Panel</h1>
+    <h1>Admin İşlemleri</h1>
 
-    <div id="statusBox" class="card">
-      <div id="statusLine" class="notice ok">Durum: Hazır</div>
-      <div class="muted" style="margin-top:8px">Not: Admin yetkisi için Firestore’da <b>admins/{UID}</b> dokümanı olmalı (örn: role="admin").</div>
-    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="row">
+          <button id="btnLogin" class="btn pri">Google ile giriş</button>
+          <button id="btnLogout" class="btn dark">Çıkış</button>
+          <span id="pillAdmin" class="pill pending">Admin: kontrol ediliyor…</span>
+          <span class="right muted small">Not: Admin yetkisi için Firestore’da <b>admins/{UID}</b> dokümanı olmalı.</span>
+        </div>
 
-    <div class="card">
-      <h2 style="margin:0 0 10px">Admin Giriş (Email/Password)</h2>
-      <div class="label">Email</div>
-      <input id="email" type="email" placeholder="Email" autocomplete="email" />
-      <div class="label">Password</div>
-      <input id="pass" type="password" placeholder="Password" autocomplete="current-password" />
-      <div class="spacer"></div>
-      <div class="row">
-        <button id="btnLogin" class="btn blue" style="flex:1">Giriş</button>
-        <button id="btnLogout" class="btn dark" style="flex:1">Çıkış</button>
-      </div>
-      <div class="muted" style="margin-top:10px">
-        Admin UID kontrolü: <b id="uidLine">-</b>
-      </div>
-    </div>
+        <div class="hr"></div>
 
-    <div class="card">
-      <h2 style="margin:0 0 10px">Admin İşlemleri</h2>
-
-      <div class="muted">
-        Giriş yapan: <b id="whoLine">-</b> | UID: <b id="uidLine2">-</b>
+        <div class="row">
+          <div>
+            <div class="muted small">Giriş yapan:</div>
+            <div id="who" class="mono">-</div>
+          </div>
+          <div>
+            <div class="muted small">UID:</div>
+            <div id="uid" class="mono">-</div>
+          </div>
+        </div>
       </div>
 
-      <div class="spacer"></div>
-
-      <div class="row">
-        <button id="btnLoadPending" class="btn gray" style="flex:1">Pending Uploads Yükle</button>
-        <button id="btnLoadLatest" class="btn gray" style="flex:1">Son 50 Upload (tümü) yükle</button>
+      <div class="card">
+        <div class="row">
+          <button id="btnLoadPending" class="btn dark">Pending Uploads Yükle</button>
+          <button id="btnLoadLast" class="btn dark">Son 50 Upload (tümü) yükle</button>
+          <span id="status" class="muted">Durum: -</span>
+        </div>
+        <div class="hr"></div>
+        <div id="list" class="list"></div>
       </div>
 
-      <div class="muted" style="margin-top:10px">
-        Durum: <b id="loadStatus">-</b>
+      <div class="card">
+        <h2 style="margin:0 0 10px">Debug</h2>
+        <div id="debug" class="debugbox">Hazır.</div>
       </div>
-
-      <div id="list" class="list"></div>
-    </div>
-
-    <div class="card">
-      <h2 style="margin:0 0 10px">Debug</h2>
-      <pre id="debug">Hazır.</pre>
     </div>
   </div>
 
   <script type="module">
-    // ---------- Firebase (v10 modular) ----------
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
       getAuth,
+      GoogleAuthProvider,
+      signInWithRedirect,
+      getRedirectResult,
       onAuthStateChanged,
-      signInWithEmailAndPassword,
       signOut
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
@@ -104,17 +97,17 @@
       doc,
       getDoc,
       collection,
-      addDoc,
-      updateDoc,
-      serverTimestamp,
       query,
       where,
       orderBy,
       limit,
-      getDocs
+      getDocs,
+      serverTimestamp,
+      writeBatch,
+      addDoc
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    // ✅ Senin config (aynı bırak)
+    // ==== SENİN CONFIG (DEĞİŞTİRME) ====
     const firebaseConfig = {
       apiKey: "AIzaSyBDTN_8sf9P7uwtnRqBTmlszcztb36g-XA",
       authDomain: "falhane-e3057.firebaseapp.com",
@@ -128,290 +121,336 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
 
-    // ---------- UI helpers ----------
+    // UI
     const $ = (id) => document.getElementById(id);
-    const debugEl = $("debug");
+    const dbg = (s) => { $("debug").textContent = String(s); };
+    const dbgAdd = (s) => { $("debug").textContent += "\\n" + String(s); };
 
-    function log(...args) {
-      const msg = args.map(a => (typeof a === "string" ? a : JSON.stringify(a, null, 2))).join(" ");
-      debugEl.textContent = (debugEl.textContent ? debugEl.textContent + "\n" : "") + msg;
+    let currentUser = null;
+    let isAdmin = false;
+
+    function setAdminPill(state) {
+      const pill = $("pillAdmin");
+      pill.classList.remove("ok","pending","bad");
+      if (state === true) { pill.classList.add("ok"); pill.textContent = "Admin: EVET"; }
+      else if (state === false) { pill.classList.add("bad"); pill.textContent = "Admin: HAYIR"; }
+      else { pill.classList.add("pending"); pill.textContent = "Admin: kontrol ediliyor…"; }
     }
 
-    function setStatus(ok, text) {
-      const el = $("statusLine");
-      el.className = "notice " + (ok ? "ok" : "bad");
-      el.textContent = text;
+    function setStatus(t) { $("status").textContent = "Durum: " + t; }
+
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[m]));
     }
 
-    function tsToText(v) {
-      try {
-        if (!v) return "-";
-        if (typeof v === "string") return v;
-        if (v.toDate) return v.toDate().toISOString();
-        return String(v);
-      } catch { return "-"; }
-    }
-
-    function pill(status) {
-      const s = (status || "").toLowerCase();
-      if (s === "approved") return `<span class="pill approved">approved</span>`;
-      if (s === "rejected") return `<span class="pill rejected">rejected</span>`;
+    function statusPill(status){
+      if (status === "approved") return `<span class="pill ok">approved</span>`;
+      if (status === "rejected") return `<span class="pill bad">rejected</span>`;
       return `<span class="pill pending">pending</span>`;
     }
 
-    // ---------- Admin check ----------
-    async function isAdmin(uid) {
-      const ref = doc(db, "admins", uid);
-      const snap = await getDoc(ref);
-      return snap.exists();
+    async function checkAdmin(uid){
+      // Admin kontrol: admins/{uid} var mı?
+      try{
+        const ref = doc(db, "admins", uid);
+        const snap = await getDoc(ref);
+        isAdmin = snap.exists();
+        setAdminPill(isAdmin);
+        dbgAdd("ADMIN CHECK: " + (isAdmin ? "OK" : "NO"));
+        return isAdmin;
+      }catch(e){
+        isAdmin = false;
+        setAdminPill(false);
+        dbgAdd("ADMIN CHECK ERROR: " + e.message);
+        return false;
+      }
     }
 
-    // ---------- Load uploads ----------
-    async function loadUploads(mode) {
-      $("list").innerHTML = "";
-      $("loadStatus").textContent = "Yükleniyor...";
-      try {
-        let q;
+    function renderList(docs){
+      const root = $("list");
+      root.innerHTML = "";
+      if (!docs.length){
+        root.innerHTML = `<div class="muted">Kayıt yok.</div>`;
+        return;
+      }
 
-        if (mode === "pending") {
-          q = query(
-            collection(db, "uploads"),
-            where("status", "==", "pending"),
-            orderBy("createdAt", "desc"),
-            limit(50)
-          );
-        } else {
-          q = query(
-            collection(db, "uploads"),
-            orderBy("createdAt", "desc"),
-            limit(50)
-          );
-        }
+      for (const d of docs){
+        const data = d.data();
+        const id = d.id;
 
+        const name = data.name ?? data.ad ?? "";
+        const age  = data.age ?? data.yas ?? "";
+        const zodiac = data.zodiac ?? data.burc ?? "";
+        const userId = data.userId ?? "";
+        const createdAt = data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : (data.createdAt ?? "");
+        const status = data.status ?? "pending";
+
+        // Foto alanları (hangi isimle kaydediyorsan yakalayalım)
+        const photo1 = data.photo1Url || data.photo1 || data.image1Url || data.image1 || data.img1 || "";
+        const photo2 = data.photo2Url || data.photo2 || data.image2Url || data.image2 || data.img2 || "";
+
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <div class="row">
+            <h3 class="mono" style="margin:0">${escapeHtml(id)}</h3>
+            ${statusPill(status)}
+            <button class="btn ghost right" data-json="${escapeHtml(id)}">JSON</button>
+          </div>
+          <div class="meta">
+            <div><b>userId:</b> <span class="mono">${escapeHtml(userId)}</span></div>
+            <div><b>createdAt:</b> <span class="mono">${escapeHtml(createdAt)}</span></div>
+            ${name ? `<div><b>ad:</b> ${escapeHtml(name)}</div>` : ""}
+            ${age ? `<div><b>yaş:</b> ${escapeHtml(age)}</div>` : ""}
+            ${zodiac ? `<div><b>burç:</b> ${escapeHtml(zodiac)}</div>` : ""}
+          </div>
+
+          <div class="photos">
+            <div class="ph">${photo1 ? `<img src="${escapeHtml(photo1)}" alt="foto1">` : `<div class="muted small" style="padding:12px">Foto1 yok</div>`}</div>
+            <div class="ph">${photo2 ? `<img src="${escapeHtml(photo2)}" alt="foto2">` : `<div class="muted small" style="padding:12px">Foto2 yok</div>`}</div>
+          </div>
+
+          <div class="row" style="margin-top:10px">
+            <button class="btn ok" data-approve="${escapeHtml(id)}">Onayla → readings</button>
+            <button class="btn bad" data-reject="${escapeHtml(id)}">Reddet</button>
+          </div>
+
+          <div id="json-${escapeHtml(id)}" class="debugbox" style="display:none;margin-top:10px"></div>
+        `;
+        root.appendChild(div);
+
+        // JSON toggle
+        div.querySelector(`[data-json="${CSS.escape(id)}"]`).addEventListener("click", () => {
+          const box = div.querySelector(`#json-${CSS.escape(id)}`);
+          const isOpen = box.style.display !== "none";
+          box.style.display = isOpen ? "none" : "block";
+          if (!isOpen) box.textContent = JSON.stringify(data, null, 2);
+        });
+
+        // Approve
+        div.querySelector(`[data-approve="${CSS.escape(id)}"]`).addEventListener("click", async () => {
+          await approveUpload(id);
+        });
+
+        // Reject
+        div.querySelector(`[data-reject="${CSS.escape(id)}"]`).addEventListener("click", async () => {
+          await rejectUpload(id);
+        });
+      }
+    }
+
+    async function loadPending(){
+      if (!currentUser) { setStatus("Önce giriş yap"); return; }
+      if (!isAdmin) { setStatus("Admin değilsin"); return; }
+
+      setStatus("pending yükleniyor…");
+      dbg("LOAD: pending sorgusu…");
+
+      try{
+        // where(status == pending) + orderBy(createdAt desc) genelde index ister.
+        // Hata verirse Firebase zaten link verir.
+        const q = query(
+          collection(db, "uploads"),
+          where("status", "==", "pending"),
+          orderBy("createdAt", "desc"),
+          limit(50)
+        );
         const snap = await getDocs(q);
-        const docs = [];
-        snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
+        const docs = snap.docs;
 
-        $("loadStatus").textContent = `Uploads yüklendi • ${mode === "pending" ? "pending" : "toplam"}: ${docs.length} (max 50)`;
-
-        if (docs.length === 0) {
-          $("list").innerHTML = `<div class="muted">Kayıt yok.</div>`;
-          return;
+        renderList(docs);
+        setStatus(`pending: ${docs.length} (max 50)`);
+        dbgAdd("LOAD pending OK: " + docs.length);
+      }catch(e){
+        setStatus("HATA: " + e.message);
+        dbgAdd("LOAD pending ERROR: " + e.message);
+        // Index linkini kullanıcı görsün diye debug’a bas
+        if (String(e.message).includes("index")) {
+          dbgAdd("\\nBU HATA INDEX İSTER. Hata mesajındaki linkten create index yap.");
         }
-
-        for (const it of docs) {
-          renderUploadItem(it);
-        }
-        setStatus(true, "Durum: Uploads yüklendi");
-      } catch (e) {
-        console.error(e);
-        $("loadStatus").textContent = "HATA";
-        setStatus(false, "Durum: Uploads okuma HATA");
-        log("LOAD ERROR:", e?.message || e);
       }
     }
 
-    // ---------- Approve -> readings ----------
-    async function approveToReadings(uploadId) {
-      const user = auth.currentUser;
-      if (!user) {
-        alert("Önce admin giriş yap");
-        return;
-      }
-      const uid = user.uid;
-      const ok = await isAdmin(uid);
-      if (!ok) {
-        alert("Admin yetkin yok (admins/{uid} yok).");
-        return;
-      }
+    async function loadLast50(){
+      if (!currentUser) { setStatus("Önce giriş yap"); return; }
+      if (!isAdmin) { setStatus("Admin değilsin"); return; }
 
-      try {
-        // 1) uploads/{docId} oku
-        const upRef = doc(db, "uploads", uploadId);
-        const upSnap = await getDoc(upRef);
-        if (!upSnap.exists()) {
-          alert("Upload bulunamadı");
-          return;
-        }
-        const up = upSnap.data();
+      setStatus("son 50 yükleniyor…");
+      dbg("LOAD: son 50 upload…");
 
-        // 2) readings içine yeni doküman yaz
-        // 🔴 burada userId KESİNLİKLE uploads içinden gelir
+      try{
+        const q = query(
+          collection(db, "uploads"),
+          orderBy("createdAt", "desc"),
+          limit(50)
+        );
+        const snap = await getDocs(q);
+        const docs = snap.docs;
+
+        renderList(docs);
+        setStatus(`toplam: ${docs.length} (son 50)`);
+        dbgAdd("LOAD last50 OK: " + docs.length);
+      }catch(e){
+        setStatus("HATA: " + e.message);
+        dbgAdd("LOAD last50 ERROR: " + e.message);
+      }
+    }
+
+    async function approveUpload(uploadId){
+      if (!currentUser) { alert("Önce giriş yap"); return; }
+      if (!isAdmin) { alert("Admin değilsin"); return; }
+
+      const ok = confirm("Onaylıyorsun. readings'e taşınacak. Emin misin?");
+      if (!ok) return;
+
+      try{
+        setStatus("Onaylanıyor…");
+        dbg("APPROVE: " + uploadId);
+
+        const uploadRef = doc(db, "uploads", uploadId);
+        const snap = await getDoc(uploadRef);
+        if (!snap.exists()) { alert("Upload bulunamadı"); return; }
+
+        const u = snap.data();
+
+        // readings dokümanına yazılacak alanlar (uploads'taki veriyi baz alıyoruz)
         const readingPayload = {
-          text: up.text || "",
-          userId: up.userId || "",          // kullanıcı UID burada olmalı
+          ...u,
           sourceUploadId: uploadId,
           status: "approved",
-          createdAt: up.createdAt || serverTimestamp(),
           approvedAt: serverTimestamp(),
-          approvedBy: uid
+          approvedBy: currentUser.uid
         };
 
-        if (!readingPayload.userId) {
-          alert("uploads.userId boş. Upload sırasında userId 'test' gibi yanlış kaydedilmiş olabilir.");
-          return;
-        }
+        // Bazı alanları temize çek (istersen)
+        delete readingPayload.rejectedAt;
+        delete readingPayload.rejectedBy;
 
-        await addDoc(collection(db, "readings"), readingPayload);
+        const batch = writeBatch(db);
 
-        // 3) uploads status approved
-        await updateDoc(upRef, {
+        // 1) readings'e yeni doc
+        const readingsCol = collection(db, "readings");
+        const newReadingRef = doc(readingsCol); // ID bizden
+        batch.set(newReadingRef, readingPayload);
+
+        // 2) upload status update
+        batch.update(uploadRef, {
           status: "approved",
           approvedAt: serverTimestamp(),
-          approvedBy: uid
+          approvedBy: currentUser.uid
         });
 
-        setStatus(true, `Durum: Onaylandı → readings (${uploadId})`);
-        log("APPROVED:", { uploadId, readingUserId: readingPayload.userId });
+        await batch.commit();
 
-        // listeyi yenile (pending ise düşsün)
-        await loadUploads("pending");
-      } catch (e) {
-        console.error(e);
-        setStatus(false, `Durum: Onay HATA (${uploadId})`);
-        log("APPROVE ERROR:", e?.message || e);
-        alert(e?.message || "Hata");
+        dbgAdd("APPROVE OK. readingId=" + newReadingRef.id);
+        setStatus("Onaylandı ✅ (readings yazıldı)");
+
+        // Listeyi yenile
+        await loadPending();
+      }catch(e){
+        dbgAdd("APPROVE ERROR: " + e.message);
+        setStatus("HATA: " + e.message);
+        alert("Hata: " + e.message);
       }
     }
 
-    async function rejectUpload(uploadId) {
-      const user = auth.currentUser;
-      if (!user) { alert("Önce admin giriş yap"); return; }
-      const uid = user.uid;
-      const ok = await isAdmin(uid);
-      if (!ok) { alert("Admin yetkin yok."); return; }
+    async function rejectUpload(uploadId){
+      if (!currentUser) { alert("Önce giriş yap"); return; }
+      if (!isAdmin) { alert("Admin değilsin"); return; }
 
-      try {
-        const upRef = doc(db, "uploads", uploadId);
-        await updateDoc(upRef, {
+      const ok = confirm("Reddedeceksin. Emin misin?");
+      if (!ok) return;
+
+      try{
+        setStatus("Reddediliyor…");
+        dbg("REJECT: " + uploadId);
+
+        const uploadRef = doc(db, "uploads", uploadId);
+
+        const batch = writeBatch(db);
+        batch.update(uploadRef, {
           status: "rejected",
           rejectedAt: serverTimestamp(),
-          rejectedBy: uid
+          rejectedBy: currentUser.uid
         });
-        setStatus(true, `Durum: Reddedildi (${uploadId})`);
-        log("REJECTED:", uploadId);
-        await loadUploads("pending");
-      } catch (e) {
-        console.error(e);
-        setStatus(false, `Durum: Red HATA (${uploadId})`);
-        log("REJECT ERROR:", e?.message || e);
-        alert(e?.message || "Hata");
+        await batch.commit();
+
+        dbgAdd("REJECT OK.");
+        setStatus("Reddedildi ❌");
+
+        await loadPending();
+      }catch(e){
+        dbgAdd("REJECT ERROR: " + e.message);
+        setStatus("HATA: " + e.message);
+        alert("Hata: " + e.message);
       }
     }
 
-    // ---------- Render ----------
-    function renderUploadItem(it) {
-      const el = document.createElement("div");
-      el.className = "item";
-
-      const createdAt = tsToText(it.createdAt);
-      const userId = it.userId || "-";
-      const status = it.status || "pending";
-      const txt = (it.text || "").toString();
-
-      el.innerHTML = `
-        <div class="itemTop">
-          <div>
-            <div class="id">${it.id}</div>
-            <div class="meta">userId: <b>${userId}</b> • createdAt: <b>${createdAt}</b></div>
-          </div>
-          <div>${pill(status)}</div>
-        </div>
-
-        <div class="text">${escapeHtml(txt)}</div>
-
-        <div class="row">
-          <button class="btn small blue" data-approve="${it.id}">Onayla → readings</button>
-          <button class="btn small red" data-reject="${it.id}">Reddet</button>
-          <button class="btn small gray" data-json="${it.id}">JSON</button>
-        </div>
-
-        <div class="spacer"></div>
-        <div id="json-${it.id}" style="display:none">
-          <pre>${escapeHtml(JSON.stringify(it, null, 2))}</pre>
-        </div>
-      `;
-
-      $("list").appendChild(el);
-
-      el.querySelector(`[data-approve="${it.id}"]`).addEventListener("click", () => approveToReadings(it.id));
-      el.querySelector(`[data-reject="${it.id}"]`).addEventListener("click", () => rejectUpload(it.id));
-      el.querySelector(`[data-json="${it.id}"]`).addEventListener("click", () => {
-        const j = document.getElementById(`json-${it.id}`);
-        j.style.display = (j.style.display === "none") ? "block" : "none";
-      });
-    }
-
-    function escapeHtml(s) {
-      return (s ?? "").toString()
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    // ---------- Auth UI ----------
+    // ==== EVENTS ====
     $("btnLogin").addEventListener("click", async () => {
-      debugEl.textContent = "";
-      const email = $("email").value.trim();
-      const pass = $("pass").value;
-      if (!email || !pass) { alert("Email ve şifre gir"); return; }
-
-      try {
-        const cred = await signInWithEmailAndPassword(auth, email, pass);
-        log("LOGIN OK:", cred.user.uid);
-      } catch (e) {
-        console.error(e);
-        setStatus(false, "Durum: Giriş HATA");
-        log("LOGIN ERROR:", e?.message || e);
-        alert(e?.message || "Giriş hatası");
+      dbg("LOGIN: signInWithRedirect…");
+      try{
+        await signInWithRedirect(auth, provider);
+      }catch(e){
+        dbgAdd("LOGIN ERROR: " + e.message);
+        alert("Login hata: " + e.message);
       }
     });
 
     $("btnLogout").addEventListener("click", async () => {
-      try {
+      try{
         await signOut(auth);
-        log("LOGOUT OK");
-      } catch (e) {
-        console.error(e);
-        log("LOGOUT ERROR:", e?.message || e);
+        dbg("Çıkış yapıldı.");
+      }catch(e){
+        dbgAdd("LOGOUT ERROR: " + e.message);
       }
     });
 
-    $("btnLoadPending").addEventListener("click", () => loadUploads("pending"));
-    $("btnLoadLatest").addEventListener("click", () => loadUploads("latest"));
+    $("btnLoadPending").addEventListener("click", loadPending);
+    $("btnLoadLast").addEventListener("click", loadLast50);
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        $("uidLine").textContent = "-";
-        $("uidLine2").textContent = "-";
-        $("whoLine").textContent = "-";
-        setStatus(true, "Durum: Oturum kapalı");
-        return;
-      }
+    // ==== BOOT ====
+    (async () => {
+      dbg("BOOT: url=" + location.href);
+      setAdminPill(null);
 
-      $("uidLine").textContent = user.uid;
-      $("uidLine2").textContent = user.uid;
-      $("whoLine").textContent = user.email || "(email yok)";
-
-      try {
-        const ok = await isAdmin(user.uid);
-        if (ok) {
-          setStatus(true, "Durum: Admin giriş OK");
-          log("ADMIN OK:", user.uid);
+      // Redirect sonucu (varsa) yakala
+      try{
+        dbgAdd("REDIRECT: getRedirectResult() çağrılıyor…");
+        const res = await getRedirectResult(auth);
+        if (res && res.user){
+          dbgAdd("REDIRECT: user geldi: " + (res.user.email || res.user.uid));
         } else {
-          setStatus(false, "Durum: Bu kullanıcı admin değil (admins/{uid} yok)");
-          log("NOT ADMIN:", user.uid);
+          dbgAdd("REDIRECT: sonuç yok (normal).");
         }
-      } catch (e) {
-        setStatus(false, "Durum: Admin kontrol HATA");
-        log("ADMIN CHECK ERROR:", e?.message || e);
+      }catch(e){
+        dbgAdd("REDIRECT ERROR: " + e.message);
       }
-    });
 
-    log("BOOT: admin.html hazır.");
+      onAuthStateChanged(auth, async (u) => {
+        currentUser = u || null;
+
+        if (u){
+          $("who").textContent = u.email || "-";
+          $("uid").textContent = u.uid;
+          dbgAdd("AUTH STATE: signed in");
+          await checkAdmin(u.uid);
+          setStatus("Giriş OK. Admin ise listeleyebilirsin.");
+        }else{
+          $("who").textContent = "-";
+          $("uid").textContent = "-";
+          isAdmin = false;
+          setAdminPill(false);
+          dbgAdd("AUTH STATE: null");
+          setStatus("Oturum kapalı.");
+          $("list").innerHTML = "";
+        }
+      });
+    })();
   </script>
 </body>
 </html>
