@@ -10,7 +10,7 @@
     .wrap{max-width:980px;margin:0 auto;padding:22px;}
     h1{font-size:44px;line-height:1.02;margin:8px 0 18px;font-weight:800;}
     .grid{display:grid;gap:16px;}
-    .card{background:var(--card);border-radius:18px;padding:16px 16px;box-shadow:0 12px 30px rgba(10,20,40,.08);}
+    .card{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 12px 30px rgba(10,20,40,.08);}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .btn{border:0;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer}
     .btn.pri{background:var(--pri);color:#fff}
@@ -35,6 +35,13 @@
     .small{font-size:12px}
     .hr{height:1px;background:rgba(10,20,40,.10);margin:10px 0}
     .right{margin-left:auto}
+    input{
+      width:100%; max-width:420px;
+      padding:12px 12px; border-radius:12px;
+      border:1px solid rgba(10,20,40,.15);
+      font-size:16px;
+    }
+    label{font-weight:700;font-size:13px;color:var(--muted)}
   </style>
 </head>
 <body>
@@ -44,10 +51,23 @@
     <div class="grid">
       <div class="card">
         <div class="row">
-          <button id="btnLogin" class="btn pri">Google ile giriş</button>
-          <button id="btnLogout" class="btn dark">Çıkış</button>
           <span id="pillAdmin" class="pill pending">Admin: kontrol ediliyor…</span>
           <span class="right muted small">Not: Admin yetkisi için Firestore’da <b>admins/{UID}</b> dokümanı olmalı.</span>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row" style="align-items:flex-end">
+          <div style="flex:1;min-width:240px">
+            <label>Email</label>
+            <input id="email" type="email" placeholder="admin@mail.com" autocomplete="username" />
+          </div>
+          <div style="flex:1;min-width:240px">
+            <label>Şifre</label>
+            <input id="pass" type="password" placeholder="••••••••" autocomplete="current-password" />
+          </div>
+          <button id="btnLogin" class="btn pri">Giriş</button>
+          <button id="btnLogout" class="btn dark">Çıkış</button>
         </div>
 
         <div class="hr"></div>
@@ -85,11 +105,11 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
       getAuth,
-      GoogleAuthProvider,
-      signInWithRedirect,
-      getRedirectResult,
       onAuthStateChanged,
-      signOut
+      signOut,
+      signInWithEmailAndPassword,
+      setPersistence,
+      browserLocalPersistence
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
     import {
@@ -103,8 +123,7 @@
       limit,
       getDocs,
       serverTimestamp,
-      writeBatch,
-      addDoc
+      writeBatch
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     // ==== SENİN CONFIG (DEĞİŞTİRME) ====
@@ -121,9 +140,10 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
 
-    // UI
+    // iOS Safari’de state kaybolmasın diye local persistence
+    await setPersistence(auth, browserLocalPersistence);
+
     const $ = (id) => document.getElementById(id);
     const dbg = (s) => { $("debug").textContent = String(s); };
     const dbgAdd = (s) => { $("debug").textContent += "\\n" + String(s); };
@@ -154,7 +174,6 @@
     }
 
     async function checkAdmin(uid){
-      // Admin kontrol: admins/{uid} var mı?
       try{
         const ref = doc(db, "admins", uid);
         const snap = await getDoc(ref);
@@ -189,7 +208,6 @@
         const createdAt = data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : (data.createdAt ?? "");
         const status = data.status ?? "pending";
 
-        // Foto alanları (hangi isimle kaydediyorsan yakalayalım)
         const photo1 = data.photo1Url || data.photo1 || data.image1Url || data.image1 || data.img1 || "";
         const photo2 = data.photo2Url || data.photo2 || data.image2Url || data.image2 || data.img2 || "";
 
@@ -223,7 +241,6 @@
         `;
         root.appendChild(div);
 
-        // JSON toggle
         div.querySelector(`[data-json="${CSS.escape(id)}"]`).addEventListener("click", () => {
           const box = div.querySelector(`#json-${CSS.escape(id)}`);
           const isOpen = box.style.display !== "none";
@@ -231,12 +248,10 @@
           if (!isOpen) box.textContent = JSON.stringify(data, null, 2);
         });
 
-        // Approve
         div.querySelector(`[data-approve="${CSS.escape(id)}"]`).addEventListener("click", async () => {
           await approveUpload(id);
         });
 
-        // Reject
         div.querySelector(`[data-reject="${CSS.escape(id)}"]`).addEventListener("click", async () => {
           await rejectUpload(id);
         });
@@ -251,8 +266,6 @@
       dbg("LOAD: pending sorgusu…");
 
       try{
-        // where(status == pending) + orderBy(createdAt desc) genelde index ister.
-        // Hata verirse Firebase zaten link verir.
         const q = query(
           collection(db, "uploads"),
           where("status", "==", "pending"),
@@ -260,17 +273,14 @@
           limit(50)
         );
         const snap = await getDocs(q);
-        const docs = snap.docs;
-
-        renderList(docs);
-        setStatus(`pending: ${docs.length} (max 50)`);
-        dbgAdd("LOAD pending OK: " + docs.length);
+        renderList(snap.docs);
+        setStatus(`pending: ${snap.docs.length} (max 50)`);
+        dbgAdd("LOAD pending OK: " + snap.docs.length);
       }catch(e){
         setStatus("HATA: " + e.message);
         dbgAdd("LOAD pending ERROR: " + e.message);
-        // Index linkini kullanıcı görsün diye debug’a bas
         if (String(e.message).includes("index")) {
-          dbgAdd("\\nBU HATA INDEX İSTER. Hata mesajındaki linkten create index yap.");
+          dbgAdd("\\nBU HATA INDEX İSTER. Firebase hata mesajındaki linkten Create index yap.");
         }
       }
     }
@@ -289,11 +299,9 @@
           limit(50)
         );
         const snap = await getDocs(q);
-        const docs = snap.docs;
-
-        renderList(docs);
-        setStatus(`toplam: ${docs.length} (son 50)`);
-        dbgAdd("LOAD last50 OK: " + docs.length);
+        renderList(snap.docs);
+        setStatus(`toplam: ${snap.docs.length} (son 50)`);
+        dbgAdd("LOAD last50 OK: " + snap.docs.length);
       }catch(e){
         setStatus("HATA: " + e.message);
         dbgAdd("LOAD last50 ERROR: " + e.message);
@@ -304,8 +312,7 @@
       if (!currentUser) { alert("Önce giriş yap"); return; }
       if (!isAdmin) { alert("Admin değilsin"); return; }
 
-      const ok = confirm("Onaylıyorsun. readings'e taşınacak. Emin misin?");
-      if (!ok) return;
+      if (!confirm("Onaylıyorsun. readings'e yazılacak. Emin misin?")) return;
 
       try{
         setStatus("Onaylanıyor…");
@@ -314,10 +321,8 @@
         const uploadRef = doc(db, "uploads", uploadId);
         const snap = await getDoc(uploadRef);
         if (!snap.exists()) { alert("Upload bulunamadı"); return; }
-
         const u = snap.data();
 
-        // readings dokümanına yazılacak alanlar (uploads'taki veriyi baz alıyoruz)
         const readingPayload = {
           ...u,
           sourceUploadId: uploadId,
@@ -326,18 +331,16 @@
           approvedBy: currentUser.uid
         };
 
-        // Bazı alanları temize çek (istersen)
         delete readingPayload.rejectedAt;
         delete readingPayload.rejectedBy;
 
         const batch = writeBatch(db);
 
-        // 1) readings'e yeni doc
-        const readingsCol = collection(db, "readings");
-        const newReadingRef = doc(readingsCol); // ID bizden
-        batch.set(newReadingRef, readingPayload);
+        // readings'e yeni doc (ID otomatik)
+        const readingRef = doc(collection(db, "readings"));
+        batch.set(readingRef, readingPayload);
 
-        // 2) upload status update
+        // uploads status update
         batch.update(uploadRef, {
           status: "approved",
           approvedAt: serverTimestamp(),
@@ -346,10 +349,8 @@
 
         await batch.commit();
 
-        dbgAdd("APPROVE OK. readingId=" + newReadingRef.id);
-        setStatus("Onaylandı ✅ (readings yazıldı)");
-
-        // Listeyi yenile
+        dbgAdd("APPROVE OK. readingId=" + readingRef.id);
+        setStatus("Onaylandı ✅");
         await loadPending();
       }catch(e){
         dbgAdd("APPROVE ERROR: " + e.message);
@@ -362,8 +363,7 @@
       if (!currentUser) { alert("Önce giriş yap"); return; }
       if (!isAdmin) { alert("Admin değilsin"); return; }
 
-      const ok = confirm("Reddedeceksin. Emin misin?");
-      if (!ok) return;
+      if (!confirm("Reddediyorsun. Emin misin?")) return;
 
       try{
         setStatus("Reddediliyor…");
@@ -381,7 +381,6 @@
 
         dbgAdd("REJECT OK.");
         setStatus("Reddedildi ❌");
-
         await loadPending();
       }catch(e){
         dbgAdd("REJECT ERROR: " + e.message);
@@ -392,12 +391,20 @@
 
     // ==== EVENTS ====
     $("btnLogin").addEventListener("click", async () => {
-      dbg("LOGIN: signInWithRedirect…");
+      const email = $("email").value.trim();
+      const pass  = $("pass").value;
+
+      if (!email || !pass){
+        alert("Email ve şifre boş olamaz.");
+        return;
+      }
+
+      dbg("LOGIN: email/password…");
       try{
-        await signInWithRedirect(auth, provider);
+        await signInWithEmailAndPassword(auth, email, pass);
       }catch(e){
         dbgAdd("LOGIN ERROR: " + e.message);
-        alert("Login hata: " + e.message);
+        alert("Giriş hata: " + e.message);
       }
     });
 
@@ -414,43 +421,28 @@
     $("btnLoadLast").addEventListener("click", loadLast50);
 
     // ==== BOOT ====
-    (async () => {
-      dbg("BOOT: url=" + location.href);
-      setAdminPill(null);
+    dbg("BOOT: url=" + location.href);
+    setAdminPill(null);
 
-      // Redirect sonucu (varsa) yakala
-      try{
-        dbgAdd("REDIRECT: getRedirectResult() çağrılıyor…");
-        const res = await getRedirectResult(auth);
-        if (res && res.user){
-          dbgAdd("REDIRECT: user geldi: " + (res.user.email || res.user.uid));
-        } else {
-          dbgAdd("REDIRECT: sonuç yok (normal).");
-        }
-      }catch(e){
-        dbgAdd("REDIRECT ERROR: " + e.message);
+    onAuthStateChanged(auth, async (u) => {
+      currentUser = u || null;
+
+      if (u){
+        $("who").textContent = u.email || "-";
+        $("uid").textContent = u.uid;
+        dbgAdd("AUTH STATE: signed in");
+        await checkAdmin(u.uid);
+        setStatus("Giriş OK. Admin ise listeleyebilirsin.");
+      }else{
+        $("who").textContent = "-";
+        $("uid").textContent = "-";
+        isAdmin = false;
+        setAdminPill(false);
+        dbgAdd("AUTH STATE: null");
+        setStatus("Oturum kapalı.");
+        $("list").innerHTML = "";
       }
-
-      onAuthStateChanged(auth, async (u) => {
-        currentUser = u || null;
-
-        if (u){
-          $("who").textContent = u.email || "-";
-          $("uid").textContent = u.uid;
-          dbgAdd("AUTH STATE: signed in");
-          await checkAdmin(u.uid);
-          setStatus("Giriş OK. Admin ise listeleyebilirsin.");
-        }else{
-          $("who").textContent = "-";
-          $("uid").textContent = "-";
-          isAdmin = false;
-          setAdminPill(false);
-          dbgAdd("AUTH STATE: null");
-          setStatus("Oturum kapalı.");
-          $("list").innerHTML = "";
-        }
-      });
-    })();
+    });
   </script>
 </body>
 </html>
